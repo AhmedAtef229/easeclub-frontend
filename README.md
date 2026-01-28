@@ -1,4 +1,4 @@
-# AdmineLogin
+<!-- # AdmineLogin
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
 
@@ -57,3 +57,50 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+ -->
+
+# Admin Login – EaseClub
+
+Frontend Admin Login page for **EaseClub Management System**  
+Built with **Angular (Standalone APIs)**, **Lazy Loading**, and **Tailwind CSS**.
+
+---
+
+## 🚀 Tech Stack
+
+- **Angular 20** (Standalone Components)
+- **Angular Router** (Lazy Loading)
+- **Reactive Forms**
+- **HTTP Interceptors**
+- **Tailwind CSS**
+- **Dark / Light Mode**
+- **GitHub Flow (Team Collaboration)**
+
+---
+
+## 📁 Project Structure
+
+```text
+src/app
+│
+├── core
+│   ├── auth
+│   │   ├── auth.service.ts        # Authentication logic
+│   │   ├── auth.interceptor.ts    # Attach token to requests
+│   │   └── auth.guard.ts          # Route protection
+│
+├── features
+│   └── auth
+│       └── login
+│           ├── login.component.ts
+│           └── login.component.html
+│
+├── shared
+│   └── auth-layout
+│       ├── auth-layout.component.ts
+│       └── auth-layout.component.html
+│
+├── app.routes.ts                  # Application routes (Lazy Loaded)
+├── app.ts                         # Root component
+└── main.ts                        # Application bootstrap
+```
