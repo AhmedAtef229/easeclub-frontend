@@ -81,6 +81,7 @@ Built with **Angular (Standalone APIs)**, **Lazy Loading**, and **Tailwind CSS**
 ## 📁 Project Structure
 
 ```text
+
 src/app
 │
 ├── core

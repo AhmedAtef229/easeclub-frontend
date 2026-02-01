@@ -13,7 +13,23 @@
 // // loadComponent: () =>
 // //   import('./features/dashboard/dashboard.component')
 // //     .then(m => m.DashboardComponent),
+// import { Routes } from '@angular/router';
+
+// export const routes: Routes = [
+//   {
+//     path: '',
+//     redirectTo: 'login',
+//     pathMatch: 'full',
+//   },
+//   {
+//     path: 'login',
+//     loadComponent: () =>
+//       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
+//   },
+// ];
+
 import { Routes } from '@angular/router';
+import { guestGuard } from './core/auth/guest.guard';
 
 export const routes: Routes = [
   {
@@ -23,7 +39,15 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password.component').then(
+        (c) => c.ResetPasswordComponent,
+      ),
   },
 ];
