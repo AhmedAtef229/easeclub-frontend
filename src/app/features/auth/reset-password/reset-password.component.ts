@@ -4,11 +4,11 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AuthLayoutComponent } from '../../../shared/auth-layout/auth-layout.component';
-
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   standalone: true,
   selector: 'app-reset-password',
-  imports: [CommonModule, ReactiveFormsModule, AuthLayoutComponent],
+  imports: [CommonModule, ReactiveFormsModule, AuthLayoutComponent, TranslateModule],
   templateUrl: './reset-password.component.html',
 })
 export class ResetPasswordComponent implements OnInit {

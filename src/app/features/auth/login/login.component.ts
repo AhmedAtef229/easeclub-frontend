@@ -8,11 +8,11 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AuthLayoutComponent } from '../../../shared/auth-layout/auth-layout.component';
-
+import { TranslateModule } from '@ngx-translate/core';
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [ReactiveFormsModule, AuthLayoutComponent,CommonModule],
+  imports: [ReactiveFormsModule, AuthLayoutComponent,CommonModule,TranslateModule],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {

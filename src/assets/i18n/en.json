@@ -1,0 +1,30 @@
+
+{
+  "APP": {
+    "TAGLINE": "YOUR CLUB, SIMPLIFIED",
+    "FOOTER": {
+      "COPYRIGHT": "© 2026 EaseClub Management Systems. All rights reserved.",
+      "PRIVACY": "Privacy Policy",
+      "SUPPORT": "Support",
+      "TERMS": "Terms of Service"
+    }
+  },
+  "AUTH": {
+    "LOGIN": {
+      "TITLE": "Admin Login",
+      "DESC": "Please sign in to access the management panel.",
+      "EMAIL_PLACEHOLDER": "admin@easeclub.com",
+      "PASSWORD_PLACEHOLDER": "••••••••",
+      "BUTTON": "Sign In →",
+      "LOADING": "Signing in..."
+    },
+    "RESET": {
+      "TITLE": "Reset Password",
+      "DESC": "Please enter your new password to secure your account",
+      "NEW_PASSWORD": "New Password",
+      "CONFIRM_PASSWORD": "Confirm Password",
+      "BUTTON": "Reset Password",
+      "SAVING": "Saving..."
+    }
+  }
+}

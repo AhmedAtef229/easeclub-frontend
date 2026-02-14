@@ -1,4 +1,63 @@
+
 <app-auth-layout>
+  <div icon>
+    <i class="fa-solid fa-user-shield text-primary text-xl"></i>
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="login()" class="space-y-5">
+    <h2 class="text-2xl font-semibold text-center text-darkGray dark:text-white">
+      {{ 'AUTH.LOGIN.TITLE' | translate }}
+    </h2>
+
+    <p class="text-center text-sm text-mediumGray">
+      {{ 'AUTH.LOGIN.DESC' | translate }}
+    </p>
+
+    <div *ngIf="error" class="text-sm text-center text-danger">
+      {{ error }}
+    </div>
+
+    <div class="relative">
+      <i
+        class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-mediumGray transition-opacity duration-200 peer-placeholder-shown:opacity-100 peer-not-placeholder-shown:opacity-0"
+      ></i>
+
+      <input
+        type="email"
+        formControlName="email"
+        [placeholder]="'AUTH.LOGIN.EMAIL_PLACEHOLDER' | translate"
+        class="peer w-full px-4 py-3 pl-11 rounded-lg bg-white dark:bg-darkCard border border-[#E0E0E0] dark:border-darkBorder text-darkGray dark:text-white focus:outline-none focus:ring-2 focus:ring-lavender"
+      />
+    </div>
+
+    <div class="relative">
+      <i
+        class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-mediumGray transition-opacity duration-200 peer-placeholder-shown:opacity-100 peer-not-placeholder-shown:opacity-0"
+      ></i>
+
+      <input
+        type="password"
+        formControlName="password"
+        [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
+        class="peer w-full px-4 py-3 pl-11 rounded-lg bg-white dark:bg-darkCard border border-[#E0E0E0] dark:border-darkBorder text-darkGray dark:text-white focus:outline-none focus:ring-2 focus:ring-lavender"
+      />
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="loading"
+      class="w-full py-3 rounded-lg font-medium bg-primary hover:bg-primaryHover text-white transition disabled:opacity-60"
+    >
+      {{
+        loading
+          ? ('AUTH.LOGIN.LOADING' | translate)
+          : ('AUTH.LOGIN.BUTTON' | translate)
+      }}
+    </button>
+  </form>
+</app-auth-layout>
+
+ <!-- <app-auth-layout>
   <div icon>
     <i class="fa-solid fa-user-shield text-primary text-xl"></i>
   </div>
@@ -15,12 +74,12 @@
     </div>
 
     <div class="relative">
-      <!-- Icon -->
+
       <i
         class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-mediumGray transition-opacity duration-200 peer-placeholder-shown:opacity-100 peer-not-placeholder-shown:opacity-0"
       ></i>
 
-      <!-- Input -->
+
       <input
         type="email"
         formControlName="email"
@@ -42,7 +101,6 @@
       />
     </div>
 
-    <!-- Button -->
     <button
       type="submit"
       [disabled]="loading"
@@ -51,4 +109,5 @@
       {{ loading ? 'Signing in...' : 'Sign In →' }}
     </button>
   </form>
-</app-auth-layout>
+
+</app-auth-layout> -->
