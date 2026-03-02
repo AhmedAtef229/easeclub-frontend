@@ -4,11 +4,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        /* Primary */
-        primary: '#6A0DAD', // Deep Purple
-        primaryHover: '#5B0BA0',
+        /* Primary Brand */
+        primary: '#491F8D', // Deep Purple (Brand)
+        primaryHover: '#3F197A',
         lavender: '#CFA5FF',
-
         /* Neutrals */
         white: '#FFFFFF',
         lightGray: '#F5F5F5',
@@ -16,16 +15,20 @@ module.exports = {
         darkGray: '#333333',
 
         /* Accents */
-        danger: '#FFB6C1', // Alerts
-        success: '#00D1FF', // Success
+        success: '#00D1FF',
+        danger: '#FF5A5F',
 
         /* Dark Mode */
-        darkBg: '#151128',
-        darkCard: '#1F1B3A',
+        darkBg: '#0F0B1A',
+        darkCard: '#1A1428',
         darkBorder: '#2E2A4D',
+
+        /* Dark Mode Actions */
+        darkPrimary: '#8A6DFF',
+        darkSecondary: '#BFAFFF',
       },
       backgroundImage: {
-        'primary-gradient': 'linear-gradient(135deg, #6A0DAD, #CFA5FF)',
+        'primary-gradient': 'linear-gradient(135deg, #491F8D, #CFA5FF)',
         'gray-gradient': 'linear-gradient(135deg, #F5F5F5, #E0E0E0)',
       },
     },

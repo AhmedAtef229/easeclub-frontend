@@ -1,4 +1,3 @@
-
 <app-auth-layout>
   <div icon>
     <i class="fa-solid fa-user-shield text-primary text-xl"></i>
@@ -48,16 +47,12 @@
       [disabled]="loading"
       class="w-full py-3 rounded-lg font-medium bg-primary hover:bg-primaryHover text-white transition disabled:opacity-60"
     >
-      {{
-        loading
-          ? ('AUTH.LOGIN.LOADING' | translate)
-          : ('AUTH.LOGIN.BUTTON' | translate)
-      }}
+      {{ loading ? ('AUTH.LOGIN.LOADING' | translate) : ('AUTH.LOGIN.BUTTON' | translate) }}
     </button>
   </form>
 </app-auth-layout>
 
- <!-- <app-auth-layout>
+<!-- <app-auth-layout>
   <div icon>
     <i class="fa-solid fa-user-shield text-primary text-xl"></i>
   </div>

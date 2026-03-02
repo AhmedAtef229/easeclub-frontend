@@ -1,0 +1,133 @@
+<div class="h-full w-64 flex flex-col">
+
+  <!-- ================= HEADER ================= -->
+  <div class="p-5 border-b border-gray-200 dark:border-darkBorder">
+    <h2 class="text-2xl font-bold text-primary dark:text-darkPrimary">
+      EaseClub
+    </h2>
+    <p class="text-sm text-mediumGray">Admin Panel</p>
+  </div>
+
+  <!-- ================= MENU ================= -->
+  <nav class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+
+    <a routerLink="/admin/dashboard"
+       routerLinkActive="bg-primary text-white"
+       [routerLinkActiveOptions]="{ exact: true }"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-table-columns w-5"></i>
+      Dashboard
+    </a>
+
+    <a routerLink="/admin/memberships"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-user-gear w-5"></i>
+      Memberships
+    </a>
+
+    <a routerLink="/admin/membership-plans"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-dollar-sign w-5"></i>
+      Membership Plans
+    </a>
+
+    <a routerLink="/admin/membership-types"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-tag w-5"></i>
+      Membership Types
+    </a>
+
+    <a routerLink="/admin/branches"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-building w-5"></i>
+      Branch
+    </a>
+
+    <a routerLink="/admin/installment-templates"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-file-invoice-dollar w-5"></i>
+      Installment Templates
+    </a>
+
+    <a routerLink="/admin/application-templates"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-file-lines w-5"></i>
+      Application Templates
+    </a>
+
+    <a routerLink="/admin/application-reviews"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-clipboard-check w-5"></i>
+      Application Reviews
+    </a>
+
+    <a routerLink="/admin/bookings"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-calendar-check w-5"></i>
+      Bookings
+    </a>
+
+    <a routerLink="/admin/events"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-calendar-days w-5"></i>
+      Events
+    </a>
+
+    <a routerLink="/admin/payments"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white   dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-credit-card w-5"></i>
+      Payments
+    </a>
+
+    <a routerLink="/admin/members"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-users w-5"></i>
+      Members
+    </a>
+
+    <a routerLink="/admin/form-config"
+       routerLinkActive="bg-primary text-white"
+       class="flex items-center gap-3 p-3 rounded-xl text-darkGray dark:text-white  dark:hover:bg-darkBorder transition">
+      <i class="fa-solid fa-sliders w-5"></i>
+      Form Config
+    </a>
+
+  </nav>
+
+  <!-- ================= FOOTER ================= -->
+  <div class="p-4 border-t border-gray-200 dark:border-darkBorder flex flex-col gap-2">
+
+    <button
+  (click)="themeService.toggleTheme()"
+  class="flex items-center gap-3 p-3 rounded-xl
+         hover:bg-gray-100 dark:hover:bg-darkBorder
+         transition"
+>
+  <i class="fa-regular"
+     [ngClass]="themeService.isDarkMode() ? 'fa-sun' : 'fa-moon'">
+  </i>
+
+  {{ themeService.isDarkMode() ? 'Light Mode' : 'Dark Mode' }}
+</button>
+
+    <button
+      class="flex items-center gap-3 p-3 rounded-xl text-danger hover:bg-danger hover:text-white transition">
+      <i class="fa-solid fa-right-from-bracket w-5"></i>
+      Logout
+    </button>
+
+  </div>
+
+</div>
+

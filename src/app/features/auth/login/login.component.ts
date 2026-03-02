@@ -9,22 +9,30 @@ import {
 import { AuthService } from '../../../core/auth/auth.service';
 import { AuthLayoutComponent } from '../../../shared/auth-layout/auth-layout.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { ThemeService } from '../../../core/services/theme.service';
+
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [ReactiveFormsModule, AuthLayoutComponent,CommonModule,TranslateModule],
+  imports: [
+    ReactiveFormsModule,
+    AuthLayoutComponent,
+    CommonModule,
+    TranslateModule
+  ],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
+
   loginForm!: FormGroup;
   loading = false;
   error = '';
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    public themeService: ThemeService // ✅ Inject هنا
   ) {
-    // ✅ إنشاء الفورم هنا
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -40,7 +48,6 @@ export class LoginComponent {
     this.authService.login(this.loginForm.value).subscribe({
       next: (res: any) => {
         localStorage.setItem('accessToken', res.accessToken);
-        // TODO: navigate to dashboard
       },
       error: () => {
         this.error = 'Invalid email or password';

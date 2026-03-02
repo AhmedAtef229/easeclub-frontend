@@ -1,0 +1,34 @@
+<app-page-layout
+  title="Booking Management"
+  subtitle="Manage facility bookings and reservations"
+>
+
+  <!-- Actions -->
+  <div actions class="flex items-center justify-between gap-4">
+
+    <!-- Search -->
+    <div class="relative w-full max-w-md">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      <input
+        type="text"
+        placeholder="Search bookings..."
+        class="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary"
+      />
+    </div>
+
+    <!-- Button -->
+    <button
+      class="bg-primary text-white px-5 py-2 rounded-xl flex items-center gap-2"
+    >
+      📅 Add Booking
+    </button>
+
+  </div>
+
+  <!-- Table -->
+  <app-tables
+    [columns]="columns"
+    [data]="data"
+  ></app-tables>
+
+</app-page-layout>

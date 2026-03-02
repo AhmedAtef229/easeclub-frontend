@@ -1,0 +1,32 @@
+<div class="space-y-8">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-3xl font-bold text-darkGray dark:text-white">
+      {{ title }}
+    </h1>
+
+    <p class="text-mediumGray mt-2">
+      {{ subtitle }}
+    </p>
+  </div>
+
+  <!-- Action Bar -->
+  <div
+    class="bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           rounded-2xl p-5"
+  >
+    <ng-content select="[actions]"></ng-content>
+  </div>
+
+  <!-- Main Content -->
+  <div
+    class="bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           rounded-2xl p-6"
+  >
+    <ng-content></ng-content>
+  </div>
+
+</div>

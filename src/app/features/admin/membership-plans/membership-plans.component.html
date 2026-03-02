@@ -1,0 +1,83 @@
+<app-page-layout
+  title="Membership Plan Management"
+  subtitle="Create and manage membership plans with installment options"
+>
+
+  <!-- 🔎 Action Bar -->
+  <div
+    actions
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  >
+
+    <!-- Left -->
+    <div class="flex items-center gap-4 w-full">
+
+   <!-- Search (Shared Component) -->
+<app-search-input
+  placeholder="Search plans..."
+  (search)="onSearch($event)"
+></app-search-input>
+
+      <!-- Filter -->
+      <div class="relative">
+        <button
+          (click)="toggleFilter()"
+          class="px-4 py-2 rounded-xl border bg-white
+                 flex items-center gap-2 min-w-[140px]"
+        >
+          {{ selectedFilter }}
+          <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
+        </button>
+
+        <div
+          *ngIf="showFilter"
+          class="absolute mt-2 w-full bg-white border rounded-xl shadow z-10"
+        >
+          <button
+            *ngFor="let f of filters"
+            (click)="selectFilter(f)"
+            class="w-full text-left px-4 py-2 hover:bg-gray-100
+                   flex items-center justify-between"
+          >
+            {{ f }}
+            <i *ngIf="selectedFilter === f"
+               class="fa-solid fa-check text-primary"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Create Button -->
+  <button
+  class="px-5 py-2 rounded-xl
+         bg-primary text-white
+         inline-flex items-center gap-2
+         whitespace-nowrap
+         hover:bg-primaryHover"
+  (click)="openCreateModal()"
+>
+  <i class="fa-solid fa-plus text-sm"></i>
+  <span>Create Plan</span>
+</button>
+  </div>
+
+  <!-- 📊 Table -->
+  <app-tables
+    [columns]="columns"
+    [data]="filteredData"
+    [showActions]="true"
+    (view)="onView($event)"
+    (edit)="onEdit($event)"
+    (copy)="onCopy($event)"
+ (remove)="onDelete($event)"
+  ></app-tables>
+
+</app-page-layout>
+
+<!-- 🪟 Create Plan Modal -->
+<app-membership-plan-modal
+  *ngIf="showCreateModal"
+  (close)="closeModal()"
+  (save)="onSavePlan($event)"
+></app-membership-plan-modal>

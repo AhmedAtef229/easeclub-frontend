@@ -1,0 +1,40 @@
+<!-- <div class="h-screen w-screen flex flex-col bg-lightGray dark:bg-darkBg">
+
+  <app-navbar></app-navbar>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <app-sidebar></app-sidebar>
+
+    <main class="flex-1 p-6 overflow-y-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div> -->
+<div class="h-screen w-screen flex flex-col bg-lightGray dark:bg-darkBg">
+
+  <!-- Navbar -->
+  <app-navbar (menuClick)="toggleSidebar()"></app-navbar>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside
+      class="bg-white dark:bg-darkCard border-r border-gray-200 dark:border-darkBorder
+             transition-all duration-300 ease-in-out overflow-hidden"
+      [class.w-64]="isSidebarOpen"
+      [class.w-0]="!isSidebarOpen"
+    >
+      <app-sidebar [isOpen]="isSidebarOpen"></app-sidebar>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto transition-all duration-300">
+      <router-outlet></router-outlet>
+      <app-confirm-dialog></app-confirm-dialog>
+    </main>
+
+  </div>
+
+</div>
+

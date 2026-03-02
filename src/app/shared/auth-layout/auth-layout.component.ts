@@ -20,6 +20,8 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { ThemeService } from '../../core/services/theme.service'; // عدل المسار لو مختلف
+
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
@@ -28,12 +30,13 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class AuthLayoutComponent {
 
-  // 👇 نستخدم inject بدل constructor عشان نتجنب أي مشاكل injection
+  // ✅ inject services
   translate = inject(TranslateService);
+  themeService = inject(ThemeService);
 
   constructor() {
-    // لو مفيش لغة متحددة نبدأ بالعربي
-    const savedLang = this.translate.currentLang || 'ar';
+    // 🌍 Language Init
+    const savedLang = localStorage.getItem('lang') || 'ar';
     this.translate.use(savedLang);
 
     document.documentElement.lang = savedLang;
@@ -41,7 +44,7 @@ export class AuthLayoutComponent {
   }
 
   toggleTheme() {
-    document.documentElement.classList.toggle('dark');
+    this.themeService.toggleTheme();
   }
 
   toggleLang() {
@@ -49,9 +52,9 @@ export class AuthLayoutComponent {
     const nextLang = currentLang === 'ar' ? 'en' : 'ar';
 
     this.translate.use(nextLang);
+    localStorage.setItem('lang', nextLang);
 
     document.documentElement.lang = nextLang;
     document.documentElement.dir = nextLang === 'ar' ? 'rtl' : 'ltr';
   }
 }
-

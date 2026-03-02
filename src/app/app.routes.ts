@@ -32,6 +32,7 @@ import { Routes } from '@angular/router';
 import { guestGuard } from './core/auth/guest.guard';
 
 export const routes: Routes = [
+  // ================= AUTH =================
   {
     path: '',
     redirectTo: 'login',
@@ -49,5 +50,74 @@ export const routes: Routes = [
       import('./features/auth/reset-password/reset-password.component').then(
         (c) => c.ResetPasswordComponent,
       ),
+  },
+
+  // ================= ADMIN =================
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./shared/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/dashboard/dashboard.component').then(
+            (c) => c.DashboardComponent,
+          ),
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'membership-plans',
+        loadComponent: () =>
+          import('./features/admin/membership-plans/membership-plans.component').then(
+            (c) => c.MembershipPlansComponent,
+          ),
+      },
+      {
+        path: 'membership-types',
+        loadComponent: () =>
+          import('./features/admin/membership-types/membership-types.component').then(
+            (c) => c.MembershipTypesComponent,
+          ),
+      },
+      // ✅ Branches
+      {
+        path: 'branches',
+        loadComponent: () =>
+          import('./features/admin/branches/branches.component').then((c) => c.BranchesComponent),
+      },
+
+      // ✅ Installment Templates
+      {
+        path: 'installment-templates',
+        loadComponent: () =>
+          import('./features/admin/installment-templates/installment-templates.component').then(
+            (c) => c.InstallmentTemplatesComponent,
+          ),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./features/admin/bookings/bookings.component').then((m) => m.BookingsComponent),
+      },
+
+      {
+        path: 'memberships',
+        loadComponent: () =>
+          import('./features/admin/memberships/memberships.component').then(
+            (m) => m.MembershipsComponent,
+          ),
+      },
+    ],
+  },
+
+  // fallback
+  {
+    path: '**',
+    redirectTo: 'login',
   },
 ];

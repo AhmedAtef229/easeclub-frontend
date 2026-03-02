@@ -1,0 +1,149 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <!-- Modal -->
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between">
+      <div>
+        <h2 class="text-xl font-semibold text-gray-800">
+          {{ data ? 'Edit Membership Type' : 'Create Membership Type' }}
+        </h2>
+        <p class="text-sm text-gray-500">
+          Add a new membership type to your club
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="close.emit()"
+        class="text-gray-400 hover:text-gray-600 text-xl"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" class="space-y-5" (ngSubmit)="onSave()">
+
+      <!-- Name -->
+      <div class="space-y-1">
+        <label class="text-sm font-medium">
+          Name <span class="text-danger">*</span>
+        </label>
+
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="e.g., Adult Membership"
+          class="w-full px-4 py-2 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 focus:bg-white focus:outline-none
+                 focus:ring-2 focus:ring-primary"
+        />
+
+        <p *ngIf="isInvalid('name')" class="text-sm text-danger">
+          Name is required
+        </p>
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-1">
+        <label class="text-sm font-medium">Description</label>
+
+        <textarea
+          rows="3"
+          formControlName="description"
+          placeholder="Brief description of this membership type"
+          class="w-full px-4 py-2 rounded-xl
+                 border border-gray-200 bg-gray-50
+                 focus:bg-white focus:outline-none
+                 focus:ring-2 focus:ring-primary"
+        ></textarea>
+      </div>
+
+      <!-- Family Membership -->
+      <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+        <label class="flex items-center gap-3 text-sm font-medium">
+          <input type="checkbox" formControlName="familyAllowed" class="w-4 h-4 accent-primary" />
+          Family Membership Allowed
+        </label>
+
+        <div *ngIf="form.value.familyAllowed" class="space-y-1">
+          <label class="text-sm font-medium">
+            Max Family Members <span class="text-danger">*</span>
+          </label>
+
+          <input
+            type="number"
+            min="1"
+            formControlName="maxFamilyMembers"
+            class="w-full px-4 py-2 rounded-xl
+                   border border-gray-200 bg-white
+                   focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+
+          <p *ngIf="isInvalid('maxFamilyMembers')" class="text-sm text-danger">
+            This field is required
+          </p>
+        </div>
+      </div>
+
+      <!-- ✅ Branches (الجزء اللي كان ناقص) -->
+      <div class="bg-gray-50 rounded-xl p-4 space-y-3">
+
+        <label class="flex items-center gap-3 text-sm font-medium">
+          <input type="checkbox" formControlName="allBranches" class="w-4 h-4 accent-primary" />
+          All Branches Permitted
+        </label>
+
+        <div *ngIf="!form.value.allBranches" class="space-y-2">
+
+          <p class="text-sm font-medium">
+            Select Branches <span class="text-danger">*</span>
+          </p>
+
+          <div class="max-h-32 overflow-y-auto space-y-2 pr-1">
+            <label
+              *ngFor="let branch of branches"
+              class="flex items-center gap-3 text-sm"
+            >
+              <input
+                type="checkbox"
+                class="w-4 h-4 accent-primary"
+                [checked]="form.value.selectedBranches.includes(branch.id)"
+                (change)="toggleBranch(branch.id)"
+              />
+              {{ branch.name }}
+            </label>
+          </div>
+
+          <p *ngIf="isInvalid('selectedBranches')" class="text-sm text-danger">
+            Please select at least one branch
+          </p>
+
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 pt-4">
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="px-5 py-2 rounded-xl border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="px-6 py-2 rounded-xl bg-primary text-white hover:opacity-90"
+        >
+          {{ data ? 'Update' : 'Create' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
