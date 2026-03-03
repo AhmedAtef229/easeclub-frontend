@@ -55,6 +55,8 @@
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { AppConfig } from '../appconfig';
 
 interface LoginPayload {
   email: string;
@@ -63,7 +65,8 @@ interface LoginPayload {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly api = 'https://easeclub.runasp.net/api/v1/auth';
+  private readonly api = `${AppConfig.ProdApi}/auth`;
+  private authStatus = new BehaviorSubject<boolean>(!!localStorage.getItem('access_token'));
 
   private defaultHeaders = new HttpHeaders({
     'X-Client-Type': 'Web',
@@ -80,6 +83,12 @@ export class AuthService {
         headers: this.defaultHeaders,
         withCredentials: true,
       }
+    )
+    .pipe(
+      tap((res:any) => {
+        localStorage.setItem('accessToken', res.accessToken);
+        this.authStatus.next(true);
+      })
     );
   }
 
@@ -98,8 +107,8 @@ export class AuthService {
     );
   }
 
-  isAuthenticated(): boolean {
-  return !!localStorage.getItem('accessToken');
+get isAuthenticated$(): Observable<boolean> {
+  return this.authStatus.asObservable();
 }
 
 }

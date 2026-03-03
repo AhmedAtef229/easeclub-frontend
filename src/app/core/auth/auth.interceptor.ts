@@ -1,24 +1,23 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const publicEndpoints = [
-    '/login',
-    '/reset-password',
-  ];
+  // Use a more specific check to avoid accidental matches
+  const isPublic = req.url.includes('/auth/login') || req.url.includes('/auth/reset-password');
 
-  // لو الريكوست رايح لـ endpoint public → سيبه زي ما هو
-  if (publicEndpoints.some(url => req.url.includes(url))) {
+  if (isPublic) {
     return next(req);
   }
 
+  // 🚨 FIX: Match the key used in AuthService ('access_token')
   const token = localStorage.getItem('accessToken');
 
   if (token) {
-    req = req.clone({
+    const cloned = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`,
       },
     });
+    return next(cloned);
   }
 
   return next(req);

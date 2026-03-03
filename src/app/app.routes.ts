@@ -1,46 +1,19 @@
-// import { Routes } from '@angular/router';
-
-// export const routes: Routes = [
-//   {
-//     path: 'login',
-//     loadComponent: () =>
-//       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
-//   },
-//   { path: '**', redirectTo: 'login' },
-// ];
-// // path: 'dashboard',
-// // canActivate: [authGuard],
-// // loadComponent: () =>
-// //   import('./features/dashboard/dashboard.component')
-// //     .then(m => m.DashboardComponent),
-// import { Routes } from '@angular/router';
-
-// export const routes: Routes = [
-//   {
-//     path: '',
-//     redirectTo: 'login',
-//     pathMatch: 'full',
-//   },
-//   {
-//     path: 'login',
-//     loadComponent: () =>
-//       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
-//   },
-// ];
-
 import { Routes } from '@angular/router';
 import { guestGuard } from './core/auth/guest.guard';
+import { authGuard } from './core/auth/auth.guard'; // Ensure this is your logged-in guard
 
 export const routes: Routes = [
-  // ================= AUTH =================
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
+  // 1. Initial Redirect: If user hits "", send them to the admin dashboard
+  { 
+    path: '', 
+    redirectTo: 'admin/dashboard', 
+    pathMatch: 'full' 
   },
+
+  // ================= AUTH (Public/Guest) =================
   {
     path: 'login',
-    canActivate: [guestGuard],
+    canActivate: [guestGuard], // Prevents logged-in users from seeing login
     loadComponent: () =>
       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
   },
@@ -52,9 +25,11 @@ export const routes: Routes = [
       ),
   },
 
-  // ================= ADMIN =================
+  // ================= ADMIN (Protected) =================
   {
     path: 'admin',
+    // THIS LINE PROTECTS ALL CHILDREN BELOW AUTOMATICALLY
+    canActivateChild: [authGuard], 
     loadComponent: () =>
       import('./shared/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
     children: [
@@ -64,11 +39,6 @@ export const routes: Routes = [
           import('./features/admin/dashboard/dashboard.component').then(
             (c) => c.DashboardComponent,
           ),
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
       },
       {
         path: 'membership-plans',
@@ -84,14 +54,11 @@ export const routes: Routes = [
             (c) => c.MembershipTypesComponent,
           ),
       },
-      // ✅ Branches
       {
         path: 'branches',
         loadComponent: () =>
           import('./features/admin/branches/branches.component').then((c) => c.BranchesComponent),
       },
-
-      // ✅ Installment Templates
       {
         path: 'installment-templates',
         loadComponent: () =>
@@ -104,7 +71,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/bookings/bookings.component').then((m) => m.BookingsComponent),
       },
-
       {
         path: 'memberships',
         loadComponent: () =>
@@ -112,10 +78,16 @@ export const routes: Routes = [
             (m) => m.MembershipsComponent,
           ),
       },
+      // Default child route for /admin
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
     ],
   },
 
-  // fallback
+  // ================= FALLBACK =================
   {
     path: '**',
     redirectTo: 'login',
