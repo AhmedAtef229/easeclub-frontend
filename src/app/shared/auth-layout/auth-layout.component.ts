@@ -1,26 +1,10 @@
 
-// import { Component } from '@angular/core';
-// import { RouterOutlet } from '@angular/router';
-// import { CommonModule } from '@angular/common';
-// import { TranslateModule } from '@ngx-translate/core';
-// @Component({
-//   selector: 'app-auth-layout',
-//   standalone: true,
-//   imports: [CommonModule, RouterOutlet,TranslateModule],
-//   templateUrl: './auth-layout.component.html',
-// })
-// export class AuthLayoutComponent {
-//   toggleTheme() {
-//     document.documentElement.classList.toggle('dark');
-//   }
-// }
-
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { ThemeService } from '../../core/services/theme.service'; // عدل المسار لو مختلف
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-auth-layout',
