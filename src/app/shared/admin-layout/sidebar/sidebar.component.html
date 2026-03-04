@@ -121,7 +121,7 @@
   {{ themeService.isDarkMode() ? 'Light Mode' : 'Dark Mode' }}
 </button>
 
-    <button
+    <button (click)="logout()"
       class="flex items-center gap-3 p-3 rounded-xl text-danger hover:bg-danger hover:text-white transition">
       <i class="fa-solid fa-right-from-bracket w-5"></i>
       Logout

@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,7 +13,14 @@ import { ThemeService } from '../../../core/services/theme.service';
 export class SidebarComponent {
 
   @Input() isOpen = false;
+  private authService = inject(AuthService);
 
   constructor(public themeService: ThemeService) {}
+
+  logout() {
+    this.authService.logout().subscribe({
+      error: (err) => console.error('Logout failed', err)
+    });
+  }
 
 }

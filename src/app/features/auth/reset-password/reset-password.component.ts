@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -10,45 +10,55 @@ import { ThemeService } from '../../../core/services/theme.service';
 @Component({
   standalone: true,
   selector: 'app-reset-password',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    AuthLayoutComponent,
-    TranslateModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, AuthLayoutComponent, TranslateModule],
   templateUrl: './reset-password.component.html',
 })
 export class ResetPasswordComponent implements OnInit {
+  // Declare properties
+  private route: ActivatedRoute;
+  private router: Router;
+  private fb: FormBuilder;
+  private authService: AuthService;
+  public themeService: ThemeService;
 
-  token!: string;
+  form!: FormGroup;
+  token: string | null = null;
+  email: string | null = null;
   loading = false;
   error: string | null = null;
-  form!: FormGroup;
 
-  constructor(
-    private route: ActivatedRoute,
-    private fb: FormBuilder,
-    private authService: AuthService,
-    public themeService: ThemeService // ✅ Inject هنا بس
-  ) {}
+  constructor() {
+    // Using inject() inside the constructor
+    this.route = inject(ActivatedRoute);
+    this.router = inject(Router);
+    this.fb = inject(FormBuilder);
+    this.authService = inject(AuthService);
+    this.themeService = inject(ThemeService);
+  }
 
   ngOnInit() {
-    this.token = this.route.snapshot.queryParamMap.get('token') || '';
+    const params = this.route.snapshot.queryParamMap;
+    this.token = params.get('token');
+    this.email = params.get('email');
 
     this.form = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required]]
+    }, {
+      validators: (g: FormGroup) => 
+        g.get('password')?.value === g.get('confirmPassword')?.value ? null : { mismatch: true }
     });
   }
 
   submit() {
-    if (this.form.invalid || !this.token) return;
+    if (this.form.invalid || !this.token || !this.email) return;
 
     this.loading = true;
-
-    this.authService.resetPassword(this.token, this.form.value.password).subscribe({
+    this.authService.resetPassword(this.token, this.email, this.form.value.password).subscribe({
       next: () => {
         this.loading = false;
         alert('Password reset successfully');
+        //this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.loading = false;
