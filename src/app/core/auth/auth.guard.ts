@@ -1,25 +1,26 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from './auth.service';
-import { take,map } from 'rxjs';
+import { take,map,filter,switchMap } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  return authService.isAuthenticated$.pipe(
-    take(1), // Take the current value and complete
+  // 1. Wait until initialization is complete
+  // 2. Then check if authenticated
+  return authService.isInitializing$.pipe(
+    filter(isInit => !isInit), // Wait until isInitializing is false
+    switchMap(() => authService.isAuthenticated$),
+    take(1),
     map((isAuth) => {
-      if (isAuth) {
-        return true;
-      }
+      if (isAuth) return true;
 
-      // If not authenticated, redirect to login
+      // Use returnUrl to match your logic
       router.navigate(['/login'], {
         queryParams: { returnUrl: state.url },
       });
       return false;
     })
   );
-
 };

@@ -23,18 +23,6 @@ import { routes } from './app/app.routes';
 
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { appConfig } from './app/app.config';
 
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideHttpClient(),
-    provideRouter(routes),
-
-    provideTranslateService({
-      fallbackLang: 'ar',
-      loader: provideTranslateHttpLoader({
-        prefix: './assets/i18n/',
-        suffix: '.json',
-      }),
-    }),
-  ],
-}).catch(console.error);
+bootstrapApplication(AppComponent,appConfig).catch(console.error);
