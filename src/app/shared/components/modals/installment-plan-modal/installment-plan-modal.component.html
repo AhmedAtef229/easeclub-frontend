@@ -1,0 +1,140 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div
+    class="bg-white dark:bg-darkCard
+           w-[650px] max-h-[80vh]
+           rounded-2xl shadow-xl
+           flex flex-col"
+  >
+
+    <!-- Header -->
+    <div
+      class="flex justify-between items-center
+             p-5 border-b
+             border-gray-200 dark:border-darkBorder"
+    >
+
+      <div>
+        <h2 class="text-lg font-semibold text-darkGray dark:text-white">
+          Installment Templates - {{ plan?.name }}
+        </h2>
+
+        <p class="text-sm text-mediumGray">
+          Manage installment templates for this plan
+        </p>
+      </div>
+
+      <button
+        (click)="closeModal()"
+        class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+
+    <!-- Body -->
+    <div class="p-6 space-y-6 overflow-y-auto">
+
+      <div
+        *ngFor="let template of templates"
+        class="border border-gray-200 dark:border-darkBorder
+               rounded-xl p-4
+               bg-gray-50 dark:bg-darkBorder"
+      >
+
+        <!-- Template Header -->
+        <div class="flex justify-between mb-4">
+
+          <div>
+            <h3 class="font-semibold text-gray-800 dark:text-white">
+              {{ template.title }}
+            </h3>
+
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ template.subtitle }}
+            </p>
+          </div>
+
+          <button
+            class="text-red-400 hover:text-red-600 transition"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+        </div>
+
+
+        <!-- Table -->
+        <table class="w-full text-sm">
+
+          <thead
+            class="text-gray-500 dark:text-gray-400
+                   border-b border-gray-200 dark:border-darkBorder"
+          >
+            <tr>
+              <th class="text-left py-2">Installment #</th>
+              <th class="text-left py-2">Percentage</th>
+              <th class="text-left py-2">Amount</th>
+              <th class="text-left py-2">Due After (days)</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let row of template.rows"
+              class="border-b border-gray-200
+                     dark:border-darkBorder
+                     last:border-none
+                     hover:bg-gray-100 dark:hover:bg-darkCard"
+            >
+              <td class="py-2 text-darkGray dark:text-white">
+                #{{ row.num }}
+              </td>
+
+              <td class="text-darkGray dark:text-white">
+                {{ row.percent }}
+              </td>
+
+              <td class="text-darkGray dark:text-white">
+                {{ row.amount }}
+              </td>
+
+              <td class="text-darkGray dark:text-white">
+                {{ row.due }}
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div
+      class="p-4 border-t
+             border-gray-200 dark:border-darkBorder
+             flex justify-end"
+    >
+
+      <button
+        (click)="closeModal()"
+        class="px-5 py-2
+               bg-primary hover:bg-primaryHover
+               text-white
+               rounded-xl transition"
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

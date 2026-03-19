@@ -2,15 +2,22 @@
 <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
   <!-- Modal -->
-  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 space-y-6">
+  <div
+    class="bg-white dark:bg-darkCard
+           w-full max-w-lg
+           rounded-2xl shadow-xl
+           border border-gray-200 dark:border-darkBorder
+           p-6 space-y-6"
+  >
 
     <!-- Header -->
     <div class="flex items-start justify-between">
       <div>
-        <h2 class="text-xl font-semibold text-gray-800">
+        <h2 class="text-xl font-semibold text-darkGray dark:text-white">
           {{ data ? 'Edit Membership Type' : 'Create Membership Type' }}
         </h2>
-        <p class="text-sm text-gray-500">
+
+        <p class="text-sm text-mediumGray">
           Add a new membership type to your club
         </p>
       </div>
@@ -18,7 +25,7 @@
       <button
         type="button"
         (click)="close.emit()"
-        class="text-gray-400 hover:text-gray-600 text-xl"
+        class="text-mediumGray hover:text-darkGray dark:hover:text-white text-xl transition"
       >
         ✕
       </button>
@@ -29,7 +36,8 @@
 
       <!-- Name -->
       <div class="space-y-1">
-        <label class="text-sm font-medium">
+
+        <label class="text-sm font-medium text-darkGray dark:text-white">
           Name <span class="text-danger">*</span>
         </label>
 
@@ -38,76 +46,71 @@
           formControlName="name"
           placeholder="e.g., Adult Membership"
           class="w-full px-4 py-2 rounded-xl
-                 border border-gray-200 bg-gray-50
-                 focus:bg-white focus:outline-none
-                 focus:ring-2 focus:ring-primary"
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 placeholder:text-mediumGray
+                 focus:outline-none
+                 focus:ring-2 focus:ring-lavender"
         />
 
         <p *ngIf="isInvalid('name')" class="text-sm text-danger">
           Name is required
         </p>
+
       </div>
 
       <!-- Description -->
       <div class="space-y-1">
-        <label class="text-sm font-medium">Description</label>
+
+        <label class="text-sm font-medium text-darkGray dark:text-white">
+          Description
+        </label>
 
         <textarea
           rows="3"
           formControlName="description"
           placeholder="Brief description of this membership type"
           class="w-full px-4 py-2 rounded-xl
-                 border border-gray-200 bg-gray-50
-                 focus:bg-white focus:outline-none
-                 focus:ring-2 focus:ring-primary"
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 placeholder:text-mediumGray
+                 focus:outline-none
+                 focus:ring-2 focus:ring-lavender"
         ></textarea>
+
       </div>
 
       <!-- Family Membership -->
-      <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-        <label class="flex items-center gap-3 text-sm font-medium">
-          <input type="checkbox" formControlName="familyAllowed" class="w-4 h-4 accent-primary" />
-          Family Membership Allowed
-        </label>
+     
 
-        <div *ngIf="form.value.familyAllowed" class="space-y-1">
-          <label class="text-sm font-medium">
-            Max Family Members <span class="text-danger">*</span>
-          </label>
+      <!-- Branches -->
+      <div
+        class="bg-gray-50 dark:bg-darkBorder
+               rounded-xl p-4 space-y-3"
+      >
 
+        <label class="flex items-center gap-3 text-sm font-medium text-darkGray dark:text-white">
           <input
-            type="number"
-            min="1"
-            formControlName="maxFamilyMembers"
-            class="w-full px-4 py-2 rounded-xl
-                   border border-gray-200 bg-white
-                   focus:outline-none focus:ring-2 focus:ring-primary"
+            type="checkbox"
+            formControlName="allBranches"
+            class="w-4 h-4 accent-primary"
           />
-
-          <p *ngIf="isInvalid('maxFamilyMembers')" class="text-sm text-danger">
-            This field is required
-          </p>
-        </div>
-      </div>
-
-      <!-- ✅ Branches (الجزء اللي كان ناقص) -->
-      <div class="bg-gray-50 rounded-xl p-4 space-y-3">
-
-        <label class="flex items-center gap-3 text-sm font-medium">
-          <input type="checkbox" formControlName="allBranches" class="w-4 h-4 accent-primary" />
           All Branches Permitted
         </label>
 
         <div *ngIf="!form.value.allBranches" class="space-y-2">
 
-          <p class="text-sm font-medium">
+          <p class="text-sm font-medium text-darkGray dark:text-white">
             Select Branches <span class="text-danger">*</span>
           </p>
 
           <div class="max-h-32 overflow-y-auto space-y-2 pr-1">
+
             <label
               *ngFor="let branch of branches"
-              class="flex items-center gap-3 text-sm"
+              class="flex items-center gap-3 text-sm text-darkGray dark:text-white"
             >
               <input
                 type="checkbox"
@@ -115,8 +118,11 @@
                 [checked]="form.value.selectedBranches.includes(branch.id)"
                 (change)="toggleBranch(branch.id)"
               />
+
               {{ branch.name }}
+
             </label>
+
           </div>
 
           <p *ngIf="isInvalid('selectedBranches')" class="text-sm text-danger">
@@ -124,26 +130,38 @@
           </p>
 
         </div>
+
       </div>
 
       <!-- Actions -->
       <div class="flex justify-end gap-3 pt-4">
+
+        <!-- Cancel -->
         <button
           type="button"
           (click)="close.emit()"
-          class="px-5 py-2 rounded-xl border border-gray-300 hover:bg-gray-100"
+          class="px-5 py-2 rounded-xl
+                 border border-gray-300 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 hover:bg-gray-100 dark:hover:bg-darkBorder
+                 transition"
         >
           Cancel
         </button>
 
+        <!-- Save -->
         <button
           type="submit"
-          class="px-6 py-2 rounded-xl bg-primary text-white hover:opacity-90"
+          class="px-6 py-2 rounded-xl
+                 bg-primary hover:bg-primaryHover
+                 text-white transition"
         >
           {{ data ? 'Update' : 'Create' }}
         </button>
+
       </div>
 
     </form>
+
   </div>
 </div>

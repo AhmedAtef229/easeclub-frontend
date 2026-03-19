@@ -1,17 +1,26 @@
 <div class="relative w-full md:w-80">
+
+  <!-- Icon -->
   <i
     class="fa-solid fa-magnifying-glass
            absolute left-3 top-1/2 -translate-y-1/2
-           text-gray-400 text-sm"
+           text-mediumGray dark:text-gray-400
+           text-sm"
   ></i>
 
+  <!-- Input -->
   <input
     type="text"
     [placeholder]="placeholder"
     (input)="onInput($any($event.target).value)"
     class="w-full pl-9 pr-4 py-2 rounded-xl
-           border border-gray-200
-           bg-white
-           focus:outline-none focus:ring-2 focus:ring-primary"
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           text-darkGray dark:text-white
+           placeholder:text-mediumGray
+           focus:outline-none
+           focus:ring-2 focus:ring-lavender
+           transition"
   />
+
 </div>

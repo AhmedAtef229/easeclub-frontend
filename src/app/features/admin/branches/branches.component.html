@@ -3,33 +3,39 @@
   subtitle="Manage club branches to associate with plans and members"
 >
   <div actions class="flex items-center justify-between gap-4">
+
     <!-- Search -->
     <app-search-input
       placeholder="Search branches..."
       (search)="onSearch($event)"
     ></app-search-input>
-    <!-- Button -->
+
+    <!-- Create Button -->
     <button
-      class="bg-primary text-white px-5 py-2 rounded-xl flex items-center gap-2 hover:opacity-90 transition"
+      class="bg-primary text-white px-5 py-2 rounded-xl
+             flex items-center gap-2 hover:opacity-90 transition"
       (click)="openCreateModal()"
     >
       <i class="fa-solid fa-plus text-sm"></i>
       Create Branch
     </button>
+
   </div>
 
   <!-- Table -->
   <app-tables
     [columns]="columns"
     [data]="filteredData"
-    (remove)="onDelete($event)"
+    (edit)="onEdit($event)"
     [showActions]="true"
   ></app-tables>
+
 </app-page-layout>
 
-<!-- 🔥 Create Branch Modal -->
+<!-- Modal -->
 <app-branch-modal
-  *ngIf="showCreateModal"
+  *ngIf="showModal"
+  [data]="editItem"
   (close)="closeModal()"
-  (save)="onCreateBranch($event)"
+  (save)="onSaveBranch($event)"
 ></app-branch-modal>

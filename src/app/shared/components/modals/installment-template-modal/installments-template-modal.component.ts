@@ -5,6 +5,7 @@ import {
   FormBuilder,
   Validators,
   FormGroup,
+  FormArray
 } from '@angular/forms';
 
 @Component({
@@ -20,16 +21,18 @@ export class InstallmentTemplateModalComponent implements OnInit {
   @Output() save = new EventEmitter<any>();
 
   mode: 'auto' | 'manual' = 'auto';
+
   form!: FormGroup;
 
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
+
     this.form = this.fb.group({
       name: ['', Validators.required],
       installmentsCount: [null],
       durationDays: [null],
-      installments: [[]],
+      installments: this.fb.array([])
     });
 
     if (this.data) {
@@ -40,21 +43,48 @@ export class InstallmentTemplateModalComponent implements OnInit {
     this.applyModeValidation();
   }
 
+  /* ================= FORM ARRAY ================= */
+
+  get installments(): FormArray {
+    return this.form.get('installments') as FormArray;
+  }
+
+  addInstallment() {
+
+    const installment = this.fb.group({
+      percentage: ['', Validators.required],
+      dueAfter: [0, Validators.required]
+    });
+
+    this.installments.push(installment);
+  }
+
+  removeInstallment(index: number) {
+    this.installments.removeAt(index);
+  }
+
+  /* ================= MODE ================= */
+
   setMode(mode: 'auto' | 'manual') {
     this.mode = mode;
     this.applyModeValidation();
   }
 
   applyModeValidation() {
+
     const countCtrl = this.form.get('installmentsCount');
     const durationCtrl = this.form.get('durationDays');
 
     if (this.mode === 'auto') {
+
       countCtrl?.setValidators([Validators.required, Validators.min(1)]);
       durationCtrl?.setValidators([Validators.required, Validators.min(1)]);
+
     } else {
+
       countCtrl?.clearValidators();
       durationCtrl?.clearValidators();
+
       countCtrl?.setValue(null);
       durationCtrl?.setValue(null);
     }
@@ -63,12 +93,19 @@ export class InstallmentTemplateModalComponent implements OnInit {
     durationCtrl?.updateValueAndValidity();
   }
 
+  /* ================= VALIDATION ================= */
+
   isInvalid(controlName: string): boolean {
+
     const ctrl = this.form.get(controlName);
+
     return !!(ctrl && ctrl.invalid && (ctrl.touched || ctrl.dirty));
   }
 
+  /* ================= SAVE ================= */
+
   onSave() {
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -76,9 +113,10 @@ export class InstallmentTemplateModalComponent implements OnInit {
 
     this.save.emit({
       ...this.form.value,
-      mode: this.mode,
+      mode: this.mode
     });
 
     this.close.emit();
   }
+
 }

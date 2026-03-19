@@ -1,6 +1,18 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Output,
+  Input,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
 
 @Component({
   selector: 'app-membership-plan-modal',
@@ -8,7 +20,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './membership-plan-modal.component.html',
 })
-export class MembershipPlanModalComponent {
+export class MembershipPlanModalComponent implements OnChanges {
+
+  @Input() plan: any = null;
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
@@ -34,6 +48,26 @@ export class MembershipPlanModalComponent {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['plan']) {
+      if (this.plan) {
+        this.form.patchValue({
+          name: this.plan.name,
+          description: '',
+          membershipType: this.plan.type,
+          price: this.plan.price?.replace('$', ''),
+          duration: this.plan.duration?.replace(' days', ''),
+          active: this.plan.active,
+        });
+      } else {
+        this.form.reset({
+          active: true,
+          templates: []
+        });
+      }
+    }
+  }
+
   toggleTemplate(id: number) {
     const current = this.form.value.templates as number[];
 
@@ -55,6 +89,5 @@ export class MembershipPlanModalComponent {
     }
 
     this.save.emit(this.form.value);
-    this.close.emit();
   }
 }

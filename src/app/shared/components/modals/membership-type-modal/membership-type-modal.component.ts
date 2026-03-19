@@ -16,14 +16,12 @@ import {
 export class MembershipTypeModalComponent implements OnInit {
 
   @Input() data: any = null;
+
+  /* ❌ شيلنا mock */
+  @Input() branches: { id: string; name: string }[] = [];
+
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
-
-  branches = [
-    { id: 1, name: 'Downtown Branch' },
-    { id: 2, name: 'Northside Branch' },
-    { id: 3, name: 'Westside Branch' },
-  ];
 
   form!: FormGroup;
 
@@ -36,28 +34,16 @@ export class MembershipTypeModalComponent implements OnInit {
       familyAllowed: [false],
       maxFamilyMembers: [null],
       allBranches: [true],
-      selectedBranches: [[]],
+      selectedBranches: this.fb.control<string[]>([]) // ✅ string[]
     });
 
     if (this.data) {
-      this.form.patchValue(this.data);
+      this.form.patchValue({
+        ...this.data,
+        selectedBranches: this.data.selectedBranches || [],
+      });
     }
 
-    /* Family validation */
-    this.form.get('familyAllowed')?.valueChanges.subscribe(enabled => {
-      const ctrl = this.form.get('maxFamilyMembers');
-
-      if (enabled) {
-        ctrl?.setValidators([Validators.required, Validators.min(1)]);
-      } else {
-        ctrl?.clearValidators();
-        ctrl?.setValue(null);
-      }
-
-      ctrl?.updateValueAndValidity();
-    });
-
-    /* Branches validation */
     this.form.get('allBranches')?.valueChanges.subscribe(all => {
       const ctrl = this.form.get('selectedBranches');
 
@@ -72,8 +58,8 @@ export class MembershipTypeModalComponent implements OnInit {
     });
   }
 
-  toggleBranch(id: number) {
-    const selected = this.form.value.selectedBranches as number[];
+  toggleBranch(id: string) {
+    const selected = this.form.value.selectedBranches as string[];
 
     if (selected.includes(id)) {
       this.form.patchValue({

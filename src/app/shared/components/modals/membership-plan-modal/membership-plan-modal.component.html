@@ -1,28 +1,60 @@
 <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-  <div class="bg-white w-full max-w-xl rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+
+  <div
+    class="bg-white dark:bg-darkCard
+           w-full max-w-xl
+           rounded-2xl shadow-xl
+           max-h-[90vh] overflow-y-auto
+           border border-gray-200 dark:border-darkBorder"
+  >
+
     <!-- Header -->
-    <div class="flex items-center justify-between p-5 border-b">
+    <div
+      class="flex items-center justify-between
+             p-5
+             border-b border-gray-200 dark:border-darkBorder"
+    >
       <div>
-        <h2 class="text-lg font-semibold">Create Membership Plan</h2>
-        <p class="text-sm text-gray-500">Create a new membership plan with installment options</p>
+        <h2 class="text-lg font-semibold text-darkGray dark:text-white">
+          {{ plan ? 'Edit Membership Plan' : 'Create Membership Plan' }}
+        </h2>
+
+        <p class="text-sm text-mediumGray">
+          Create a new membership plan with installment options
+        </p>
       </div>
 
-      <button (click)="close.emit()" class="text-gray-400 hover:text-black">✕</button>
+      <button
+        (click)="close.emit()"
+        class="text-mediumGray hover:text-darkGray dark:hover:text-white text-lg transition"
+      >
+        ✕
+      </button>
     </div>
 
     <!-- Body -->
     <form [formGroup]="form" class="p-5 space-y-5">
+
       <!-- Plan Name -->
       <div>
-        <label class="text-sm font-medium">Plan Name *</label>
+        <label class="text-sm font-medium text-darkGray dark:text-white">
+          Plan Name *
+        </label>
+
         <input
           formControlName="name"
-          class="w-full mt-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
           placeholder="e.g. Premium Adult Annual"
+          class="w-full mt-1 px-4 py-2 rounded-xl
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 placeholder:text-mediumGray
+                 focus:outline-none focus:ring-2 focus:ring-lavender"
         />
+
         <p
           *ngIf="form.get('name')?.touched && form.get('name')?.invalid"
-          class="text-red-500 text-xs mt-1"
+          class="text-danger text-xs mt-1"
         >
           Plan name is required
         </p>
@@ -30,20 +62,35 @@
 
       <!-- Description -->
       <div>
-        <label class="text-sm font-medium">Description</label>
+        <label class="text-sm font-medium text-darkGray dark:text-white">
+          Description
+        </label>
+
         <textarea
           formControlName="description"
-          class="w-full mt-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
           placeholder="Brief description of this plan"
+          class="w-full mt-1 px-4 py-2 rounded-xl
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 placeholder:text-mediumGray
+                 focus:outline-none focus:ring-2 focus:ring-lavender"
         ></textarea>
       </div>
 
       <!-- Membership Type -->
       <div>
-        <label class="text-sm font-medium">Membership Type *</label>
+        <label class="text-sm font-medium text-darkGray dark:text-white">
+          Membership Type *
+        </label>
+
         <select
           formControlName="membershipType"
-          class="w-full mt-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
+          class="w-full mt-1 px-4 py-2 rounded-xl
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 focus:outline-none focus:ring-2 focus:ring-lavender"
         >
           <option value="">Select membership type</option>
           <option value="Premium">Premium</option>
@@ -54,67 +101,141 @@
 
       <!-- Price & Duration -->
       <div class="grid grid-cols-2 gap-4">
+
+        <!-- Price -->
         <div>
-          <label class="text-sm font-medium">Total Price ($) *</label>
+          <label class="text-sm font-medium text-darkGray dark:text-white">
+            Total Price ($) *
+          </label>
+
           <input
             type="number"
             formControlName="price"
-            class="w-full mt-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
             placeholder="e.g. 1200"
+            class="w-full mt-1 px-4 py-2 rounded-xl
+                   bg-white dark:bg-darkCard
+                   border border-gray-200 dark:border-darkBorder
+                   text-darkGray dark:text-white
+                   placeholder:text-mediumGray
+                   focus:outline-none focus:ring-2 focus:ring-lavender"
           />
         </div>
 
+        <!-- Duration -->
         <div>
-          <label class="text-sm font-medium">Duration (days) *</label>
+          <label class="text-sm font-medium text-darkGray dark:text-white">
+            Duration (days) *
+          </label>
+
           <input
             type="number"
             formControlName="duration"
-            class="w-full mt-1 px-4 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none"
             placeholder="e.g. 365"
+            class="w-full mt-1 px-4 py-2 rounded-xl
+                   bg-white dark:bg-darkCard
+                   border border-gray-200 dark:border-darkBorder
+                   text-darkGray dark:text-white
+                   placeholder:text-mediumGray
+                   focus:outline-none focus:ring-2 focus:ring-lavender"
           />
         </div>
+
       </div>
 
       <!-- Active -->
-      <label class="flex items-center gap-2">
-        <input type="checkbox" formControlName="active" />
+      <label class="flex items-center gap-2 text-darkGray dark:text-white">
+        <input
+          type="checkbox"
+          formControlName="active"
+          class="accent-primary"
+        />
         <span class="text-sm">Plan is Active</span>
       </label>
 
       <!-- Installment Templates -->
       <div>
-        <h3 class="font-medium mb-2">Installment Templates</h3>
+
+        <h3 class="font-medium mb-2 text-darkGray dark:text-white">
+          Installment Templates
+        </h3>
 
         <div class="space-y-2">
+
           <div
             *ngFor="let t of installmentTemplates"
-            class="flex items-center gap-3 p-3 border rounded-xl"
+            class="flex items-center gap-3
+                   p-3
+                   border border-gray-200 dark:border-darkBorder
+                   rounded-xl
+                   bg-white dark:bg-darkCard"
           >
-            <input type="checkbox" (change)="toggleTemplate(t.id)" />
 
-            <span class="font-medium">{{ t.name }}</span>
+            <input
+              type="checkbox"
+              (change)="toggleTemplate(t.id)"
+              class="accent-primary"
+            />
 
-            <span class="ml-auto px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs">
+            <span class="font-medium text-darkGray dark:text-white">
+              {{ t.name }}
+            </span>
+
+            <span
+              class="ml-auto px-3 py-1 rounded-full
+                     bg-purple-100 text-purple-700
+                     dark:bg-darkBorder dark:text-darkSecondary
+                     text-xs"
+            >
               {{ t.installments }} installments
             </span>
 
             <span
               *ngIf="t.duration"
-              class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs"
+              class="px-3 py-1 rounded-full
+                     bg-gray-100 text-gray-600
+                     dark:bg-darkBorder dark:text-gray-300
+                     text-xs"
             >
               {{ t.duration }}
             </span>
+
           </div>
+
         </div>
+
       </div>
+
     </form>
 
     <!-- Footer -->
-    <div class="flex justify-end gap-3 p-5 border-t">
-      <button (click)="close.emit()">Cancel</button>
-      <button (click)="submit()" class="bg-primary text-white px-5 py-2 rounded-xl">
-        Create Plan
+    <div
+      class="flex justify-end gap-3
+             p-5
+             border-t border-gray-200 dark:border-darkBorder"
+    >
+
+      <button
+        (click)="close.emit()"
+        class="px-4 py-2 rounded-xl
+               border border-gray-300 dark:border-darkBorder
+               text-darkGray dark:text-white
+               hover:bg-gray-100 dark:hover:bg-darkBorder
+               transition"
+      >
+        Cancel
       </button>
+
+      <button
+        (click)="submit()"
+        class="bg-primary hover:bg-primaryHover
+               text-white
+               px-5 py-2 rounded-xl
+               transition"
+      >
+        {{ plan ? 'Save Changes' : 'Create Plan' }}
+      </button>
+
     </div>
+
   </div>
 </div>

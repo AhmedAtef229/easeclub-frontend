@@ -2,61 +2,45 @@
   title="Membership Type Management"
   subtitle="Define membership categories for your club"
 >
-
   <!-- ================= Actions ================= -->
-  <div actions class="flex items-center justify-between gap-4">
-
+  <div actions class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
     <!-- Search -->
+    <app-search-input placeholder="Search types..." (search)="onSearch($event)"></app-search-input>
 
-  <app-search-input
-  placeholder="Search templates..."
-  (search)="onSearch($event)"
-></app-search-input>
     <!-- Create Button -->
     <button
-      class="bg-primary text-white
-             px-5 py-2 rounded-xl
-             flex items-center gap-2 hover:opacity-90"
+      class="px-5 py-2 rounded-xl bg-primary text-white flex items-center gap-2 hover:bg-primaryHover transition"
       (click)="openCreateModal()"
     >
       <span class="text-lg">+</span>
       Create Type
     </button>
-
   </div>
 
   <!-- ================= Content ================= -->
   <div class="space-y-4">
-
     <!-- Header -->
-    <div>
-      <h2 class="text-xl font-semibold">
-        Membership Types
-      </h2>
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold text-darkGray dark:text-white">Membership Types</h2>
 
-      <p class="text-sm text-gray-500">
-        {{ data.length }} types found
-      </p>
+      <p class="text-sm text-mediumGray">{{ filteredData.length }} types found</p>
     </div>
 
     <!-- Table -->
- <app-tables
-  [columns]="columns"
-  [data]="filteredData"
-  [showActions]="true"
-  (edit)="openEditModal($event)"
-  (remove)="deleteMembershipType($event)"
->
-</app-tables>
+    <app-tables
+      [columns]="columns"
+      [data]="filteredData"
+      [showActions]="true"
+      (edit)="openEditModal($event)"
+    ></app-tables>
   </div>
-
 </app-page-layout>
 
 <!-- ================= Modal ================= -->
 <app-membership-type-modal
   *ngIf="isModalOpen"
+  [branches]="branches"
   [data]="editItem"
-  (close)="closeModal()"
   (save)="saveMembershipType($event)"
->
-</app-membership-type-modal>
+  (close)="closeModal()"
+></app-membership-type-modal>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -8,33 +8,45 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './branch-modal.component.html',
 })
-export class BranchModalComponent {
+export class BranchModalComponent implements OnInit {
 
-  @Input() data: any = null; // edit mode
+  @Input() data: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
 
-  form: FormGroup;
+  form!: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      name: ['', Validators.required],
-    });
-  }
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
+
+    this.form = this.fb.group({
+      id: [''],
+      name: ['', Validators.required],
+    });
+
     if (this.data) {
-      this.form.patchValue(this.data);
+
+      this.form.patchValue({
+        id: this.data.id,
+        name: this.data.name
+      });
+
     }
+
   }
 
   submit() {
+
     if (this.form.invalid) {
+
       this.form.markAllAsTouched();
       return;
+
     }
 
     this.save.emit(this.form.value);
-    this.close.emit();
+
   }
+
 }

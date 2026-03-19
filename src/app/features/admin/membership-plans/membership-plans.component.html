@@ -6,60 +6,95 @@
   <!-- 🔎 Action Bar -->
   <div
     actions
-    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
   >
 
     <!-- Left -->
     <div class="flex items-center gap-4 w-full">
 
-   <!-- Search (Shared Component) -->
-<app-search-input
-  placeholder="Search plans..."
-  (search)="onSearch($event)"
-></app-search-input>
+      <!-- Search -->
+      <app-search-input
+        placeholder="Search plans..."
+        (search)="onSearch($event)"
+      ></app-search-input>
 
       <!-- Filter -->
       <div class="relative">
+
         <button
           (click)="toggleFilter()"
-          class="px-4 py-2 rounded-xl border bg-white
-                 flex items-center gap-2 min-w-[140px]"
+          class="px-4 py-2 rounded-xl
+                 border border-gray-200 dark:border-darkBorder
+                 bg-white dark:bg-darkCard
+                 text-darkGray dark:text-white
+                 flex items-center gap-2
+                 min-w-[140px]
+                 hover:bg-gray-50 dark:hover:bg-darkBorder
+                 transition"
         >
           {{ selectedFilter }}
           <i class="fa-solid fa-chevron-down text-xs ml-auto"></i>
         </button>
 
+        <!-- Dropdown -->
         <div
           *ngIf="showFilter"
-          class="absolute mt-2 w-full bg-white border rounded-xl shadow z-10"
+          class="absolute mt-2 w-full
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 rounded-xl shadow-lg z-10 overflow-hidden"
         >
+
           <button
             *ngFor="let f of filters"
             (click)="selectFilter(f)"
-            class="w-full text-left px-4 py-2 hover:bg-gray-100
-                   flex items-center justify-between"
+            class="w-full text-left px-4 py-2
+                   hover:bg-gray-100 dark:hover:bg-darkBorder
+                   flex items-center justify-between
+                   text-darkGray dark:text-white"
           >
             {{ f }}
-            <i *ngIf="selectedFilter === f"
-               class="fa-solid fa-check text-primary"></i>
+
+            <i
+              *ngIf="selectedFilter === f"
+              class="fa-solid fa-check text-primary"
+            ></i>
+
           </button>
+
         </div>
+
       </div>
 
     </div>
 
     <!-- Create Button -->
-  <button
-  class="px-5 py-2 rounded-xl
-         bg-primary text-white
-         inline-flex items-center gap-2
-         whitespace-nowrap
-         hover:bg-primaryHover"
-  (click)="openCreateModal()"
->
-  <i class="fa-solid fa-plus text-sm"></i>
-  <span>Create Plan</span>
-</button>
+    <button
+      class="px-5 py-2 rounded-xl
+             bg-primary hover:bg-primaryHover
+             text-white
+             inline-flex items-center gap-2
+             whitespace-nowrap
+             transition"
+      (click)="openCreateModal()"
+    >
+      <i class="fa-solid fa-plus text-sm"></i>
+      <span>Create Plan</span>
+    </button>
+
+  </div>
+
+  <!-- 📊 Table Header -->
+  <div class="flex items-center justify-between mb-3">
+
+    <h3 class="text-lg font-semibold text-darkGray dark:text-white">
+      Membership Plans
+    </h3>
+
+    <span class="text-sm text-mediumGray">
+      {{ filteredData.length }} plans found
+    </span>
+
   </div>
 
   <!-- 📊 Table -->
@@ -67,17 +102,26 @@
     [columns]="columns"
     [data]="filteredData"
     [showActions]="true"
+    [showView]="true"
+    [showCopy]="true"
     (view)="onView($event)"
-    (edit)="onEdit($event)"
     (copy)="onCopy($event)"
- (remove)="onDelete($event)"
+    (edit)="onEdit($event)"
+    (remove)="onDelete($event)"
   ></app-tables>
 
 </app-page-layout>
 
 <!-- 🪟 Create Plan Modal -->
 <app-membership-plan-modal
-  *ngIf="showCreateModal"
+  *ngIf="showModal"
+  [plan]="selectedPlan"
   (close)="closeModal()"
   (save)="onSavePlan($event)"
 ></app-membership-plan-modal>
+
+<app-installment-plan-modal
+  *ngIf="showInstallmentModal"
+  [plan]="selectedPlanForInstallments"
+  (close)="showInstallmentModal = false"
+></app-installment-plan-modal>

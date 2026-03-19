@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AuthLayoutComponent } from '../../../shared/auth-layout/auth-layout.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ThemeService } from '../../../core/services/theme.service';
+import { ThemeService } from '../../../core/services/api/ui/theme.service';
 
 @Component({
   standalone: true,
@@ -41,13 +41,16 @@ export class ResetPasswordComponent implements OnInit {
     this.token = params.get('token');
     this.email = params.get('email');
 
-    this.form = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required]]
-    }, {
-      validators: (g: FormGroup) => 
-        g.get('password')?.value === g.get('confirmPassword')?.value ? null : { mismatch: true }
-    });
+    this.form = this.fb.group(
+      {
+        password: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      {
+        validators: (g: FormGroup) =>
+          g.get('password')?.value === g.get('confirmPassword')?.value ? null : { mismatch: true },
+      },
+    );
   }
 
   submit() {

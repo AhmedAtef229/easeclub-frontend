@@ -4,57 +4,76 @@
 >
 
   <!-- ===== Actions (Header Row) ===== -->
- <div actions class="flex items-center justify-between gap-4">
+  <div
+    actions
+    class="flex items-center justify-between gap-4
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           rounded-2xl p-4 shadow-sm"
+  >
 
-  <!-- Tabs -->
-  <div class="flex items-center gap-2 bg-gray-100 dark:bg-darkBorder p-1 rounded-xl">
-    <button
-      (click)="activeTab = 'pending'"
-      [class.bg-white]="activeTab === 'pending'"
-      [class.dark:bg-darkCard]="activeTab === 'pending'"
-      class="px-4 py-2 rounded-lg text-sm font-medium transition"
+    <!-- Tabs -->
+    <div
+      class="flex items-center gap-2
+             bg-gray-100 dark:bg-darkBorder
+             p-1 rounded-xl"
     >
-      Pending Applications
+
+    
+
+      <!-- Active -->
+      <button
+        (click)="activeTab = 'active'"
+        [class.bg-white]="activeTab === 'active'"
+        [class.dark:bg-darkCard]="activeTab === 'active'"
+        class="px-4 py-2 rounded-lg text-sm font-medium
+               text-darkGray dark:text-white
+               transition hover:bg-white/80 dark:hover:bg-darkCard"
+      >
+        Active Members
+      </button>
+
+      <!-- Expired -->
+      <button
+        (click)="activeTab = 'expired'"
+        [class.bg-white]="activeTab === 'expired'"
+        [class.dark:bg-darkCard]="activeTab === 'expired'"
+        class="px-4 py-2 rounded-lg text-sm font-medium
+               text-darkGray dark:text-white
+               transition hover:bg-white/80 dark:hover:bg-darkCard"
+      >
+        Expired Members
+      </button>
+
+    </div>
+
+    <!-- Notification Templates Button -->
+    <button
+      class="bg-primary hover:bg-primaryHover
+             text-white
+             px-5 py-2 rounded-xl
+             flex items-center gap-2
+             transition shadow-sm"
+    >
+      <i class="fa-solid fa-paper-plane text-sm"></i>
+      Notification Templates
     </button>
 
-    <button
-      (click)="activeTab = 'active'"
-      [class.bg-white]="activeTab === 'active'"
-      [class.dark:bg-darkCard]="activeTab === 'active'"
-      class="px-4 py-2 rounded-lg text-sm font-medium transition"
-    >
-      Active Members
-    </button>
-
-    <button
-      (click)="activeTab = 'expired'"
-      [class.bg-white]="activeTab === 'expired'"
-      [class.dark:bg-darkCard]="activeTab === 'expired'"
-      class="px-4 py-2 rounded-lg text-sm font-medium transition"
-    >
-      Expired Members
-    </button>
   </div>
 
-  <!-- Notification Templates Button -->
-  <button
-    class="bg-primary text-white px-5 py-2 rounded-xl
-           flex items-center gap-2
-           hover:opacity-90 transition"
-  >
-    <i class="fa-solid fa-paper-plane text-sm"></i>
-    Notification Templates
-  </button>
-
-</div>
   <!-- ===== Content ===== -->
-  <div class="space-y-4">
+  <div
+    class="space-y-4
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           rounded-2xl p-5 shadow-sm"
+  >
 
-  <!-- Search -->
-  <app-search-input
-  placeholder="Search members..."
-  (search)="onSearch($event)"
-></app-search-input>
+    <!-- Search -->
+    <app-search-input
+      placeholder="Search members..."
+      (search)="onSearch($event)"
+    ></app-search-input>
 
     <!-- Table -->
     <app-tables

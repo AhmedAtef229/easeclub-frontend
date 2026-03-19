@@ -34,7 +34,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  //init Auth 
+  //init Auth
 async initAuth(): Promise<void> {
   try {
     const response = await firstValueFrom(this.refreshToken());
@@ -71,7 +71,7 @@ async initAuth(): Promise<void> {
       `${this.api}${AuthEndpoints.LOGIN}`,
       payload,
       { withCredentials: true,headers: this.defaultHeaders },
-      
+
     ).pipe(
       tap(res => {
         this.accessToken = res.accessToken;
@@ -125,14 +125,14 @@ async initAuth(): Promise<void> {
 // ------------------------
 resetPassword(token: string, email: string, password: string): Observable<any> {
   // We send all three to the backend for verification
-  const payload = { 
-    token, 
-    email, 
-    password 
+  const payload = {
+    token,
+    email,
+    password
   };
 
   return this.http.post(
-    `${this.api}${AuthEndpoints.RESET_PASSWORD}`, 
+    `${this.api}${AuthEndpoints.RESET_PASSWORD}`,
     payload,
   );
 }

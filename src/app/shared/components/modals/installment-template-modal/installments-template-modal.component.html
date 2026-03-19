@@ -1,16 +1,14 @@
-<!-- Overlay -->
-<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-  <!-- Modal -->
-  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 space-y-6">
-
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+  <div
+    class="w-full max-w-2xl rounded-2xl bg-white dark:bg-darkCard shadow-xl border border-gray-200 dark:border-darkBorder"
+  >
     <!-- Header -->
-    <div class="flex items-start justify-between">
+    <div class="flex items-start justify-between px-7 pt-7">
       <div>
-        <h2 class="text-xl font-semibold text-gray-800">
-          {{ data ? 'Edit Installment Template' : 'Create Installment Template' }}
+        <h2 class="text-[22px] font-semibold text-darkGray dark:text-white">
+          Create Installment Template
         </h2>
-        <p class="text-sm text-gray-500">
+        <p class="mt-1 text-lg text-mediumGray">
           Define payment installment structure
         </p>
       </div>
@@ -18,18 +16,21 @@
       <button
         type="button"
         (click)="close.emit()"
-        class="text-gray-400 hover:text-gray-600 text-xl"
+        class="text-mediumGray hover:text-darkGray dark:hover:text-white text-2xl leading-none"
       >
-        ✕
+        ×
       </button>
     </div>
 
-    <!-- Form -->
-    <form [formGroup]="form" class="space-y-5" (ngSubmit)="onSave()">
-
+    <!-- Body -->
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSave()"
+      class="px-7 pt-8 pb-7 space-y-5"
+    >
       <!-- Template Name -->
-      <div class="space-y-1">
-        <label class="text-sm font-medium text-gray-700">
+      <div>
+        <label class="mb-2 block text-[15px] font-semibold text-darkGray dark:text-white">
           Template Name <span class="text-danger">*</span>
         </label>
 
@@ -37,116 +38,179 @@
           type="text"
           formControlName="name"
           placeholder="e.g., 3 Monthly Installments"
-          class="w-full px-4 py-2 rounded-xl
-                 border border-gray-200
-                 bg-gray-50
-                 focus:bg-white
-                 focus:outline-none
-                 focus:ring-2 focus:ring-primary"
+          class="w-full rounded-xl border border-transparent bg-lightGray dark:bg-darkBg dark:text-white px-4 py-3 text-[15px] placeholder:text-mediumGray outline-none focus:border-primary focus:bg-white dark:focus:bg-darkCard"
         />
 
-        <p *ngIf="isInvalid('name')" class="text-sm text-danger">
+        <p *ngIf="isInvalid('name')" class="mt-1 text-sm text-danger">
           Template name is required
         </p>
       </div>
 
       <!-- Mode Switch -->
-      <div class="flex bg-gray-100 rounded-xl p-1">
+      <div
+        class="grid grid-cols-2 rounded-2xl bg-lightGray dark:bg-darkBg p-1"
+      >
         <button
           type="button"
           (click)="setMode('auto')"
-          class="flex-1 py-2 rounded-lg text-sm font-medium transition"
-          [class.bg-white]="mode === 'auto'"
+          class="flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-[15px] font-semibold transition-all"
+          [ngClass]="
+            mode === 'auto'
+              ? 'bg-white dark:bg-darkCard text-primary shadow-sm'
+              : 'text-darkGray dark:text-darkSecondary'
+          "
         >
-          ✨ Auto-Generate
+          <span class="text-base">✧</span>
+          <span>Auto-Generate</span>
         </button>
 
         <button
           type="button"
           (click)="setMode('manual')"
-          class="flex-1 py-2 rounded-lg text-sm font-medium transition"
-          [class.bg-white]="mode === 'manual'"
+          class="flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-[15px] font-semibold transition-all"
+          [ngClass]="
+            mode === 'manual'
+              ? 'bg-white dark:bg-darkCard text-primary shadow-sm'
+              : 'text-darkGray dark:text-darkSecondary'
+          "
         >
-          ☰ Manual Entry
+          <span class="text-base">≣</span>
+          <span>Manual Entry</span>
         </button>
       </div>
 
-      <!-- Auto Generate -->
-      <div *ngIf="mode === 'auto'" class="grid grid-cols-2 gap-4">
+      <!-- AUTO MODE -->
+      <div *ngIf="mode === 'auto'" class="space-y-5">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <!-- Number of Installments -->
+          <div>
+            <label class="mb-2 block text-[15px] font-semibold text-darkGray dark:text-white">
+              Number of Installments <span class="text-danger">*</span>
+            </label>
 
-        <!-- Installments Count -->
-        <div class="space-y-1">
-          <label class="text-sm font-medium">
-            Number of Installments <span class="text-danger">*</span>
-          </label>
+            <input
+              type="number"
+              formControlName="installmentsCount"
+              placeholder="e.g., 3"
+              class="w-full rounded-xl border border-transparent bg-lightGray dark:bg-darkBg dark:text-white px-4 py-3 text-[15px] placeholder:text-mediumGray outline-none focus:border-primary focus:bg-white dark:focus:bg-darkCard"
+            />
 
-          <input
-            type="number"
-            min="1"
-            formControlName="installmentsCount"
-            placeholder="e.g., 3"
-            class="w-full px-4 py-2 rounded-xl
-                   border border-gray-200
-                   bg-gray-50
-                   focus:bg-white
-                   focus:outline-none
-                   focus:ring-2 focus:ring-primary"
-          />
+            <p *ngIf="isInvalid('installmentsCount')" class="mt-1 text-sm text-danger">
+              Please enter a valid number of installments
+            </p>
+          </div>
 
-          <p *ngIf="isInvalid('installmentsCount')" class="text-sm text-danger">
-            Number of installments must be greater than 0
-          </p>
+          <!-- Duration -->
+          <div>
+            <label class="mb-2 block text-[15px] font-semibold text-darkGray dark:text-white">
+              Duration (days) <span class="text-danger">*</span>
+            </label>
+
+            <input
+              type="number"
+              formControlName="durationDays"
+              placeholder="e.g., 90"
+              class="w-full rounded-xl border border-transparent bg-lightGray dark:bg-darkBg dark:text-white px-4 py-3 text-[15px] placeholder:text-mediumGray outline-none focus:border-primary focus:bg-white dark:focus:bg-darkCard"
+            />
+
+            <p *ngIf="isInvalid('durationDays')" class="mt-1 text-sm text-danger">
+              Please enter a valid duration
+            </p>
+          </div>
         </div>
 
-        <!-- Duration -->
-        <div class="space-y-1">
-          <label class="text-sm font-medium">
-            Duration (days) <span class="text-danger">*</span>
-          </label>
-
-          <input
-            type="number"
-            min="1"
-            formControlName="durationDays"
-            placeholder="e.g., 90"
-            class="w-full px-4 py-2 rounded-xl
-                   border border-gray-200
-                   bg-gray-50
-                   focus:bg-white
-                   focus:outline-none
-                   focus:ring-2 focus:ring-primary"
-          />
-
-          <p *ngIf="isInvalid('durationDays')" class="text-sm text-danger">
-            Duration must be greater than 0
+        <!-- Info Box -->
+        <div
+          class="rounded-2xl border border-gray-200 dark:border-darkBorder bg-[#FAF8FC] dark:bg-darkBg px-6 py-6"
+        >
+          <p class="text-[15px] leading-7 text-mediumGray">
+            Installments will be automatically generated with equal percentages
+            and evenly distributed due dates.
           </p>
-        </div>
-
-        <!-- Info -->
-        <div class="col-span-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-xl">
-          Installments will be automatically generated with equal percentages
-          and evenly distributed due dates.
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="flex justify-end gap-3 pt-4">
+      <!-- MANUAL MODE -->
+      <div *ngIf="mode === 'manual'" class="space-y-4">
+        <!-- Installments List -->
+        <div formArrayName="installments" class="space-y-4">
+          <div
+            *ngFor="let installment of installments.controls; let i = index"
+            [formGroupName]="i"
+            class="rounded-2xl border border-gray-200 dark:border-darkBorder bg-[#FAF8FC] dark:bg-darkBg px-6 py-5"
+          >
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
+              <!-- Percentage -->
+              <div>
+                <label class="mb-2 block text-[15px] font-semibold text-darkGray dark:text-white">
+                  Percentage <span class="text-danger">*</span>
+                </label>
+
+                <input
+                  type="number"
+                  formControlName="percentage"
+                  placeholder="e.g., 33.33"
+                  class="w-full rounded-xl border border-transparent bg-white dark:bg-darkCard dark:text-white px-4 py-3 text-[15px] placeholder:text-mediumGray outline-none focus:border-primary"
+                />
+              </div>
+
+              <!-- Due After -->
+              <div>
+                <label class="mb-2 block text-[15px] font-semibold text-darkGray dark:text-white">
+                  Due After (days) <span class="text-danger">*</span>
+                </label>
+
+                <input
+                  type="number"
+                  formControlName="dueAfter"
+                  placeholder="e.g., 30"
+                  class="w-full rounded-xl border border-transparent bg-white dark:bg-darkCard dark:text-white px-4 py-3 text-[15px] placeholder:text-mediumGray outline-none focus:border-primary"
+                />
+              </div>
+
+              <!-- Remove -->
+              <div class="flex md:justify-end">
+                <button
+                  type="button"
+                  (click)="removeInstallment(i)"
+                  class="mt-2 md:mt-0 text-danger text-2xl leading-none px-2"
+                  title="Remove installment"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Installment Button -->
+        <button
+          type="button"
+          (click)="addInstallment()"
+          class="w-full rounded-xl border border-primary/20 bg-lavender/80 hover:bg-lavender text-darkGray dark:text-darkGray px-4 py-3.5 text-[15px] font-semibold transition-all flex items-center justify-center gap-3"
+        >
+          <span class="text-xl leading-none">＋</span>
+          <span>Add Installment</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-end gap-4 pt-6">
         <button
           type="button"
           (click)="close.emit()"
-          class="px-5 py-2 rounded-xl border border-gray-300 hover:bg-gray-100"
+          class="rounded-xl px-5 py-3 text-[15px] font-semibold text-darkGray dark:text-white hover:bg-lightGray dark:hover:bg-darkBg transition"
         >
           Cancel
         </button>
 
         <button
           type="submit"
-          class="px-6 py-2 rounded-xl bg-primary text-white hover:opacity-90"
+          class="rounded-xl bg-primary hover:bg-primaryHover text-white px-7 py-3 text-[15px] font-semibold transition"
         >
-          {{ data ? 'Update' : 'Create' }}
+          Create
         </button>
       </div>
-
     </form>
   </div>
 </div>

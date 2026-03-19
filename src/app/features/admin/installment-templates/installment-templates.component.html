@@ -3,29 +3,26 @@
   subtitle="Define payment installment structures for membership plans"
 >
 
+  <!-- Actions -->
+  <div actions class="flex items-center justify-between gap-4">
 
- <!-- Actions -->
-<div actions class="flex items-center justify-between gap-4">
+    <!-- Search -->
+    <app-search-input
+      placeholder="Search templates..."
+      (search)="onSearch($event)"
+    ></app-search-input>
 
-  <!-- Search -->
+    <!-- Button -->
+    <button
+      class="bg-primary text-white px-5 py-2 rounded-xl
+             flex items-center gap-2 hover:opacity-90 transition"
+      (click)="openCreateModal()"
+    >
+      <i class="fa-solid fa-plus text-sm"></i>
+      Create Template
+    </button>
 
-  <app-search-input
-  placeholder="Search templates..."
-  (search)="onSearch($event)"
-></app-search-input>
-
-
-  <!-- Button -->
-  <button
-    class="bg-primary text-white px-5 py-2 rounded-xl
-           flex items-center gap-2 hover:opacity-90 transition"
-    (click)="openCreateModal()"
-  >
-    <i class="fa-solid fa-plus text-sm"></i>
-    Create Template
-  </button>
-
-</div>
+  </div>
 
   <!-- Table -->
   <app-tables
@@ -33,13 +30,15 @@
     [data]="filteredData"
     [showActions]="true"
     (remove)="onDelete($event)"
+    (edit)="onEdit($event)"
   ></app-tables>
 
 </app-page-layout>
 
-<!-- Create Installment Template Modal -->
+<!-- Create / Edit Modal -->
 <app-installment-template-modal
-  *ngIf="showCreateModal"
+  *ngIf="showModal"
+  [data]="editItem"
   (close)="closeModal()"
   (save)="onSaveTemplate($event)"
 >

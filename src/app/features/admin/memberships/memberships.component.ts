@@ -11,7 +11,7 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 })
 export class MembershipsComponent {
 
-  activeTab: 'pending' | 'active' | 'expired' = 'pending';
+  activeTab:  'active' | 'expired' = 'active';
 
   columns: TableColumn[] = [
     { key: 'name', label: 'Name' },

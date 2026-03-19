@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ConfirmService, ConfirmData } from '../../../core/services/confirm.service';
+import { ConfirmService, ConfirmData } from '../../../core/services/api/ui/confirm.service';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -9,14 +9,13 @@ import { ConfirmService, ConfirmData } from '../../../core/services/confirm.serv
   templateUrl: './confirm-dialog.component.html',
 })
 export class ConfirmDialogComponent implements OnInit {
-
   visible = false;
   data!: ConfirmData;
 
   constructor(private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
-    this.confirmService.getConfirm().subscribe(data => {
+    this.confirmService.getConfirm().subscribe((data) => {
       this.data = data;
       this.visible = true;
     });

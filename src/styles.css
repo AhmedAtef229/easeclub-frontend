@@ -1,3 +1,85 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+
+/* ===== Page Layout ===== */
+
+.ec-page {
+  @apply bg-lightGray min-h-screen text-darkGray;
+}
+
+.dark .ec-page {
+  @apply bg-darkBg text-white;
+}
+
+
+/* ===== Cards ===== */
+
+.ec-card {
+  @apply bg-white border border-gray-200 rounded-2xl shadow-sm;
+}
+
+.dark .ec-card {
+  @apply bg-darkCard border-darkBorder;
+}
+
+
+/* ===== Inputs ===== */
+
+.ec-input {
+  @apply w-full px-4 py-2 rounded-xl
+  bg-white
+  border border-gray-200
+  text-darkGray
+  focus:outline-none focus:ring-2 focus:ring-lavender;
+}
+
+.dark .ec-input {
+  @apply bg-darkCard border-darkBorder text-white;
+}
+
+
+/* ===== Tables ===== */
+
+.ec-table {
+  @apply w-full border border-gray-200 rounded-xl overflow-hidden;
+}
+
+.dark .ec-table {
+  @apply border-darkBorder;
+}
+
+.ec-table thead {
+  @apply bg-gray-50 text-mediumGray text-sm;
+}
+
+.dark .ec-table thead {
+  @apply bg-darkCard text-gray-300;
+}
+
+.ec-table tbody tr {
+  @apply border-t border-gray-200;
+}
+
+.dark .ec-table tbody tr {
+  @apply border-darkBorder;
+}
+
+
+/* ===== Buttons ===== */
+
+.ec-btn-primary {
+  @apply px-6 py-2 rounded-xl bg-primary text-white hover:bg-primaryHover transition;
+}
+
+.ec-btn-secondary {
+  @apply px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100;
+}
+
+.dark .ec-btn-secondary {
+  @apply border-darkBorder hover:bg-darkBorder;
+}
+
+}

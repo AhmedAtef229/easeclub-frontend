@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
-import { MembershipPlanModalComponent } from
-  '../../../shared/components/modals/membership-plan-modal/membership-plan-modal.component';
+import { MembershipPlanModalComponent } from '../../../shared/components/modals/membership-plan-modal/membership-plan-modal.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import { ConfirmService } from '../../../core/services/confirm.service';
+import { ConfirmService } from '../../../core/services/api/ui/confirm.service';
+import { InstallmentPlanModalComponent } from '../../../shared/components/modals/installment-plan-modal/installment-plan-modal.component';
 @Component({
   selector: 'app-membership-plans',
   standalone: true,
@@ -13,12 +13,17 @@ import { ConfirmService } from '../../../core/services/confirm.service';
     CommonModule,
     PageLayoutComponent,
     TablesComponent,
-    MembershipPlanModalComponent,SearchInputComponent],
+    MembershipPlanModalComponent,
+    SearchInputComponent,
+    InstallmentPlanModalComponent,
+  ],
   templateUrl: './membership-plans.component.html',
 })
 export class MembershipPlansComponent {
+  constructor(private confirmService: ConfirmService) {}
 
-  /* ===== Table Columns ===== */
+  /* ================= TABLE ================= */
+
   columns: TableColumn[] = [
     { key: 'name', label: 'Plan Name' },
     { key: 'type', label: 'Type', type: 'badge' },
@@ -28,7 +33,6 @@ export class MembershipPlansComponent {
     { key: 'templates', label: 'Templates' },
   ];
 
-  /* ===== Data ===== */
   data = [
     {
       name: 'Premium Adult Annual',
@@ -66,9 +70,10 @@ export class MembershipPlansComponent {
 
   filteredData = [...this.data];
 
-constructor(private confirmService: ConfirmService) {}
+  showInstallmentModal = false;
+  selectedPlanForInstallments: any = null;
+  /* ================= FILTER ================= */
 
-  /* ===== Filter ===== */
   filters = ['All Plans', 'Active Only', 'Inactive Only'];
   selectedFilter = 'All Plans';
   showFilter = false;
@@ -86,77 +91,103 @@ constructor(private confirmService: ConfirmService) {}
     }
 
     if (filter === 'Active Only') {
-      this.filteredData = this.data.filter(p => p.active);
+      this.filteredData = this.data.filter((p) => p.active);
     }
 
     if (filter === 'Inactive Only') {
-      this.filteredData = this.data.filter(p => !p.active);
+      this.filteredData = this.data.filter((p) => !p.active);
     }
   }
 
-  /* ===== Modal ===== */
-  showCreateModal = false;
+  /* ================= MODAL ================= */
+
+  showModal = false;
+  selectedPlan: any = null;
 
   openCreateModal() {
-    this.showCreateModal = true;
-  }
-
-  closeModal() {
-    this.showCreateModal = false;
-  }
-
-  onSavePlan(plan: any) {
-    this.data = [
-      ...this.data,
-      {
-        name: plan.name,
-        type: plan.membershipType,
-        price: `$${plan.price}`,
-        duration: `${plan.duration} days`,
-        active: plan.active,
-        templates: plan.templates.length,
-      },
-    ];
-
-    this.filteredData = [...this.data];
-    this.closeModal();
-  }
-
-  /* ===== Actions ===== */
-  onView(row: any) {
-    console.log('View:', row);
+    this.selectedPlan = null;
+    this.showModal = true;
   }
 
   onEdit(row: any) {
-    console.log('Edit:', row);
+    this.selectedPlan = row;
+    this.showModal = true;
   }
 
+  closeModal() {
+    this.showModal = false;
+  }
+
+  /* ================= SAVE (CREATE + EDIT) ================= */
+
+  onSavePlan(plan: any) {
+    if (this.selectedPlan) {
+      // ===== EDIT =====
+      this.data = this.data.map((p) =>
+        p === this.selectedPlan
+          ? {
+              name: plan.name,
+              type: plan.membershipType,
+              price: `$${plan.price}`,
+              duration: `${plan.duration} days`,
+              active: plan.active,
+              templates: plan.templates.length,
+            }
+          : p,
+      );
+    } else {
+      // ===== CREATE =====
+      this.data = [
+        ...this.data,
+        {
+          name: plan.name,
+          type: plan.membershipType,
+          price: `$${plan.price}`,
+          duration: `${plan.duration} days`,
+          active: plan.active,
+          templates: plan.templates.length,
+        },
+      ];
+    }
+
+    this.filteredData = [...this.data];
+    this.showModal = false;
+  }
+
+  /* ================= ACTIONS ================= */
+
+  onView(row: any) {
+    this.selectedPlanForInstallments = row;
+    this.showInstallmentModal = true;
+  }
   onCopy(row: any) {
     const copy = { ...row, name: row.name + ' (Copy)' };
     this.data = [...this.data, copy];
     this.filteredData = [...this.data];
   }
 
- onDelete(row: any) {
-  this.confirmService.confirm({
-    title: 'Delete Plan',
-    message: `Are you sure you want to delete "${row.name}"?`,
-    confirmText: 'Yes, Delete',
-    cancelText: 'Cancel'
-  }).subscribe(result => {
-    if (result) {
-      this.data = this.data.filter(r => r !== row);
-      this.filteredData = [...this.data];
-    }
-  });
-}
+  onDelete(row: any) {
+    this.confirmService
+      .confirm({
+        title: 'Delete Plan',
+        message: `Are you sure you want to delete "${row.name}"?`,
+        confirmText: 'Yes, Delete',
+        cancelText: 'Cancel',
+      })
+      .subscribe((result) => {
+        if (result) {
+          this.data = this.data.filter((r) => r !== row);
+          this.filteredData = [...this.data];
+        }
+      });
+  }
+
+  /* ================= SEARCH ================= */
 
   onSearch(value: string) {
-  const text = value.toLowerCase();
-
-  this.filteredData = this.data.filter(plan =>
-    plan.name.toLowerCase().includes(text) ||
-    plan.type.toLowerCase().includes(text)
-  );
-}
+    const text = value.toLowerCase();
+    this.filteredData = this.data.filter(
+      (plan) => plan.name.toLowerCase().includes(text) || plan.type.toLowerCase().includes(text),
+    );
+  }
 }

@@ -1,11 +1,12 @@
-
 <!-- Overlay -->
 <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
   <!-- Modal -->
   <div
     class="bg-white dark:bg-darkCard
-           w-full max-w-md rounded-2xl shadow-xl
+           w-full max-w-md
+           rounded-2xl shadow-xl
+           border border-gray-200 dark:border-darkBorder
            p-6 space-y-6"
   >
 
@@ -15,14 +16,15 @@
         <h2 class="text-xl font-semibold text-darkGray dark:text-white">
           {{ data ? 'Edit Branch' : 'Create Branch' }}
         </h2>
-        <p class="text-sm text-gray-500">
+
+        <p class="text-sm text-mediumGray">
           Add a new branch to your club
         </p>
       </div>
 
       <button
         (click)="close.emit()"
-        class="text-gray-400 hover:text-gray-600 text-xl"
+        class="text-mediumGray hover:text-darkGray dark:hover:text-white text-xl transition"
       >
         ✕
       </button>
@@ -33,8 +35,9 @@
 
       <!-- Branch Name -->
       <div>
-        <label class="block text-sm font-medium mb-1">
-          Branch Name <span class="text-red-500">*</span>
+
+        <label class="block text-sm font-medium mb-1 text-darkGray dark:text-white">
+          Branch Name <span class="text-danger">*</span>
         </label>
 
         <input
@@ -42,39 +45,52 @@
           formControlName="name"
           placeholder="Enter branch name"
           class="w-full px-4 py-2 rounded-xl
-                 border border-gray-300
-                 focus:outline-none focus:ring-2 focus:ring-primary"
+                 bg-white dark:bg-darkCard
+                 border border-gray-200 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 placeholder:text-mediumGray
+                 focus:outline-none
+                 focus:ring-2 focus:ring-lavender
+                 transition"
         />
 
         <!-- Error -->
         <p
           *ngIf="form.get('name')?.touched && form.get('name')?.invalid"
-          class="text-sm text-red-500 mt-1"
+          class="text-danger text-sm mt-1"
         >
           Branch name is required
         </p>
+
       </div>
 
       <!-- Actions -->
       <div class="flex justify-end gap-3 pt-4">
+
+        <!-- Cancel -->
         <button
           type="button"
           (click)="close.emit()"
           class="px-5 py-2 rounded-xl
-                 border border-gray-300
-                 hover:bg-gray-100"
+                 border border-gray-300 dark:border-darkBorder
+                 text-darkGray dark:text-white
+                 hover:bg-gray-100 dark:hover:bg-darkBorder
+                 transition"
         >
           Cancel
         </button>
 
+        <!-- Submit -->
         <button
           type="submit"
           class="px-6 py-2 rounded-xl
-                 bg-primary text-white
-                 hover:opacity-90"
+                 bg-primary hover:bg-primaryHover
+                 text-white
+                 transition"
         >
           {{ data ? 'Update' : 'Create' }}
         </button>
+
       </div>
 
     </form>
