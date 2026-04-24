@@ -1,16 +1,34 @@
 <app-page-layout
   title="Installment Template Management"
-  subtitle="Define payment installment structures for membership plans"
+  subtitle="Create and manage payment installment templates for membership plans"
 >
 
-  <!-- Actions -->
-  <div actions class="flex items-center justify-between gap-4">
+  <!-- 🔥 Filters + Button -->
+  <div
+    class="flex items-center justify-between mb-4 p-4 rounded-2xl
+           bg-gray-50 dark:bg-darkCard border border-gray-200 dark:border-darkBorder"
+  >
 
-    <!-- Search -->
-    <app-search-input
-      placeholder="Search templates..."
-      (search)="onSearch($event)"
-    ></app-search-input>
+    <!-- Filters -->
+    <div class="flex gap-3">
+
+      <!-- Status -->
+      <app-dropdown
+        class="w-36"
+        [options]="['All','Active','Inactive']"
+        [selected]="selectedStatus"
+        (valueChange)="onStatusChange($event)"
+      ></app-dropdown>
+
+      <!-- Plans -->
+      <app-dropdown
+        class="w-48"
+        [options]="planOptions"
+        [selected]="selectedPlanLabel"
+        (valueChange)="onPlanChange($event)"
+      ></app-dropdown>
+
+    </div>
 
     <!-- Button -->
     <button
@@ -24,22 +42,54 @@
 
   </div>
 
-  <!-- Table -->
-  <app-tables
-    [columns]="columns"
-    [data]="filteredData"
-    [showActions]="true"
-    (remove)="onDelete($event)"
-    (edit)="onEdit($event)"
-  ></app-tables>
+  <!-- 🔥 Table Card -->
+  <div
+    class="rounded-2xl border border-gray-200 dark:border-darkBorder
+           bg-white dark:bg-darkCard p-4"
+  >
+
+    <!-- Title -->
+    <div class="mb-3">
+      <h3 class="font-semibold text-lg text-darkGray dark:text-white">
+        Installment Templates
+      </h3>
+      <p class="text-sm text-mediumGray">
+        {{ filteredData.length }} templates found
+      </p>
+    </div>
+
+    <!-- Table -->
+    <app-tables
+      [columns]="columns"
+      [data]="filteredData"
+      [showActions]="true"
+      [showView]="true"
+      (edit)="onEdit($event)"
+      (view)="onView($event)"
+    ></app-tables>
+
+  </div>
 
 </app-page-layout>
 
-<!-- Create / Edit Modal -->
+<!-- Modal -->
 <app-installment-template-modal
   *ngIf="showModal"
-  [data]="editItem"
   (close)="closeModal()"
   (save)="onSaveTemplate($event)"
->
-</app-installment-template-modal>
+></app-installment-template-modal>
+
+<!-- 🔥 Preview Modal -->
+<app-installment-preview-modal
+  *ngIf="showPreviewModal"
+  [installments]="previewInstallments"
+  (close)="showPreviewModal = false"
+></app-installment-preview-modal>
+
+<!-- 🔥 Edit Modal -->
+<app-edit-installment-percentages-modal
+  *ngIf="showEditPercentagesModal"
+  [installments]="editInstallments"
+  (close)="showEditPercentagesModal = false"
+  (save)="onSaveEditInstallments($event)"
+></app-edit-installment-percentages-modal>

@@ -8,46 +8,51 @@ import { Branch } from '../../models/branch.model';
 })
 export class BranchService {
 
-  /* ================= CONFIG ================= */
-
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
-
-  // 🔥 المصدر الوحيد للـ clubId
   private clubId = '9f3a8b6e-2a7d-4b5c-9d9c-1e8c4c2f7a31';
 
   constructor(private http: HttpClient) {}
 
-  /* ================= CLUB ID ================= */
-
-  // ✅ getter تستخدمه في أي مكان في المشروع
   getClubId(): string {
     return this.clubId;
   }
 
-  /* ================= GET BRANCHES ================= */
+  /* ================= GET ================= */
+  getBranches(isActive?: boolean): Observable<Branch[]> {
 
-  getBranches(): Observable<Branch[]> {
-    return this.http.get<Branch[]>(
-      `${this.baseUrl}/clubs/${this.clubId}/branches`
-    );
+    let url = `${this.baseUrl}/clubs/${this.clubId}/branches`;
+
+    if (isActive !== undefined) {
+      url += `?isActive=${isActive}`;
+    }
+
+    return this.http.get<Branch[]>(url);
   }
 
-  /* ================= CREATE BRANCH ================= */
-
+  /* ================= CREATE ================= */
   createBranch(data: { name: string }): Observable<string> {
     return this.http.post<string>(
-      `${this.baseUrl}/clubs/${this.clubId}/branches`,
-      data
+      `${this.baseUrl}/branches`,
+      {
+        ...data,
+        clubId: this.clubId
+      }
     );
   }
 
-  /* ================= UPDATE BRANCH ================= */
-
+  /* ================= UPDATE ================= */
   updateBranch(branchId: string, data: { name: string }): Observable<void> {
     return this.http.put<void>(
-      `${this.baseUrl}/clubs/${this.clubId}/branches/${branchId}`,
+      `${this.baseUrl}/branches/${branchId}`,
       data
     );
   }
 
+  /* 🔥 TOGGLE STATUS */
+  toggleStatus(branchId: string, isActive: boolean): Observable<void> {
+    return this.http.put<void>(
+      `${this.baseUrl}/branches/${branchId}`,
+      { isActive }
+    );
+  }
 }

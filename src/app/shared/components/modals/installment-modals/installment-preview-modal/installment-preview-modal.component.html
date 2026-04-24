@@ -1,0 +1,108 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+
+  <div class="w-full max-w-2xl rounded-2xl bg-white dark:bg-darkCard shadow-xl border border-gray-200 dark:border-darkBorder">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between px-6 pt-6">
+      <div>
+        <h2 class="text-xl font-semibold text-darkGray dark:text-white">
+          Installment Preview
+        </h2>
+        <p class="text-sm text-mediumGray mt-1">
+          Preview of {{ totalInstallments }} Monthly Installments
+        </p>
+      </div>
+
+      <button
+        (click)="close.emit()"
+        class="text-mediumGray hover:text-darkGray dark:hover:text-white text-xl"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 space-y-5">
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 gap-4">
+
+        <div class="p-4 rounded-xl border border-gray-200 dark:border-darkBorder bg-lightGray dark:bg-darkBg">
+          <p class="text-sm text-mediumGray">Total Installments</p>
+          <p class="text-xl font-semibold text-darkGray dark:text-white mt-1">
+            {{ totalInstallments }}
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl border border-gray-200 dark:border-darkBorder bg-lightGray dark:bg-darkBg">
+          <p class="text-sm text-mediumGray">Max Duration</p>
+          <p class="text-xl font-semibold text-darkGray dark:text-white mt-1">
+            {{ maxDuration }} days
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Table -->
+      <div class="rounded-xl border border-gray-200 dark:border-darkBorder overflow-hidden">
+
+        <div class="p-4 font-semibold text-darkGray dark:text-white border-b border-gray-200 dark:border-darkBorder">
+          Installment Breakdown
+        </div>
+
+        <table class="w-full text-sm">
+
+          <thead class="bg-lightGray dark:bg-darkBg text-mediumGray">
+            <tr>
+              <th class="p-3 text-left">#</th>
+              <th class="p-3 text-left">Percentage</th>
+              <th class="p-3 text-left">Due After</th>
+              <th class="p-3 text-left">Example Amount (${{ totalAmount }})</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let item of installments; let i = index"
+              class="border-t border-gray-200 dark:border-darkBorder"
+            >
+              <td class="p-3">#{{ i + 1 }}</td>
+
+              <td class="p-3">
+                <span class="px-3 py-1 rounded-full bg-lavender text-primary text-xs font-medium">
+                  {{ item.percentage }}%
+                </span>
+              </td>
+
+              <td class="p-3">
+                {{ item.dueAfterDays }} days
+              </td>
+
+              <td class="p-3 font-medium text-darkGray dark:text-white">
+                {{ calculateAmount(item.percentage) | number:'1.2-2' }}
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-end p-5 border-t border-gray-200 dark:border-darkBorder">
+
+      <button
+        (click)="close.emit()"
+        class="bg-primary hover:bg-primaryHover text-white px-6 py-2 rounded-xl transition"
+      >
+        Close
+      </button>
+
+    </div>
+
+  </div>
+</div>

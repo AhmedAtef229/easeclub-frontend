@@ -1,0 +1,106 @@
+<div class="w-[500px] bg-white dark:bg-darkCard rounded-2xl shadow-lg p-5">
+
+  <!-- Header -->
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-lg font-semibold text-darkGray dark:text-white flex items-center gap-2">
+        <i class="fa-solid fa-link text-primary"></i>
+        Manage Template Connections
+      </h2>
+
+      <p class="text-sm text-mediumGray mt-1">
+        Link membership plans to
+        <span class="font-medium text-darkGray dark:text-white">
+          Standard Membership Application
+        </span>.
+      </p>
+    </div>
+
+  <button
+  (click)="closeModal()"
+  class="px-4 py-2 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white"
+>
+  Cancel
+</button>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-4">
+    <input
+      type="text"
+      placeholder="Search membership plans..."
+      [(ngModel)]="search"
+      class="w-full border border-borderGray dark:border-darkBorder rounded-xl px-4 py-2
+             bg-cardGray dark:bg-darkBg text-darkGray dark:text-white outline-none"
+    />
+  </div>
+
+  <!-- Selected -->
+  <div class="mb-4 border border-borderGray dark:border-darkBorder rounded-xl p-3 bg-cardGray dark:bg-darkBg">
+    <div class="text-sm text-mediumGray mb-2">
+      {{ selectedPlans.length }} plans selected
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <span
+        *ngFor="let plan of selectedPlans"
+        class="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm flex items-center gap-2"
+      >
+        {{ plan.name }}
+        <button (click)="removePlan(plan)">✕</button>
+      </span>
+    </div>
+  </div>
+
+  <!-- Plans List -->
+  <div class="max-h-[250px] overflow-y-auto pr-1 space-y-3 mb-5">
+
+    <div
+      *ngFor="let plan of filteredPlans()"
+      (click)="togglePlan(plan)"
+      class="border rounded-xl p-4 cursor-pointer transition-all duration-150 flex items-start gap-3"
+      [class.border-primary]="isSelected(plan)"
+      [class.bg-primary/5]="isSelected(plan)"
+      [class.border-borderGray]="!isSelected(plan)"
+      [class.dark:border-darkBorder]="!isSelected(plan)"
+    >
+
+      <input
+        type="checkbox"
+        [checked]="isSelected(plan)"
+        class="mt-1 accent-primary"
+      />
+
+      <div>
+        <div class="font-medium text-darkGray dark:text-white">
+          {{ plan.name }}
+        </div>
+
+        <div class="text-sm text-mediumGray">
+          {{ plan.type }} • ${{ plan.price }} • {{ plan.duration }} days
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="flex justify-end gap-3">
+    <button
+      (click)="closeModal()"
+      class="px-4 py-2 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white"
+    >
+      Cancel
+    </button>
+
+    <button
+      (click)="save()"
+      class="px-5 py-2 rounded-xl bg-primary text-white flex items-center gap-2 hover:opacity-90"
+    >
+      <i class="fa-solid fa-link"></i>
+      Save Connections
+    </button>
+  </div>
+
+</div>

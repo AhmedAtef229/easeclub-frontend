@@ -21,4 +21,5 @@ export class SidebarComponent {
       error: (err) => console.error('Logout failed', err),
     });
   }
+
 }

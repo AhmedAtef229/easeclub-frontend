@@ -1,42 +1,51 @@
 <app-page-layout
   title="Membership Type Management"
-  subtitle="Define membership categories for your club"
+  subtitle="Define membership types with branch access permissions"
 >
-  <!-- ================= Actions ================= -->
-  <div actions class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-    <!-- Search -->
-    <app-search-input placeholder="Search types..." (search)="onSearch($event)"></app-search-input>
+  <!-- Filters -->
+  <div actions class="flex items-center justify-between">
 
-    <!-- Create Button -->
-    <button
-      class="px-5 py-2 rounded-xl bg-primary text-white flex items-center gap-2 hover:bg-primaryHover transition"
-      (click)="openCreateModal()"
-    >
-      <span class="text-lg">+</span>
-      Create Type
-    </button>
-  </div>
+    <div class="flex gap-3">
 
-  <!-- ================= Content ================= -->
-  <div class="space-y-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-darkGray dark:text-white">Membership Types</h2>
+      <!-- ✅ Status Dropdown -->
+      <app-dropdown
+        class="w-40"
+        [options]="['All','Active','Inactive']"
+        [selected]="selectedStatus"
+        (valueChange)="applyStatusFilter($event)"
+      ></app-dropdown>
 
-      <p class="text-sm text-mediumGray">{{ filteredData.length }} types found</p>
+      <!-- ✅ Branch Dropdown -->
+      <app-dropdown
+        class="w-44"
+        [options]="branchOptions"
+        [selected]="selectedBranchLabel"
+        (valueChange)="onBranchSelect($event)"
+      ></app-dropdown>
+
     </div>
 
-    <!-- Table -->
-    <app-tables
-      [columns]="columns"
-      [data]="filteredData"
-      [showActions]="true"
-      (edit)="openEditModal($event)"
-    ></app-tables>
+    <!-- Create -->
+    <button
+      class="px-5 py-2 rounded-xl bg-primary text-white"
+      (click)="openCreateModal()"
+    >
+      + Create Type
+    </button>
+
   </div>
+
+  <!-- Table -->
+  <app-tables
+    [columns]="columns"
+    [data]="filteredData"
+    [showActions]="false"
+    (toggleStatus)="toggleStatus($event)"
+    (edit)="openEditModal($event)"
+  ></app-tables>
 </app-page-layout>
 
-<!-- ================= Modal ================= -->
+<!-- Modal -->
 <app-membership-type-modal
   *ngIf="isModalOpen"
   [branches]="branches"

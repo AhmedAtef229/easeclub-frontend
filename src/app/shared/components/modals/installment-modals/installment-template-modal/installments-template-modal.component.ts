@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -16,7 +16,6 @@ import {
 })
 export class InstallmentTemplateModalComponent implements OnInit {
 
-  @Input() data: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
 
@@ -34,11 +33,6 @@ export class InstallmentTemplateModalComponent implements OnInit {
       durationDays: [null],
       installments: this.fb.array([])
     });
-
-    if (this.data) {
-      this.form.patchValue(this.data);
-      this.mode = this.data.mode ?? 'auto';
-    }
 
     this.applyModeValidation();
   }

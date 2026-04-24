@@ -1,0 +1,56 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+  <div class="w-full max-w-lg rounded-2xl
+              bg-white dark:bg-darkCard
+              border border-borderGray dark:border-darkBorder
+              p-6">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-lg font-semibold text-darkGray dark:text-white">
+        Change Club Logo
+      </h2>
+      <button (click)="close.emit()" class="text-mediumGray hover:text-darkGray">✕</button>
+    </div>
+
+    <!-- Description -->
+    <p class="text-sm text-mediumGray mb-5">
+      Enter a new logo URL for your club (square image recommended)
+    </p>
+
+    <!-- Input -->
+    <label class="text-sm font-medium text-darkGray dark:text-white">
+      Logo URL
+    </label>
+
+    <input
+      [(ngModel)]="logoUrl"
+      type="text"
+      placeholder="https://example.com/logo.jpg"
+      class="w-full mt-2 px-4 py-2.5 rounded-xl
+             border border-borderGray dark:border-darkBorder
+             bg-white dark:bg-darkBg
+             focus:outline-none focus:ring-2 focus:ring-primary"
+    />
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        (click)="close.emit()"
+        class="px-4 py-2 rounded-lg border border-borderGray
+               text-darkGray dark:text-white"
+      >
+        Cancel
+      </button>
+
+      <button
+        (click)="onSubmit()"
+        class="px-5 py-2 rounded-lg bg-primary hover:bg-primaryHover
+               text-white flex items-center gap-2"
+      >
+         Update Logo
+      </button>
+    </div>
+
+  </div>
+</div>

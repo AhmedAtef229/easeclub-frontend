@@ -1,0 +1,93 @@
+<div class="flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+
+  <!-- Info -->
+  <div class="text-sm text-mediumGray dark:text-mediumGray">
+    Showing page {{ currentPage }} of {{ totalPages }}
+    ({{ totalCount }} items)
+  </div>
+
+  <!-- Controls -->
+  <div class="flex items-center gap-2 flex-wrap justify-center">
+
+    <!-- First -->
+    <button
+      (click)="changePage(1)"
+      [disabled]="currentPage === 1"
+      class="px-3 py-1 rounded-lg text-sm border transition
+             border-gray-200 dark:border-darkBorder
+             bg-white dark:bg-darkCard
+             text-darkGray dark:text-white
+             hover:bg-lightGray dark:hover:bg-darkBorder
+             disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      «
+    </button>
+
+    <!-- Prev -->
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="px-3 py-1 rounded-lg text-sm border transition
+             border-gray-200 dark:border-darkBorder
+             bg-white dark:bg-darkCard
+             text-darkGray dark:text-white
+             hover:bg-lightGray dark:hover:bg-darkBorder
+             disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      ‹
+    </button>
+
+    <!-- Pages -->
+    <ng-container *ngFor="let page of pages">
+
+      <!-- Number -->
+      <button
+        *ngIf="page !== '...'; else dots"
+        (click)="changePage(page)"
+        class="px-3 py-1 rounded-lg text-sm border transition-all duration-150"
+
+        [ngClass]="page === currentPage
+          ? 'bg-primary text-white border-primary shadow-sm'
+          : 'border-gray-200 dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-lightGray dark:hover:bg-darkBorder'"
+      >
+        {{ page }}
+      </button>
+
+      <!-- Dots -->
+      <ng-template #dots>
+        <span class="px-2 text-mediumGray dark:text-mediumGray">...</span>
+      </ng-template>
+
+    </ng-container>
+
+    <!-- Next -->
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="px-3 py-1 rounded-lg text-sm border transition
+             border-gray-200 dark:border-darkBorder
+             bg-white dark:bg-darkCard
+             text-darkGray dark:text-white
+             hover:bg-lightGray dark:hover:bg-darkBorder
+             disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      ›
+    </button>
+
+    <!-- Last -->
+    <button
+      (click)="changePage(totalPages)"
+      [disabled]="currentPage === totalPages"
+      class="px-3 py-1 rounded-lg text-sm border transition
+             border-gray-200 dark:border-darkBorder
+             bg-white dark:bg-darkCard
+             text-darkGray dark:text-white
+             hover:bg-lightGray dark:hover:bg-darkBorder
+             disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      »
+    </button>
+
+  </div>
+
+</div>

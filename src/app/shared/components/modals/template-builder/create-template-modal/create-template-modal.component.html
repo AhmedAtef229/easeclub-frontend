@@ -1,0 +1,512 @@
+<div class="fixed inset-0 bg-black/30 z-50 flex">
+  <div class="w-full h-full bg-white dark:bg-darkBg flex flex-col">
+    <!-- HEADER -->
+    <div
+      class="h-16 flex items-center justify-between px-6 bg-cardGray dark:bg-darkCard border-b border-borderGray dark:border-darkBorder"
+    >
+      <!-- LEFT -->
+      <div class="flex items-center gap-4">
+        <!-- BACK BUTTON -->
+        <button
+          (click)="closeModal()"
+          class="text-lg text-mediumGray dark:text-darkSecondary hover:text-darkGray dark:hover:text-white transition"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <!-- ICON -->
+        <div
+          class="w-9 h-9 flex items-center justify-center rounded-lg bg-white dark:bg-darkBorder"
+        >
+          <i class="fa-solid fa-gear text-primary dark:text-darkPrimary"></i>
+        </div>
+
+        <!-- TITLE -->
+        <div>
+          <div class="font-semibold text-base text-darkGray dark:text-white">Template Builder</div>
+
+          <div class="text-xs text-mediumGray">
+            {{ templateName }}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <button
+        (click)="save()"
+        class="flex items-center gap-2 px-4 py-2 rounded-lg border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-white/70 dark:hover:bg-darkBorder hover:scale-[1.03] transition-all duration-200"
+      >
+        <i class="fa-regular fa-floppy-disk"></i>
+        Save
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="flex flex-1 overflow-hidden">
+      <!-- SIDEBAR -->
+      <div
+        class="w-72 border-r border-gray-200 dark:border-darkBorder p-4 overflow-y-auto bg-cardGray dark:bg-darkBg"
+      >
+        <div class="text-xs text-mediumGray mb-2">NAVIGATOR</div>
+
+        <div class="space-y-1 mb-6">
+          <div
+            *ngFor="let step of steps || []; let i = index"
+            class="p-2 rounded-lg flex justify-between items-center cursor-pointer hover:bg-lightGray dark:hover:bg-darkCard"
+            [ngClass]="{ 'bg-primary/10': selectedStepIndex === i }"
+          >
+            <div (click)="selectStep(i)" class="text-darkGray dark:text-white flex-1">
+              {{ i + 1 }}. {{ step.title }}
+            </div>
+
+            <button (click)="deleteStep(i)" class="text-danger text-xs">✕</button>
+          </div>
+        </div>
+
+        <!-- ADD STEP -->
+        <button
+          (click)="addStep()"
+          class="w-full flex items-center gap-3 p-3 mb-3 rounded-xl border border-dashed border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-primary/10 dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.02] transition-all duration-200 ease-out"
+        >
+          <i class="fa-solid fa-plus text-primary dark:text-darkPrimary"></i>
+          <span class="font-medium">Add Step</span>
+        </button>
+
+        <!-- ADD SECTION -->
+        <button
+          (click)="addSection()"
+          class="w-full flex items-center gap-3 p-3 mb-4 rounded-xl border border-dashed border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-cardGray dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.02] transition-all duration-200 ease-out"
+        >
+          <i class="fa-solid fa-list text-primary dark:text-darkPrimary"></i>
+          <span class="font-medium">Add Section</span>
+        </button>
+
+        <div class="text-xs text-mediumGray mb-2">Fields</div>
+
+        <div
+          *ngFor="let f of fieldTypes"
+          (click)="addField(f.type)"
+          class="flex items-center gap-3 p-3 rounded-xl mb-3 cursor-pointer border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard hover:bg-cardGray dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.03] transition-all duration-200 ease-out"
+        >
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-lg bg-cardGray dark:bg-darkBorder"
+          >
+            <i class="{{ f.icon }} text-primary dark:text-darkPrimary text-lg"></i>
+          </div>
+
+          <span class="text-darkGray dark:text-white font-medium">
+            {{ f.label }}
+          </span>
+        </div>
+
+       <!-- SYSTEM SECTIONS -->
+<div class="text-xs text-mediumGray mt-4 mb-2">System Sections</div>
+
+<div
+  (click)="addFamilySection()"
+  class="flex items-center gap-3 p-3 rounded-xl mb-3 cursor-pointer border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard hover:bg-cardGray dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.03] transition-all duration-200"
+>
+  <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-cardGray dark:bg-darkBorder">
+    <i class="fa-solid fa-users text-primary dark:text-darkPrimary"></i>
+  </div>
+
+  <div class="flex flex-col">
+    <span class="text-darkGray dark:text-white font-medium">
+      Family Members
+    </span>
+
+    <span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded w-fit">
+      System
+    </span>
+  </div>
+</div>
+      </div>
+
+
+      <!-- CANVAS -->
+<div class="flex-1 bg-pageBg dark:bg-darkBg p-10 overflow-auto">
+  <div class="w-[520px] mx-auto space-y-6">
+    <div
+      *ngFor="let step of steps || []; let si = index"
+      class="bg-cardGray dark:bg-darkCard rounded-xl border p-5 transition-all duration-150"
+      [class.border-primary]="selectedType === 'step' && selectedStep === step"
+      [class.border-borderGray]="!(selectedType === 'step' && selectedStep === step)"
+      [class.dark:border-darkBorder]="!(selectedType === 'step' && selectedStep === step)"
+      (click)="selectStep(si)"
+      (drop)="dropSection(step)"
+      (dragover)="$event.preventDefault()"
+    >
+      <div class="font-semibold mb-4 text-darkGray dark:text-white">
+        {{ step.title }}
+      </div>
+
+      <div
+        *ngFor="let section of step.sections || []; let i = index"
+        class="border rounded-xl p-4 mb-4 cursor-pointer transition-all duration-150
+               bg-white dark:bg-darkCard"
+        [class.border-purple-400]="section.system"
+        [class.bg-purple-50]="section.system"
+        [class.dark:bg-purple-900/20]="section.system"
+        [class.border-primary]="selectedType === 'section' && selectedSection === section"
+        [class.border-borderGray]="!(selectedType === 'section' && selectedSection === section)"
+        [class.dark:border-darkBorder]="
+          !(selectedType === 'section' && selectedSection === section)
+        "
+        (click)="selectSection(i); $event.stopPropagation()"
+        draggable="true"
+        (dragstart)="dragStartSection(section)"
+      >
+        <div class="flex justify-between mb-3">
+          <div class="font-medium flex items-center gap-2 text-darkGray dark:text-white">
+            {{ section.title }}
+
+            <span
+              *ngIf="section.repeatable"
+              class="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
+            >
+              Repeatable
+            </span>
+
+            <span
+              *ngIf="section.system"
+              class="text-xs bg-purple-100 text-purple-600
+                     dark:bg-purple-900/40 dark:text-purple-300
+                     px-2 py-1 rounded"
+            >
+              System
+            </span>
+          </div>
+
+          <!-- DELETE -->
+          <button
+            *ngIf="!section.system || section.deletable"
+            (click)="deleteSection(i); $event.stopPropagation()"
+            class="text-danger text-xs hover:underline"
+          >
+            Delete
+          </button>
+        </div>
+
+        <div
+          *ngFor="let field of section.fields || []"
+          class="border border-borderGray dark:border-darkBorder
+                 bg-white dark:bg-darkBg
+                 p-3 rounded-lg mb-2
+                 flex justify-between items-center
+                 cursor-pointer
+                 hover:border-primary transition-all"
+          draggable="true"
+          (dragstart)="dragStartField(field)"
+          (drop)="dropField(section)"
+          (dragover)="$event.preventDefault()"
+          (click)="selectField(field); $event.stopPropagation()"
+        >
+          <div>
+            <div class="font-medium text-darkGray dark:text-white">
+              {{ field.label }}
+            </div>
+
+            <div class="text-xs text-mediumGray">
+              {{ field.key }}
+            </div>
+          </div>
+
+          <div class="flex gap-2 items-center">
+            <span
+              class="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
+            >
+              {{ field.type }}
+            </span>
+
+            <button
+              (click)="deleteField(field); $event.stopPropagation()"
+              class="text-danger text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+   <div class="w-80 border-l border-borderGray dark:border-darkBorder bg-cardGray dark:bg-darkBg">
+
+  <!-- STEP PROPERTIES -->
+  <div *ngIf="selectedType === 'step'" class="p-5">
+    <div class="flex items-center gap-2 mb-4">
+      <i class="fa-solid fa-gear text-primary"></i>
+      <h3 class="font-semibold text-darkGray dark:text-white">Step Properties</h3>
+    </div>
+
+    <label class="text-sm text-mediumGray mb-1 block">
+      Step Title
+    </label>
+
+    <input
+      [(ngModel)]="selectedStep.title"
+      class="w-full border border-borderGray dark:border-darkBorder
+             p-2.5 rounded-xl
+             bg-gray-50 dark:bg-darkCard
+             text-darkGray dark:text-white
+             focus:outline-none focus:ring-2 focus:ring-primary/30"
+    />
+  </div>
+
+  <!-- SECTION PROPERTIES -->
+  <div *ngIf="selectedType === 'section'" class="p-5">
+    <div class="flex items-center gap-2 mb-4">
+      <i class="fa-solid fa-gear text-primary"></i>
+      <h3 class="font-semibold text-darkGray dark:text-white">Section Properties</h3>
+    </div>
+
+    <label class="text-sm text-mediumGray mb-1 block">
+      Title
+    </label>
+
+    <input
+      [(ngModel)]="selectedSection.title"
+      class="w-full border border-borderGray dark:border-darkBorder
+             p-2.5 rounded-xl mb-4
+             bg-gray-50 dark:bg-darkCard
+             text-darkGray dark:text-white
+             focus:outline-none focus:ring-2 focus:ring-primary/30"
+    />
+
+    <!-- Repeatable Toggle -->
+    <div
+      class="flex items-center justify-between
+             border border-borderGray dark:border-darkBorder
+             rounded-xl p-3
+             bg-gray-50 dark:bg-darkCard"
+    >
+      <span class="text-darkGray dark:text-white">
+        Repeatable
+      </span>
+
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          [(ngModel)]="selectedSection.repeatable"
+          class="sr-only peer"
+        />
+        <div
+          class="w-11 h-6 bg-gray-200 dark:bg-darkBorder
+                 peer-focus:outline-none
+                 rounded-full
+                 peer-checked:bg-primary
+                 after:content-['']
+                 after:absolute
+                 after:top-[2px]
+                 after:left-[2px]
+                 after:bg-white
+                 after:rounded-full
+                 after:h-5
+                 after:w-5
+                 after:transition-all
+                 peer-checked:after:translate-x-full"
+        ></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- FIELD PROPERTIES -->
+  <div *ngIf="selectedType === 'field'" class="p-5">
+
+    <div class="font-semibold mb-4 text-darkGray dark:text-white">
+      Field Properties
+    </div>
+
+    <!-- Label -->
+    <label class="text-sm text-mediumGray mb-1 block">Label</label>
+    <input
+      [(ngModel)]="selectedField.label"
+      class="w-full border border-borderGray dark:border-darkBorder
+             p-2.5 rounded-xl mb-4
+             bg-gray-50 dark:bg-darkCard
+             text-darkGray dark:text-white"
+    />
+
+    <!-- Key -->
+    <label class="text-sm text-mediumGray mb-1 block">Key</label>
+    <input
+      [(ngModel)]="selectedField.key"
+      class="w-full border border-borderGray dark:border-darkBorder
+             p-2.5 rounded-xl mb-4
+             bg-gray-50 dark:bg-darkCard
+             text-darkGray dark:text-white font-mono"
+    />
+
+    <!-- Type -->
+    <label class="text-sm text-mediumGray mb-1 block">Type</label>
+    <select
+      [(ngModel)]="selectedField.type"
+      class="w-full border border-borderGray dark:border-darkBorder
+             p-2.5 rounded-xl mb-4
+             bg-gray-50 dark:bg-darkCard
+             text-darkGray dark:text-white"
+    >
+      <option value="text">Short Text</option>
+      <option value="number">Number</option>
+      <option value="date">Date</option>
+      <option value="file">File</option>
+      <option value="enum">Enum</option>
+    </select>
+
+    <!-- Divider -->
+    <div class="border-t border-borderGray dark:border-darkBorder my-4"></div>
+
+    <!-- Validation -->
+    <div class="text-darkGray dark:text-white font-medium mb-3">
+      Validation
+    </div>
+
+    <!-- Required -->
+    <label class="flex items-center gap-2 mb-3 cursor-pointer">
+      <input
+        type="checkbox"
+        [(ngModel)]="selectedField.required"
+        class="accent-primary w-4 h-4"
+      />
+      <span class="text-darkGray dark:text-white">
+        Required
+      </span>
+    </label>
+
+    <div [ngSwitch]="selectedField.type">
+
+      <!-- TEXT -->
+      <ng-container *ngSwitchCase="'text'">
+        <label class="text-sm text-mediumGray mb-1 block">Min Length</label>
+        <input
+          type="number"
+          [(ngModel)]="selectedField.minLength"
+          class="w-full border border-borderGray dark:border-darkBorder
+                 p-2.5 rounded-xl mb-3
+                 bg-gray-50 dark:bg-darkCard
+                 text-darkGray dark:text-white"
+        />
+
+        <label class="text-sm text-mediumGray mb-1 block">Max Length</label>
+        <input
+          type="number"
+          [(ngModel)]="selectedField.maxLength"
+          class="w-full border border-borderGray dark:border-darkBorder
+                 p-2.5 rounded-xl
+                 bg-gray-50 dark:bg-darkCard
+                 text-darkGray dark:text-white"
+        />
+      </ng-container>
+
+      <!-- NUMBER -->
+      <ng-container *ngSwitchCase="'number'">
+        <label class="text-sm text-mediumGray mb-1 block">Min Value</label>
+        <input
+          type="number"
+          [(ngModel)]="selectedField.minValue"
+          class="w-full border border-borderGray dark:border-darkBorder
+                 p-2.5 rounded-xl mb-3
+                 bg-gray-50 dark:bg-darkCard
+                 text-darkGray dark:text-white"
+        />
+
+        <label class="text-sm text-mediumGray mb-1 block">Max Value</label>
+        <input
+          type="number"
+          [(ngModel)]="selectedField.maxValue"
+          class="w-full border border-borderGray dark:border-darkBorder
+                 p-2.5 rounded-xl
+                 bg-gray-50 dark:bg-darkCard
+                 text-darkGray dark:text-white"
+        />
+      </ng-container>
+
+     <!-- DATE -->
+<ng-container *ngSwitchCase="'date'">
+  <label class="text-sm text-mediumGray mb-1 block">
+    Min Date
+  </label>
+
+  <input
+    type="date"
+    [(ngModel)]="selectedField.minDate"
+    class="w-full border border-borderGray dark:border-darkBorder
+           p-2.5 rounded-xl mb-3
+           bg-gray-50 dark:bg-darkCard
+           text-darkGray dark:text-white
+           dark:[color-scheme:dark]
+           dark:placeholder:text-mediumGray
+           focus:outline-none focus:ring-2 focus:ring-primary/30"
+  />
+
+  <label class="text-sm text-mediumGray mb-1 block">
+    Max Date
+  </label>
+
+  <input
+    type="date"
+    [(ngModel)]="selectedField.maxDate"
+    class="w-full border border-borderGray dark:border-darkBorder
+           p-2.5 rounded-xl
+           bg-gray-50 dark:bg-darkCard
+           text-darkGray dark:text-white
+           dark:[color-scheme:dark]
+           dark:placeholder:text-mediumGray
+           focus:outline-none focus:ring-2 focus:ring-primary/30"
+  />
+</ng-container>
+
+      <!-- FILE -->
+      <ng-container *ngSwitchCase="'file'">
+        <p class="text-sm text-mediumGray">
+          No additional validation available for file type
+        </p>
+      </ng-container>
+
+      <!-- ENUM -->
+      <ng-container *ngSwitchCase="'enum'">
+
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-1">
+            <label class="text-sm text-mediumGray">Allowed Values</label>
+            <span class="text-xs text-red-500">Required</span>
+          </div>
+
+          <input
+            type="text"
+            [(ngModel)]="enumInput"
+            (keydown.enter)="addEnumValue()"
+            placeholder="Type and press Enter..."
+            class="w-full border border-borderGray dark:border-darkBorder
+                   p-2.5 rounded-xl
+                   bg-gray-50 dark:bg-darkCard
+                   text-darkGray dark:text-white
+                   focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-3">
+          <span
+            *ngFor="let val of selectedField.allowedValues; let i = index"
+            class="px-3 py-1
+                   bg-primary/10 text-primary
+                   dark:bg-primary/20 dark:text-darkSecondary
+                   rounded-lg text-sm flex items-center gap-2"
+          >
+            {{ val }}
+            <i
+              class="fa-solid fa-xmark cursor-pointer text-xs"
+              (click)="removeEnumValue(i)"
+            ></i>
+          </span>
+        </div>
+
+      </ng-container>
+
+    </div>
+  </div>
+
+</div>
+    </div>
+  </div>
+</div>

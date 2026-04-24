@@ -33,7 +33,7 @@
     </div>
 
     <!-- Body -->
-    <form [formGroup]="form" class="p-5 space-y-5">
+    <form *ngIf="form" [formGroup]="form" class="p-5 space-y-5">
 
       <!-- Plan Name -->
       <div>
@@ -61,22 +61,47 @@
       </div>
 
       <!-- Description -->
-      <div>
-        <label class="text-sm font-medium text-darkGray dark:text-white">
-          Description
-        </label>
+     <!-- Description -->
+<div>
+  <label class="text-sm font-medium text-darkGray dark:text-white">
+    Description
+  </label>
 
-        <textarea
-          formControlName="description"
-          placeholder="Brief description of this plan"
-          class="w-full mt-1 px-4 py-2 rounded-xl
-                 bg-white dark:bg-darkCard
-                 border border-gray-200 dark:border-darkBorder
-                 text-darkGray dark:text-white
-                 placeholder:text-mediumGray
-                 focus:outline-none focus:ring-2 focus:ring-lavender"
-        ></textarea>
-      </div>
+  <textarea
+    formControlName="description"
+    placeholder="Brief description of this plan"
+    class="w-full mt-1 px-4 py-2 rounded-xl
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           text-darkGray dark:text-white
+           placeholder:text-mediumGray
+           focus:outline-none focus:ring-2 focus:ring-lavender"
+  ></textarea>
+</div>
+
+<!-- 🔥 Max Family Members -->
+<div>
+  <label class="text-sm font-medium text-darkGray dark:text-white">
+    Max Family Members
+  </label>
+
+  <input
+    type="number"
+    formControlName="maxFamilyMembers"
+    placeholder="e.g. 5"
+    min="0"
+    class="w-full mt-1 px-4 py-2 rounded-xl
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           text-darkGray dark:text-white
+           placeholder:text-mediumGray
+           focus:outline-none focus:ring-2 focus:ring-lavender"
+  />
+
+  <p class="text-xs text-mediumGray mt-1">
+    Number of family members allowed in this plan
+  </p>
+</div>
 
       <!-- Membership Type -->
       <div>
@@ -85,7 +110,7 @@
         </label>
 
         <select
-          formControlName="membershipType"
+          formControlName="membershipTypeId"
           class="w-full mt-1 px-4 py-2 rounded-xl
                  bg-white dark:bg-darkCard
                  border border-gray-200 dark:border-darkBorder
@@ -93,9 +118,9 @@
                  focus:outline-none focus:ring-2 focus:ring-lavender"
         >
           <option value="">Select membership type</option>
-          <option value="Premium">Premium</option>
-          <option value="Standard">Standard</option>
-          <option value="Family">Family</option>
+          <option *ngFor="let t of membershipTypes" [value]="t.id">
+            {{ t.name }}
+          </option>
         </select>
       </div>
 
@@ -129,7 +154,7 @@
 
           <input
             type="number"
-            formControlName="duration"
+            formControlName="durationInDays"
             placeholder="e.g. 365"
             class="w-full mt-1 px-4 py-2 rounded-xl
                    bg-white dark:bg-darkCard
@@ -142,16 +167,6 @@
 
       </div>
 
-      <!-- Active -->
-      <label class="flex items-center gap-2 text-darkGray dark:text-white">
-        <input
-          type="checkbox"
-          formControlName="active"
-          class="accent-primary"
-        />
-        <span class="text-sm">Plan is Active</span>
-      </label>
-
       <!-- Installment Templates -->
       <div>
 
@@ -163,17 +178,19 @@
 
           <div
             *ngFor="let t of installmentTemplates"
+            (click)="toggleTemplate(t.id)"
             class="flex items-center gap-3
                    p-3
-                   border border-gray-200 dark:border-darkBorder
-                   rounded-xl
+                   border rounded-xl cursor-pointer transition
+                   border-gray-200 dark:border-darkBorder
                    bg-white dark:bg-darkCard"
+            [ngClass]="isChecked(t.id) ? 'border-primary bg-purple-50' : ''"
           >
 
             <input
               type="checkbox"
-              (change)="toggleTemplate(t.id)"
-              class="accent-primary"
+              [checked]="isChecked(t.id)"
+              class="accent-primary pointer-events-none"
             />
 
             <span class="font-medium text-darkGray dark:text-white">
@@ -186,17 +203,17 @@
                      dark:bg-darkBorder dark:text-darkSecondary
                      text-xs"
             >
-              {{ t.installments }} installments
+              {{ t.numOfInstallments }} installments
             </span>
 
             <span
-              *ngIf="t.duration"
+              *ngIf="t.durationOfPaymentInDays"
               class="px-3 py-1 rounded-full
                      bg-gray-100 text-gray-600
                      dark:bg-darkBorder dark:text-gray-300
                      text-xs"
             >
-              {{ t.duration }}
+              {{ t.durationOfPaymentInDays }} days
             </span>
 
           </div>

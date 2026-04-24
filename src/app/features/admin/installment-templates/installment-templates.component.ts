@@ -2,10 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
-import { InstallmentTemplateModalComponent } from '../../../shared/components/modals/installment-template-modal/installments-template-modal.component';
-import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
-import { ConfirmService } from '../../../core/services/api/ui/confirm.service';
-import { InstallmentTemplatesService } from '../../../core/services/api/installment-templates.service';
+import { InstallmentTemplateModalComponent } from '../../../shared/components/modals/installment-modals/installment-template-modal/installments-template-modal.component';
+import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
+import { InstallmentPreviewModalComponent } from '../../../shared/components/modals/installment-modals/installment-preview-modal/installment-preview-modal.component';
+import { EditInstallmentPercentagesModalComponent } from '../../../shared/components/modals/installment-modals/edit-installment-percentages-modal/edit-installment-percentages-modal.component';
+import {
+  InstallmentTemplatesService,
+  InstallmentTemplate,
+  Installment,
+} from '../../../core/services/api/installment-templates.service';
+
 import { BranchService } from '../../../core/services/api/branches.service';
 
 @Component({
@@ -16,214 +22,202 @@ import { BranchService } from '../../../core/services/api/branches.service';
     PageLayoutComponent,
     TablesComponent,
     InstallmentTemplateModalComponent,
-    SearchInputComponent,
+    DropdownComponent,
+    InstallmentPreviewModalComponent,
+    EditInstallmentPercentagesModalComponent,
   ],
   templateUrl: './installment-templates.component.html',
 })
 export class InstallmentTemplatesComponent implements OnInit {
 
   constructor(
-    private confirmService: ConfirmService,
     private installmentService: InstallmentTemplatesService,
-    private branchService: BranchService
+    private branchService: BranchService,
   ) {}
-
-  /* ================= STATE ================= */
 
   clubId!: string;
 
   data: any[] = [];
   filteredData: any[] = [];
 
+  selectedStatus = 'All';
+
+  // 🔥 Preview
+  showPreviewModal = false;
+  previewInstallments: any[] = [];
+
+  // 🔥 Edit
+  showEditPercentagesModal = false;
+  editInstallments: any[] = [];
+  selectedTemplateId: string = '';
+
+  // 🔥 Create Modal
   showModal = false;
-  editItem: any = null;
 
-  loading = false; // 🔥 UX
 
-  /* ================= TABLE ================= */
+  // 🔥 Plans Dropdown
+planOptions: string[] = ['All Plans'];
+selectedPlanLabel: string = 'All Plans';
+
+// 🔥 Status Filter
+onStatusChange(value: string) {
+  this.selectedStatus = value;
+  this.applyFilters(); // مش loadTemplates عشان أسرع
+}
+
+// 🔥 Plan Filter (حالياً شكلي بس لحد ما الباك يدعمه)
+onPlanChange(value: string) {
+  this.selectedPlanLabel = value;
+
+  // لو الباك بيدعم planId مستقبلاً:
+  // this.loadTemplates();
+
+  // حالياً مفيش فلترة حقيقية
+}
 
   columns: TableColumn[] = [
     { key: 'name', label: 'Template Name' },
-    { key: 'installments', label: 'Installments' },
-    { key: 'duration', label: 'Duration' },
-    {key:'type', label:'Type'},
+    { key: 'installments', label: 'Num of Installments' },
+    { key: 'duration', label: 'Max Duration of Payment' },
+    { key: 'isActive', label: 'Status', type: 'status' },
+    { key: 'createdAt', label: 'Created At' },
+    { key: 'updatedAt', label: 'Updated At' },
   ];
-
-  /* ================= INIT ================= */
 
   ngOnInit() {
     this.clubId = this.branchService.getClubId();
-
-    if (!this.clubId) {
-      console.error('❌ No clubId found');
-      return;
-    }
-
     this.loadTemplates();
   }
 
   /* ================= LOAD ================= */
 
   loadTemplates() {
-    this.loading = true;
-
     this.installmentService.getAll(this.clubId).subscribe({
       next: (res) => {
-        this.loading = false;
 
-        const items = res?.items || [];
-
-        this.data = items.map((item: any) => ({
+        this.data = res.map((item) => ({
           id: item.id,
           name: item.name,
           installments: item.numOfInstallments,
-          duration: item.duration + ' days', // ✅ FIXED
+          duration: item.durationOfPaymentInDays + ' days',
+          isActive: item.isActive,
+          createdAt: item.createdAt?.slice(0, 10),
+          updatedAt: item.updatedAt?.slice(0, 10),
         }));
 
-        this.filteredData = [...this.data];
-      },
-      error: (err) => {
-        this.loading = false;
-        console.error('❌ Error loading templates:', err);
+        this.applyFilters();
       }
     });
   }
 
-  /* ================= MODAL ================= */
+  applyFilters() {
+    let filtered = this.data;
 
-  openCreateModal() {
-    this.editItem = null;
-    this.showModal = true;
+    if (this.selectedStatus === 'Active') {
+      filtered = filtered.filter(i => i.isActive);
+    } else if (this.selectedStatus === 'Inactive') {
+      filtered = filtered.filter(i => !i.isActive);
+    }
+
+    this.filteredData = [...filtered];
   }
 
+  /* ================= ACTIONS ================= */
+
+  // 👁 VIEW
+  onView(row: any) {
+    this.installmentService.getById(row.id).subscribe((res) => {
+      this.previewInstallments = res.installments;
+      this.showPreviewModal = true;
+    });
+  }
+
+  // ✏️ EDIT
   onEdit(row: any) {
-    this.editItem = row;
+    this.selectedTemplateId = row.id;
+
+    this.installmentService.getById(row.id).subscribe((res) => {
+      this.editInstallments = res.installments;
+      this.showEditPercentagesModal = true;
+    });
+  }
+
+  // 💾 SAVE EDIT
+  onSaveEditInstallments(updated: any[]) {
+    this.installmentService
+      .updateInstallments(this.selectedTemplateId, updated)
+      .subscribe(() => {
+        this.showEditPercentagesModal = false;
+        this.loadTemplates();
+      });
+  }
+
+  /* ================= CREATE ================= */
+
+  openCreateModal() {
     this.showModal = true;
   }
 
   closeModal() {
     this.showModal = false;
-    this.editItem = null;
   }
 
-  /* ================= SAVE ================= */
+  onSaveTemplate(form: any) {
+    const payload = this.buildPayload(form);
+    if (!payload) return;
 
- onSaveTemplate(template: any) {
-
-  const payload = this.buildPayload(template);
-
-  if (!payload) return; // ✅ حل المشكلة هنا
-
-  if (this.editItem) {
-
-    this.installmentService.updateInstallments(
-      this.clubId,
-      this.editItem.id,
-      payload.installments
-    ).subscribe({
-      next: () => {
-        this.loadTemplates();
-        this.closeModal();
-      },
-      error: (err) => console.error('❌ Update Error:', err)
-    });
-
-  } else {
-
-    this.installmentService.create(this.clubId, payload).subscribe({
-      next: () => {
-        this.loadTemplates();
-        this.closeModal();
-      },
-      error: (err) => console.error('❌ Create Error:', err)
-    });
-  }
-}
-
-  /* ================= DELETE ================= */
-
-  onDelete(row: any) {
-    this.confirmService
-      .confirm({
-        title: 'Delete Template',
-        message: `Are you sure you want to delete "${row.name}"?`,
-        confirmText: 'Yes, Delete',
-        cancelText: 'Cancel',
+    this.installmentService
+      .create({
+        clubId: this.clubId,
+        ...payload,
       })
-      .subscribe((result) => {
-        if (result) {
-          this.data = this.data.filter((item) => item.id !== row.id);
-          this.filteredData = [...this.data];
-        }
+      .subscribe(() => {
+        this.loadTemplates();
+        this.closeModal();
       });
   }
 
-  /* ================= SEARCH ================= */
+  /* ================= HELPERS ================= */
 
-  onSearch(value: string) {
+  buildPayload(form: any) {
+    let installments: any[] = [];
 
-    const text = value.toLowerCase();
+    if (form.mode === 'auto') {
+      const percentage = 100 / form.installmentsCount;
+      const step = form.durationDays / form.installmentsCount;
 
-    if (!text) {
-      this.filteredData = [...this.data];
-      return;
+      for (let i = 0; i < form.installmentsCount; i++) {
+        installments.push({
+          order: i + 1,
+          percentage: +percentage.toFixed(2),
+          dueAfterDays: Math.round(step * (i + 1)),
+        });
+      }
+    } else {
+      const total = form.installments.reduce(
+        (sum: number, i: any) => sum + Number(i.percentage),
+        0
+      );
+
+      if (total !== 100) {
+        alert('Total must be 100%');
+        return null;
+      }
+
+      installments = form.installments.map((inst: any, index: number) => ({
+        order: index + 1,
+        percentage: inst.percentage,
+        dueAfterDays: inst.dueAfter,
+      }));
     }
 
-    this.filteredData = this.data.filter(
-      (item) =>
-        item.name.toLowerCase().includes(text) ||
-        item.duration.toLowerCase().includes(text)
-    );
+    return {
+      name: form.name,
+      numOfInstallments: installments.length,
+      durationInDays:
+        form.durationDays ||
+        Math.max(...installments.map((i) => i.dueAfterDays)),
+      installments,
+    };
   }
-
-  /* ================= PAYLOAD ================= */
-
- buildPayload(form: any): any | null {
-
-  let installments: any[] = [];
-
-  if (form.mode === 'auto') {
-
-    const percentage = 100 / form.installmentsCount;
-    const step = form.durationDays / form.installmentsCount;
-
-    for (let i = 0; i < form.installmentsCount; i++) {
-      installments.push({
-        order: i + 1,
-        percentage: +percentage.toFixed(2),
-        dueAfterDays: Math.round(step * (i + 1))
-      });
-    }
-
-  } else {
-
-    const total = form.installments.reduce(
-      (sum: number, i: any) => sum + Number(i.percentage),
-      0
-    );
-
-    if (total !== 100) {
-      alert('Total percentage must equal 100%');
-      return null; // ✅ بدل undefined
-    }
-
-    installments = form.installments.map((inst: any, index: number) => ({
-      order: index + 1,
-      percentage: inst.percentage,
-      dueAfterDays: inst.dueAfter
-    }));
-  }
-
-  return {
-    name: form.name,
-    numOfInstallments: installments.length,
-    durationInDays: form.durationDays || this.calculateDuration(installments),
-    installments
-  };
-}
-
-  calculateDuration(installments: any[]) {
-    return Math.max(...installments.map(i => i.dueAfterDays));
-  }
-
 }

@@ -1,0 +1,62 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div
+    class="bg-white dark:bg-darkCard w-full max-w-xl rounded-2xl shadow-xl border border-gray-200 dark:border-darkBorder"
+  >
+    <!-- Header -->
+    <div
+      class="flex justify-between items-center p-5 border-b border-gray-200 dark:border-darkBorder"
+    >
+      <div>
+        <h2 class="text-lg font-semibold text-darkGray dark:text-white">
+          Edit Installment Percentages
+        </h2>
+        <p class="text-sm text-mediumGray">Update the percentage distribution</p>
+      </div>
+
+      <button (click)="close.emit()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <form [formGroup]="form" class="p-5 space-y-4">
+      <div
+        *ngFor="let item of items.controls; let i = index"
+        [formGroupName]="i"
+        class="p-4 rounded-xl border border-gray-200 dark:border-darkBorder"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-medium text-mediumGray"> Installment #{{ i + 1 }} </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Percentage -->
+          <div>
+            <label class="text-sm font-medium">Percentage *</label>
+            <input
+              type="number"
+              formControlName="percentage"
+              class="w-full mt-1 px-3 py-2 rounded-xl bg-lightGray dark:bg-darkBg"
+            />
+          </div>
+
+          <!-- Due After -->
+          <div>
+            <label class="text-sm font-medium">Due After</label>
+            <div class="mt-2 text-mediumGray">{{ item.value.dueAfterDays }} days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="p-3 rounded-xl bg-blue-100 text-sm">Total: {{ getTotal() }}% / 100%</div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex justify-end gap-3 p-5 border-t border-gray-200 dark:border-darkBorder">
+      <button (click)="close.emit()" class="px-4 py-2 border rounded-xl">Cancel</button>
+
+      <button (click)="submit()" class="bg-primary text-white px-5 py-2 rounded-xl">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>

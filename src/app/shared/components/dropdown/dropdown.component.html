@@ -1,0 +1,38 @@
+<div class="relative">
+
+  <!-- Button -->
+  <button
+    (click)="toggle()"
+    class="px-4 py-2 rounded-xl border
+           bg-white dark:bg-darkCard
+           border-gray-200 dark:border-darkBorder
+           text-darkGray dark:text-white
+           hover:bg-gray-100 dark:hover:bg-darkBorder
+           transition w-full text-left"
+  >
+    {{ selected }}
+  </button>
+
+  <!-- Dropdown -->
+  <div
+    *ngIf="isOpen"
+    class="absolute mt-2 {{width}}
+           bg-white dark:bg-darkCard
+           border border-gray-200 dark:border-darkBorder
+           rounded-xl shadow-lg z-50 overflow-hidden"
+  >
+
+    <div
+      *ngFor="let option of options"
+      (click)="select(option)"
+      class="px-4 py-2 cursor-pointer
+             text-darkGray dark:text-white
+             hover:bg-gray-100 dark:hover:bg-darkBorder
+             transition"
+    >
+      {{ option }}
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,32 @@
+<app-page-layout
+  title="Pricing Policies"
+  subtitle="Create dynamic pricing rules and assign them to templates or events"
+>
+  <!-- Actions -->
+  <div actions class="flex items-center justify-between">
+
+    <!-- Search -->
+    <app-search-input
+      placeholder="Search policies..."
+      (search)="onSearch($event)"
+    ></app-search-input>
+
+    <!-- Create Button -->
+    <button
+      class="px-5 py-2 rounded-xl bg-primary text-white"
+      (click)="openCreateModal()"
+    >
+      + Create Policy
+    </button>
+
+  </div>
+
+  <!-- Table -->
+  <app-tables
+    [columns]="columns"
+    [data]="data"
+    [showActions]="true"
+    (edit)="onEdit($event)"
+  ></app-tables>
+
+</app-page-layout>

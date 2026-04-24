@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 /* ================= INTERFACES ================= */
@@ -10,19 +10,29 @@ export interface Installment {
   dueAfterDays: number;
 }
 
+export interface InstallmentTemplate {
+  id: string;
+  clubId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  durationOfPaymentInDays: number;
+  numOfInstallments: number;
+}
+
 export interface CreateTemplateDto {
+  clubId: string;
   name: string;
   numOfInstallments: number;
   durationInDays: number;
   installments: Installment[];
 }
 
-export interface TemplatesResponse {
-  items: any[];
-  hasMore: boolean;
-  page: number;
-  totalCount: number;
-  nextCursor: string;
+export interface TemplateDetails {
+  id: string;
+  name: string;
+  installments: Installment[];
 }
 
 /* ================= SERVICE ================= */
@@ -32,46 +42,60 @@ export interface TemplatesResponse {
 })
 export class InstallmentTemplatesService {
 
-  private baseUrl = 'https://easeclub.runasp.net/api/1';
+  private baseUrl = 'https://easeclub.runasp.net/api/v1';
 
   constructor(private http: HttpClient) {}
 
   /* ================= GET ALL ================= */
+  getAll(
+    clubId: string,
+    filters?: { planId?: string; active?: boolean }
+  ): Observable<InstallmentTemplate[]> {
 
-  getAll(clubId: string): Observable<TemplatesResponse> {
-    return this.http.get<TemplatesResponse>(
-      `${this.baseUrl}/clubs/${clubId}/installment-templates?page=1&limit=50`
+    let params = new HttpParams();
+
+    if (filters?.planId) {
+      params = params.set('planId', filters.planId);
+    }
+
+    if (filters?.active !== undefined) {
+      params = params.set('active', String(filters.active));
+    }
+
+    return this.http.get<InstallmentTemplate[]>(
+      `${this.baseUrl}/clubs/${clubId}/installment-templates`,
+      { params }
     );
   }
 
-  /* ================= GET BY ID ================= */
-
-  getById(clubId: string, id: string): Observable<any> {
-    return this.http.get<any>(
-      `${this.baseUrl}/clubs/${clubId}/installment-templates/${id}`
+  /* ================= GET DETAILS ================= */
+  getById(id: string): Observable<TemplateDetails> {
+    return this.http.get<TemplateDetails>(
+      `${this.baseUrl}/installment-templates/${id}`
     );
   }
 
   /* ================= CREATE ================= */
-
-  create(clubId: string, body: CreateTemplateDto): Observable<string> {
+  create(body: CreateTemplateDto): Observable<string> {
     return this.http.post(
-      `${this.baseUrl}/clubs/${clubId}/installment-templates`,
+      `${this.baseUrl}/installment-templates`,
       body,
-      { responseType: 'text' } // 🔥 مهم عشان بيرجع ID
+      { responseType: 'text' }
     );
   }
 
   /* ================= UPDATE ================= */
-
   updateInstallments(
-    clubId: string,
     id: string,
     installments: Installment[]
   ): Observable<void> {
+
+    // 🔥 Swagger عايز array of numbers فقط
+    const percentages = installments.map(i => i.percentage);
+
     return this.http.put<void>(
-      `${this.baseUrl}/clubs/${clubId}/installment-templates/${id}`,
-      installments
+      `${this.baseUrl}/installment-templates/${id}`,
+      percentages
     );
   }
 }

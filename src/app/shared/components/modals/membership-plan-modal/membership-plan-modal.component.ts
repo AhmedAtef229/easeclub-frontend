@@ -3,9 +3,9 @@ import {
   EventEmitter,
   Output,
   Input,
-  OnChanges,
-  SimpleChanges
+  OnInit
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -14,80 +14,88 @@ import {
   ReactiveFormsModule
 } from '@angular/forms';
 
+import { MembershipTypesService } from '../../../../core/services/api/membership-types.service';
+import { InstallmentTemplatesService } from '../../../../core/services/api/installment-templates.service';
+import { BranchService } from '../../../../core/services/api/branches.service';
+
 @Component({
   selector: 'app-membership-plan-modal',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './membership-plan-modal.component.html',
 })
-export class MembershipPlanModalComponent implements OnChanges {
+export class MembershipPlanModalComponent implements OnInit {
 
   @Input() plan: any = null;
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
 
-  form: FormGroup;
+  form!: FormGroup;
 
-  installmentTemplates = [
-    { id: 1, name: '3 Monthly Installments', installments: 3, duration: '90 days' },
-    { id: 2, name: '6 Month Payment Plan', installments: 6, duration: '180 days' },
-    { id: 3, name: 'Custom Quarterly', installments: 3 },
-    { id: 4, name: 'Full Payment', installments: 1, duration: '1 day' },
-  ];
+  membershipTypes: any[] = [];
+  installmentTemplates: any[] = [];
 
-  constructor(private fb: FormBuilder) {
+  clubId!: string;
+
+  constructor(
+    private fb: FormBuilder,
+    private membershipTypesService: MembershipTypesService,
+    private installmentService: InstallmentTemplatesService,
+    private branchService: BranchService
+  ) {}
+
+  ngOnInit() {
+    this.clubId = this.branchService.getClubId();
+
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      membershipType: ['', Validators.required],
+      membershipTypeId: ['', Validators.required],
       price: ['', Validators.required],
-      duration: ['', Validators.required],
-      active: [true],
-      templates: [[]],
+      durationInDays: [''],
+      isActive: [true],
+      templateIds: [[]],
+    });
+
+    this.loadMembershipTypes();
+    this.loadTemplates();
+  }
+
+  loadMembershipTypes() {
+    this.membershipTypesService.getMembershipTypes().subscribe((res: any) => {
+      this.membershipTypes = res?.items || res || [];
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['plan']) {
-      if (this.plan) {
-        this.form.patchValue({
-          name: this.plan.name,
-          description: '',
-          membershipType: this.plan.type,
-          price: this.plan.price?.replace('$', ''),
-          duration: this.plan.duration?.replace(' days', ''),
-          active: this.plan.active,
-        });
-      } else {
-        this.form.reset({
-          active: true,
-          templates: []
-        });
-      }
-    }
+  loadTemplates() {
+    this.installmentService.getAll(this.clubId).subscribe((res: any) => {
+      this.installmentTemplates = res || [];
+    });
   }
 
-  toggleTemplate(id: number) {
-    const current = this.form.value.templates as number[];
+  toggleTemplate(id: string) {
+    const current = this.form.value.templateIds || [];
 
-    if (current.includes(id)) {
-      this.form.patchValue({
-        templates: current.filter(x => x !== id),
-      });
-    } else {
-      this.form.patchValue({
-        templates: [...current, id],
-      });
-    }
+    this.form.patchValue({
+      templateIds: current.includes(id)
+        ? current.filter((x: string) => x !== id)
+        : [...current, id]
+    });
   }
 
-  submit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    this.save.emit(this.form.value);
+  isChecked(id: string) {
+    return (this.form.value.templateIds || []).includes(id);
   }
+
+submit() {
+  console.log('🔥 SUBMIT CLICKED', this.form.value);
+
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
+
+  this.save.emit(this.form.value);
+}
 }

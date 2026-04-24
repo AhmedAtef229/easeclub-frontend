@@ -1,0 +1,62 @@
+<app-page-layout
+  title="Application Templates"
+  subtitle="Manage your dynamic application forms and their connections."
+  >
+
+
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-4">
+
+<div></div>
+
+ <button
+      (click)="openCreateModal()"
+      class="bg-primary text-white px-5 py-2 rounded-xl
+             flex items-center gap-2 hover:opacity-90 transition"
+    >
+      <i class="fa-solid fa-plus text-sm"></i>
+      Create New Template
+    </button>
+
+  </div>
+
+  <!-- Table -->
+  <div class="rounded-2xl border border-gray-200 dark:border-darkBorder
+              bg-white dark:bg-darkCard p-4 overflow-x-auto">
+<app-tables
+  [columns]="columns"
+  [data]="data"
+  [showActions]="true"
+  [showManage]="true"
+  (edit)="onEdit($event)"
+  (manage)="onManageConnections($event)"
+></app-tables>
+
+  </div>
+
+</app-page-layout>
+
+<!-- 🔥 Pagination -->
+<app-pagination
+  [currentPage]="currentPage"
+  [totalCount]="totalCount"
+  [pageSize]="pageSize"
+  (pageChange)="onPageChange($event)"
+></app-pagination>
+
+<!-- 🔥 Create Modal -->
+<app-create-template-modal
+  *ngIf="showCreateModal"
+  (close)="closeCreateModal()"
+  (submitForm)="onCreateTemplate($event)"
+></app-create-template-modal>
+
+
+<!-- 🔥 Manage Connections Modal -->
+<app-template-connections
+  *ngIf="showConnectionsModal"
+  [template]="selectedTemplate"
+  (close)="closeConnectionsModal()"
+></app-template-connections>
+

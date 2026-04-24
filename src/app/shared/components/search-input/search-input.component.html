@@ -1,4 +1,4 @@
-<div class="relative w-full md:w-80">
+<div class="relative w-full md:w-64 lg:w-72">
 
   <!-- Icon -->
   <i
@@ -13,9 +13,12 @@
     type="text"
     [placeholder]="placeholder"
     (input)="onInput($any($event.target).value)"
-    class="w-full pl-9 pr-4 py-2 rounded-xl
+    class="w-full h-10
+           pl-9 pr-4
+           rounded-xl
            bg-white dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
+           text-sm
            text-darkGray dark:text-white
            placeholder:text-mediumGray
            focus:outline-none

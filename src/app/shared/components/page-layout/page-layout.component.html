@@ -1,30 +1,30 @@
-<div class="space-y-8">
+<div class="flex flex-col gap-6 sm:gap-8 min-h-full">
 
-  <!-- Header -->
+  <!-- Title -->
   <div>
-    <h1 class="text-3xl font-bold text-darkGray dark:text-white">
+    <h1 class="text-2xl sm:text-3xl font-bold text-darkGray dark:text-white">
       {{ title }}
     </h1>
 
-    <p class="text-mediumGray mt-2">
+    <p class="text-sm sm:text-base text-mediumGray mt-2">
       {{ subtitle }}
     </p>
   </div>
 
   <!-- Action Bar -->
   <div
-    class="bg-white dark:bg-darkCard
+    class="bg-cardGray dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
-           rounded-2xl p-5"
+           rounded-2xl p-4 sm:p-5"
   >
     <ng-content select="[actions]"></ng-content>
   </div>
 
   <!-- Main Content -->
   <div
-    class="bg-white dark:bg-darkCard
+    class="bg-cardGray dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
-           rounded-2xl p-6"
+           rounded-2xl p-4 sm:p-6 flex-1"
   >
     <ng-content></ng-content>
   </div>

@@ -1,19 +1,19 @@
 import { Routes } from '@angular/router';
 import { guestGuard } from './core/auth/guest.guard';
-import { authGuard } from './core/auth/auth.guard'; // Ensure this is your logged-in guard
+import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
-  // 1. Initial Redirect: If user hits "", send them to the admin dashboard
-  { 
-    path: '', 
-    redirectTo: 'admin/dashboard', 
-    pathMatch: 'full' 
+  // ================= ROOT =================
+  {
+    path: '',
+    redirectTo: 'admin/dashboard',
+    pathMatch: 'full',
   },
 
-  // ================= AUTH (Public/Guest) =================
+  // ================= AUTH =================
   {
     path: 'login',
-    canActivate: [guestGuard], // Prevents logged-in users from seeing login
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/login/login.component').then((c) => c.LoginComponent),
   },
@@ -25,11 +25,10 @@ export const routes: Routes = [
       ),
   },
 
-  // ================= ADMIN (Protected) =================
+  // ================= ADMIN =================
   {
     path: 'admin',
-    // THIS LINE PROTECTS ALL CHILDREN BELOW AUTOMATICALLY
-    canActivateChild: [authGuard], 
+    canActivateChild: [authGuard],
     loadComponent: () =>
       import('./shared/admin-layout/admin-layout.component').then((c) => c.AdminLayoutComponent),
     children: [
@@ -40,6 +39,49 @@ export const routes: Routes = [
             (c) => c.DashboardComponent,
           ),
       },
+
+      // 🔥 Club Settings
+   {
+  path: 'club-settings',
+  loadComponent: () =>
+    import('./features/admin/club-settings/club-settings.component').then(
+      (c) => c.ClubSettingsComponent,
+    ),
+},
+      // 🔥 Application Templates
+      {
+        path: 'application-templates',
+        loadComponent: () =>
+          import('./features/admin/application-templates/application-templates.component').then(
+            (c) => c.ApplicationTemplatesComponent,
+          ),
+      },
+
+      // 🔥 Application Reviews (NEW)
+      {
+        path: 'application-reviews',
+        loadComponent: () =>
+          import('./features/admin/application-reviews/application-reviews.component').then(
+            (c) => c.ApplicationReviewsComponent,
+          ),
+      },
+
+      // 🔥 Payments (NEW)
+      {
+        path: 'payments',
+        loadComponent: () =>
+          import('./features/admin/payments/payments.component').then((c) => c.PaymentsComponent),
+      },
+
+      // 🔥 Pricing Policies (NEW)
+      {
+        path: 'pricing-policies',
+        loadComponent: () =>
+          import('./features/admin/pricing-policies/pricing-policies.component').then(
+            (c) => c.PricingPoliciesComponent,
+          ),
+      },
+
       {
         path: 'membership-plans',
         loadComponent: () =>
@@ -66,11 +108,7 @@ export const routes: Routes = [
             (c) => c.InstallmentTemplatesComponent,
           ),
       },
-      {
-        path: 'bookings',
-        loadComponent: () =>
-          import('./features/admin/bookings/bookings.component').then((m) => m.BookingsComponent),
-      },
+
       {
         path: 'memberships',
         loadComponent: () =>
@@ -78,7 +116,8 @@ export const routes: Routes = [
             (m) => m.MembershipsComponent,
           ),
       },
-      // Default child route for /admin
+
+      // ✅ Default داخل admin
       {
         path: '',
         redirectTo: 'dashboard',

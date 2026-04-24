@@ -4,20 +4,19 @@
 >
   <div actions class="flex items-center justify-between gap-4">
 
-    <!-- Search -->
-    <app-search-input
-      placeholder="Search branches..."
-      (search)="onSearch($event)"
-    ></app-search-input>
+    <!-- ✅ Dropdown Reusable -->
+    <app-dropdown
+      [options]="['All','Active','Inactive']"
+      [selected]="selectedFilter"
+      (valueChange)="applyFilter($event)"
+    ></app-dropdown>
 
-    <!-- Create Button -->
+    <!-- Create -->
     <button
-      class="bg-primary text-white px-5 py-2 rounded-xl
-             flex items-center gap-2 hover:opacity-90 transition"
+      class="bg-primary text-white px-5 py-2 rounded-xl"
       (click)="openCreateModal()"
     >
-      <i class="fa-solid fa-plus text-sm"></i>
-      Create Branch
+      + Create Branch
     </button>
 
   </div>
@@ -25,14 +24,12 @@
   <!-- Table -->
   <app-tables
     [columns]="columns"
-    [data]="filteredData"
+    [data]="data"
     (edit)="onEdit($event)"
-    [showActions]="true"
+    (toggleStatus)="onToggleStatus($event)"
   ></app-tables>
-
 </app-page-layout>
 
-<!-- Modal -->
 <app-branch-modal
   *ngIf="showModal"
   [data]="editItem"

@@ -2,7 +2,7 @@ import { ApplicationConfig,provideAppInitializer,inject } from '@angular/core';
 import { provideHttpClient,withInterceptors} from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import { APP_INITIALIZER } from '@angular/core';
 import { AuthService } from './core/auth/auth.service';
 import { authInterceptor } from './core/auth/auth.interceptor';
 
