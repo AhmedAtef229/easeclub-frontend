@@ -1,1 +1,160 @@
-<p>payments works!</p>
+<!-- payments.component.html -->
+
+<app-page-layout
+  title="Finance Hub"
+  subtitle="Manage membership installments, invoices, and payment tracking"
+>
+
+  <!-- ================= STATS ================= -->
+
+  <div actions class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+    <div
+      *ngFor="let stat of stats"
+      class="bg-cardGray dark:bg-darkCard
+             border border-borderGray dark:border-darkBorder
+             rounded-2xl p-5
+             flex items-center justify-between"
+    >
+      <div>
+        <p class="text-sm text-mediumGray">
+          {{ stat.title }}
+        </p>
+
+        <h3 class="text-4xl font-semibold mt-2 text-darkGray dark:text-white">
+          {{ stat.value }}
+        </h3>
+
+        <p class="text-sm text-mediumGray mt-2">
+          {{ stat.subtitle }}
+        </p>
+      </div>
+
+      <div
+        class="w-14 h-14 rounded-2xl
+               flex items-center justify-center"
+        [ngClass]="stat.iconBg"
+      >
+        <i
+          class="fa-solid text-2xl"
+          [ngClass]="[stat.icon, stat.iconColor]"
+        ></i>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= FILTERS + TABS ================= -->
+
+  <div
+    class="mt-6
+           bg-cardGray dark:bg-darkCard
+           border border-borderGray dark:border-darkBorder
+           rounded-2xl overflow-hidden"
+  >
+
+    <!-- Tabs -->
+
+    <div
+      class="flex items-center gap-8
+             px-6 pt-5
+             border-b border-borderGray dark:border-darkBorder"
+    >
+
+      <button
+        (click)="switchTab('installments')"
+        class="pb-4 text-sm font-semibold border-b-2 transition"
+        [ngClass]="
+          activeTab === 'installments'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-darkGray dark:text-white'
+        "
+      >
+        Installments
+      </button>
+
+      <button
+        (click)="switchTab('invoices')"
+        class="pb-4 text-sm font-semibold border-b-2 transition"
+        [ngClass]="
+          activeTab === 'invoices'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-darkGray dark:text-white'
+        "
+      >
+        Invoices (Finance Ledger)
+      </button>
+
+    </div>
+
+    <!-- Filters -->
+
+    <div class="p-4 md:p-6">
+
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+        <!-- Search -->
+
+        <div class="lg:col-span-3">
+
+          <label
+            class="block mb-2 text-sm font-semibold
+                   text-darkGray dark:text-white"
+          >
+            Search
+          </label>
+
+          <app-search-input
+            placeholder="Search by Installment ID or Membership Number..."
+            (search)="onSearch($event)"
+          ></app-search-input>
+
+        </div>
+
+        <!-- Status -->
+
+        <div>
+
+          <label
+            class="block mb-2 text-sm font-semibold
+                   text-darkGray dark:text-white"
+          >
+            Status
+          </label>
+
+          <app-dropdown
+            [options]="statusOptions"
+            [selected]="selectedStatus"
+            (valueChange)="onStatusChange($event)"
+          ></app-dropdown>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= TABLE ================= -->
+
+  <div class="mt-6">
+
+    <app-tables
+      [columns]="columns"
+      [data]="filteredPayments"
+      [showActions]="false"
+    ></app-tables>
+
+  </div>
+
+  <!-- ================= EMPTY STATE ================= -->
+
+  <div
+    *ngIf="filteredPayments?.length === 0"
+    class="text-center py-10 text-gray-400"
+  >
+    No Data Found
+  </div>
+
+</app-page-layout>

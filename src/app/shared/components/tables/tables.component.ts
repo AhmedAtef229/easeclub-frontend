@@ -23,6 +23,7 @@ export class TablesComponent {
   @Input() showActions: boolean = true;
   @Input() showView: boolean = false;
   @Input() showCopy: boolean = false;
+  @Input() showEdit: boolean = true;
 
   @Output() edit = new EventEmitter<any>();
   @Output() view = new EventEmitter<any>();

@@ -6,14 +6,21 @@ import { Observable } from 'rxjs';
 
 export interface MembershipPlan {
   id: string;
+  membershipTypeId: string;
   name: string;
-  membershipTypeName: string;
+  description?: string;
+  membershipTypeName: any;
   price: number;
+  renewPrice?: number;
   maxPaymentPeriod: number;
   subscriptionValidityInYears: number;
   maxFamilyMembers: number;
   isActive: boolean;
   createdAt: string;
+  enrollmentMode?: string;
+  paymentMode?: string;
+  installmentsAllowedInRenewal?: boolean;
+  installmentTemplateIds?: string[];
 }
 
 export interface MembershipPlansResponse {
@@ -31,13 +38,25 @@ export interface CreatePlanDto {
   subscriptionValidityInYears: number;
   maxFamilyMembers: number;
   durationInDays: number;
+  enrollmentMode: string;
+  applicationTemplateId?: string;
+  paymentMode: 'Cash' | 'Installments' | 'Mixed';
+  installmentTemplateIds?: string[];
+  installmentsAllowedInRenewal?: boolean;
+  renewPrice?: number;
 }
 
 export interface UpdatePlanDto {
+  membershipTypeId?: string;
   name: string;
   description: string;
   totalPrice: number;
-  installmentTemplateIds: string[];
+  renewPrice: number;
+  subscriptionValidityInYears: number;
+  durationInDays: number;
+  maxFamilyMembers?: number;
+  enrollmentMode?: string;
+  paymentMode?: string;
 }
 
 /* ================= SERVICE ================= */
@@ -72,23 +91,23 @@ export class MembershipPlansService {
     }
 
     if (filters?.isActive !== undefined) {
-      params = params.set('isActive', String(filters.isActive)); // ✅ FIX
+      params = params.set('isActive', String(filters.isActive));
     }
 
     if (filters?.page) {
-      params = params.set('page', filters.page.toString());
+      params = params.set('Page', filters.page.toString()); // ✅ FIX
     }
 
     if (filters?.limit) {
-      params = params.set('limit', filters.limit.toString());
+      params = params.set('Limit', filters.limit.toString()); // ✅ FIX
     }
 
     if (filters?.sortBy) {
-      params = params.set('sortBy', filters.sortBy);
+      params = params.set('SortBy', filters.sortBy); // ✅ FIX
     }
 
     if (filters?.sortDesc !== undefined) {
-      params = params.set('sortDesc', String(filters.sortDesc));
+      params = params.set('SortDesc', String(filters.sortDesc)); // ✅ FIX
     }
 
     return this.http.get<MembershipPlansResponse>(
@@ -111,7 +130,7 @@ export class MembershipPlansService {
     return this.http.post(
       `${this.baseUrl}/clubs/${clubId}/membership-plans`,
       body,
-      { responseType: 'text' } // ✅ بيرجع ID
+      { responseType: 'text' }
     );
   }
 
@@ -124,14 +143,39 @@ export class MembershipPlansService {
     );
   }
 
-  /* ================= TOGGLE STATUS (Helper) ================= */
+  /* ================= UPDATE INSTALLMENT TEMPLATES ================= */
 
-  toggleStatus(planId: string, isActive: boolean): Observable<void> {
-    return this.update(planId, {
-      name: '',
-      description: '',
-      totalPrice: 0,
-      installmentTemplateIds: []
-    });
+  updateInstallmentTemplates(
+    planId: string,
+    installmentTemplateIds: string[]
+  ): Observable<void> {
+
+    return this.http.put<void>(
+      `${this.baseUrl}/membership-plans/${planId}/installment-templates`,
+      { installmentTemplateIds }
+    );
   }
+
+  /* ================= DELETE ================= */
+
+  delete(planId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/membership-plans/${planId}`
+    );
+  }
+
+  /* ================= DIRECT PAY ================= */
+
+  directPay(planId: string, body: {
+    clubId: string;
+    membershipTypeId: string;
+    installmentTemplateId: string;
+  }): Observable<any> {
+
+    return this.http.post(
+      `${this.baseUrl}/membership-plans/${planId}/direct-pay`,
+      body
+    );
+  }
+
 }

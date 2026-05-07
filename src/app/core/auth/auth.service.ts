@@ -47,7 +47,7 @@ async initAuth(): Promise<void> {
     // This is the "Green Light" for all Guards
     this.isInitializing.next(false);
   }
-  
+
 }
   // ------------------------
   // Getters

@@ -1,0 +1,31 @@
+<!-- Actions -->
+<div class="flex items-center justify-between mb-6">
+
+  <app-search-input
+    placeholder="Search policies..."
+    (search)="onSearch($event)"
+  ></app-search-input>
+
+  <button
+    class="px-5 py-2 rounded-xl bg-primary text-white"
+   (click)="openCreate()"
+  >
+    + Create Policy
+  </button>
+
+
+</div>
+
+<app-tables
+  [columns]="columns"
+  [data]="filteredData"
+  [showActions]="true"
+ (edit)="openEdit($event)"
+></app-tables>
+<app-create-policy-modal
+  *ngIf="showModal"
+  [mode]="isEdit ? 'edit' : 'create'"
+  [data]="selectedPolicy"
+  (close)="showModal = false"
+  (save)="onSavePolicy($event)"
+></app-create-policy-modal>

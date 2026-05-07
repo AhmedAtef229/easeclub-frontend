@@ -1,12 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
-import { MembershipPlanModalComponent } from '../../../shared/components/modals/membership-plan-modal/membership-plan-modal.component';
+import { MembershipPlanModalComponent } from '../../../shared/components/modals/memberships-plan-modal/membership-plan-modal/membership-plan-modal.component';
+import { MembershipPlanEditModalComponent } from '../../../shared/components/modals/memberships-plan-modal/membership-plan-edit-modal/membership-plan-edit-modal.component';
+import { MembershipPlanLinkModalComponent } from '../../../shared/components/modals/memberships-plan-modal/membership-plan-link-modal/membership-plan-link-modal.component';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { InstallmentPlanModalComponent } from '../../../shared/components/modals/installment-plan-modal/installment-plan-modal.component';
-import { MembershipPlansService } from '../../../core/services/api/membership-plans.service';
+import {
+  MembershipPlansService,
+  MembershipPlan,
+  CreatePlanDto,
+  UpdatePlanDto,
+} from '../../../core/services/api/membership-plans.service';
 import { BranchService } from '../../../core/services/api/branches.service';
+
+type StatusFilter = 'All' | 'Active' | 'Inactive';
 
 @Component({
   selector: 'app-membership-plans',
@@ -16,6 +25,8 @@ import { BranchService } from '../../../core/services/api/branches.service';
     PageLayoutComponent,
     TablesComponent,
     MembershipPlanModalComponent,
+    MembershipPlanEditModalComponent,
+    MembershipPlanLinkModalComponent,
     InstallmentPlanModalComponent,
     DropdownComponent,
   ],
@@ -25,143 +36,206 @@ export class MembershipPlansComponent implements OnInit {
   constructor(
     private plansService: MembershipPlansService,
     private branchService: BranchService,
+    private cdr: ChangeDetectorRef,
   ) {}
-  showInstallmentModal: boolean = false;
-  selectedPlanForInstallments: any = null;
+
+  /* ================= STATE ================= */
 
   clubId!: string;
+
+  data: MembershipPlan[] = [];
+  filteredData: MembershipPlan[] = [];
+
+  selectedStatus: StatusFilter = 'All';
+
+  showModal = false;
+  showEditModal = false;
+  showLinkModal = false;
+  selectedPlan: MembershipPlan | null = null;
+
+  showInstallmentModal = false;
+  selectedPlanForInstallments: MembershipPlan | null = null;
+
+  /* ================= TABLE ================= */
 
   columns: TableColumn[] = [
     { key: 'name', label: 'Plan Name' },
     { key: 'membershipTypeName', label: 'Type', type: 'badge' },
     { key: 'price', label: 'Price' },
-    { key: 'subscriptionValidityInYears', label: 'Years' },
-    { key: 'maxFamilyMembers', label: 'Family Members' },
+    { key: 'renewPrice', label: 'Renew Price' },
+    { key: 'maxFamilyMembers', label: 'Max Family Members' },
+    { key: 'paymentMode', label: 'Payment Mode' },
+    { key: 'installmentsAllowedInRenewal', label: 'Installment in Renew', type: 'boolean' },
+    { key: 'subscriptionValidityInYears', label: 'Validity (Years)' },
+    { key: 'enrollmentMode', label: 'Enrollment Mode' },
     { key: 'isActive', label: 'Status', type: 'status' },
   ];
 
-  data: any[] = [];
-  filteredData: any[] = [];
+  /* ================= INIT ================= */
 
-  selectedStatus = 'All';
-
-  showModal = false;
-  selectedPlan: any = null;
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.clubId = this.branchService.getClubId();
     this.loadPlans();
   }
 
+  /* ================= FILTER ================= */
+
+  onStatusChange(value: string): void {
+    const v = value as StatusFilter;
+
+    if (v === 'All' || v === 'Active' || v === 'Inactive') {
+      this.selectedStatus = v;
+      this.loadPlans();
+    }
+  }
+
   /* ================= LOAD ================= */
 
-  loadPlans() {
-    const filters: any = {};
+  loadPlans(): void {
+    const filters: any = {
+      page: 1,
+      limit: 50,
+    };
 
     if (this.selectedStatus === 'Active') filters.isActive = true;
     if (this.selectedStatus === 'Inactive') filters.isActive = false;
 
-    this.plansService.getAll(this.clubId, filters).subscribe((res) => {
-      this.data = res.items;
-      this.filteredData = [...this.data];
+    this.plansService.getAll(this.clubId, filters).subscribe({
+      next: (res) => {
+        // Use setTimeout to avoid NG0901 ExpressionChangedAfterItHasBeenCheckedError
+        setTimeout(() => {
+          this.data = (res.items || []).map((item: MembershipPlan) => ({
+            ...item,
+            // Convert to array because Table component expects array for 'badge' type
+            membershipTypeName: item.membershipTypeName ? [item.membershipTypeName] : [],
+          }));
+
+          this.filteredData = [...this.data];
+        });
+      },
+      error: (err) => console.error('API ERROR:', err),
     });
   }
 
-  onToggleStatus(row: any) {
-  row.isActive = !row.isActive;
+  /* ================= STATUS TOGGLE ================= */
 
-  // 🔥 هنا تربطه بالـ API بعدين
-  console.log('Status toggled:', row);
-}
-  /* ================= FILTER ================= */
-
-  onStatusChange(value: string) {
-    this.selectedStatus = value;
-    this.loadPlans();
+  onToggleStatus(row: MembershipPlan): void {
+    row.isActive = !row.isActive;
+    console.log('STATUS TOGGLED:', row);
   }
 
   /* ================= MODAL ================= */
 
-  openCreateModal() {
+  openCreateModal(): void {
     this.selectedPlan = null;
     this.showModal = true;
   }
 
-  onEdit(row: any) {
-    this.selectedPlan = row;
-    this.showModal = true;
+  onEdit(row: MembershipPlan): void {
+    // 🟢 جلب البيانات كاملة لأن قائمة الـ GET لا ترجع كل الحقول (مثل renewPrice و membershipTypeId)
+    this.plansService.getById(row.id).subscribe({
+      next: (fullPlan) => {
+        this.selectedPlan = fullPlan;
+        this.showEditModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('GET DETAILS ERROR', err),
+    });
   }
 
-  closeModal() {
+  onManageTemplates(row: MembershipPlan): void {
+    this.plansService.getById(row.id).subscribe({
+      next: (fullPlan) => {
+        this.selectedPlan = fullPlan;
+        this.showLinkModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('GET DETAILS ERROR', err),
+    });
+  }
+
+  closeModal(): void {
     this.showModal = false;
+    this.showEditModal = false;
+    this.showLinkModal = false;
+    this.cdr.detectChanges();
   }
 
   /* ================= SAVE ================= */
 
- onSavePlan(form: any) {
-  console.log('🔥 FORM DATA:', form);
+  onSavePlan(form: any): void {
+    const years = +form.subscriptionValidityInYears || 1;
+    const body: CreatePlanDto = {
+      membershipTypeId: form.membershipTypeId,
+      name: form.name,
+      price: +form.price,
+      renewPrice: +form.renewPrice || 0,
+      subscriptionValidityInYears: years,
+      maxFamilyMembers: +form.maxFamilyMembers || 0,
+      durationInDays: years * 365,
+      enrollmentMode: form.enrollmentMode,
+      paymentMode: form.paymentMode,
+      installmentTemplateIds: form.templateIds || [],
+      installmentsAllowedInRenewal: form.installmentsAllowedInRenewal || false,
+    };
 
-  if (this.selectedPlan) {
-    // ================= UPDATE =================
-    this.plansService
-      .update(this.selectedPlan.id, {
-        name: form.name,
-        description: form.description || '',
-        totalPrice: +form.price,
-        installmentTemplateIds: form.templateIds || [],
-      })
-      .subscribe({
-        next: () => {
+    this.plansService.create(this.clubId, body).subscribe({
+      next: (planId: string) => {
+        if (body.installmentTemplateIds?.length) {
+          this.plansService
+            .updateInstallmentTemplates(planId, body.installmentTemplateIds)
+            .subscribe({
+              next: () => {
+                this.loadPlans();
+                this.closeModal();
+              },
+              error: (err) => console.error('TEMPLATES ERROR', err),
+            });
+        } else {
           this.loadPlans();
           this.closeModal();
-        },
-        error: (err) => {
-          console.error('❌ UPDATE ERROR', err);
         }
-      });
-
-  } else {
-    // ================= CREATE =================
-    this.plansService
-      .create(this.clubId, {
-        membershipTypeId: form.membershipTypeId,
-        name: form.name,
-        price: +form.price,
-        subscriptionValidityInYears: 1, // ثابت مؤقتًا
-        maxFamilyMembers: +form.maxFamilyMembers || 0, // ✅ مهم
-        durationInDays: +form.durationInDays || 0,
-      })
-      .subscribe({
-        next: (planId) => {
-
-          // ================= LINK TEMPLATES =================
-          if (form.templateIds?.length) {
-            this.plansService
-              .update(planId, {
-                name: form.name,
-                description: form.description || '',
-                totalPrice: +form.price,
-                installmentTemplateIds: form.templateIds,
-              })
-              .subscribe({
-                next: () => {
-                  this.loadPlans();
-                  this.closeModal();
-                },
-                error: (err) => {
-                  console.error('❌ LINK TEMPLATES ERROR', err);
-                }
-              });
-
-          } else {
-            this.loadPlans();
-            this.closeModal();
-          }
-        },
-        error: (err) => {
-          console.error('❌ CREATE ERROR', err);
-        }
-      });
+      },
+      error: (err) => console.error('CREATE ERROR', err),
+    });
   }
-}
+  onSaveEdit(form: any): void {
+    if (!this.selectedPlan) return;
+
+    const years = this.selectedPlan.subscriptionValidityInYears || 1;
+    const body: UpdatePlanDto = {
+      membershipTypeId: this.selectedPlan.membershipTypeId,
+      name: form.name,
+      description: form.description || this.selectedPlan.description || '',
+      totalPrice: +form.price || this.selectedPlan.price,
+      renewPrice: +form.renewPrice || this.selectedPlan.renewPrice || this.selectedPlan.price,
+      subscriptionValidityInYears: years,
+      durationInDays: years * 365,
+      maxFamilyMembers: this.selectedPlan.maxFamilyMembers,
+      enrollmentMode: this.selectedPlan.enrollmentMode,
+      paymentMode: this.selectedPlan.paymentMode,
+    };
+
+    this.plansService.update(this.selectedPlan.id, body).subscribe({
+      next: () => {
+        this.loadPlans();
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('UPDATE ERROR DETAILS:', err.error); // ✅ عرض تفاصيل الخطأ بدقة
+      },
+    });
+  }
+
+  onSaveLink(templateIds: string[]): void {
+    if (!this.selectedPlan) return;
+
+    this.plansService.updateInstallmentTemplates(this.selectedPlan.id, templateIds).subscribe({
+      next: () => {
+        this.loadPlans();
+        this.closeModal();
+      },
+      error: (err) => console.error('LINK TEMPLATES ERROR', err),
+    });
+  }
 }

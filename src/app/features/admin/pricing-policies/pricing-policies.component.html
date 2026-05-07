@@ -2,31 +2,41 @@
   title="Pricing Policies"
   subtitle="Create dynamic pricing rules and assign them to templates or events"
 >
-  <!-- Actions -->
-  <div actions class="flex items-center justify-between">
 
-    <!-- Search -->
-    <app-search-input
-      placeholder="Search policies..."
-      (search)="onSearch($event)"
-    ></app-search-input>
+  <!-- ✅ حط التابس هنا -->
+  <div actions
+       class="w-full
+              bg-cardGray dark:bg-darkCard
+              border border-borderGray dark:border-darkBorder
+              rounded-2xl px-6 py-4 mt-4">
 
-    <!-- Create Button -->
+    <div actions class="w-full bg-cardGray dark:bg-darkCard border rounded-2xl px-6 py-4 mt-4">
+  <div class="flex gap-8 border-b border-borderGray dark:border-darkBorder relative">
+
     <button
-      class="px-5 py-2 rounded-xl bg-primary text-white"
-      (click)="openCreateModal()"
+      routerLink="pricing-policy-content"
+      routerLinkActive="active-tab"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="tab-btn"
     >
-      + Create Policy
+      Policies
+    </button>
+
+    <button
+      routerLink="pricing-policy-assignment"
+      routerLinkActive="active-tab"
+      class="tab-btn"
+    >
+      Assignments
     </button>
 
   </div>
+</div>
+  </div>
 
-  <!-- Table -->
-  <app-tables
-    [columns]="columns"
-    [data]="data"
-    [showActions]="true"
-    (edit)="onEdit($event)"
-  ></app-tables>
+  <!-- ✅ المحتوى -->
+  <router-outlet></router-outlet>
 
 </app-page-layout>
+
+

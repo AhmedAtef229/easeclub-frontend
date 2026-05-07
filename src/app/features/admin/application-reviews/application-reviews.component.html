@@ -1,25 +1,17 @@
-<!-- application-reviews.component.html -->
 <app-page-layout
   title="Application Reviews"
   subtitle="Review and manage member application submissions"
 >
-
   <!-- ================= FILTERS ================= -->
 
   <div
     actions
-    class="w-full
-           bg-cardGray dark:bg-darkCard
-           border border-borderGray dark:border-darkBorder
-           rounded-2xl
-           p-4 md:p-6"
+    class="w-full bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-4 md:p-6"
   >
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
       <!-- Search -->
       <div>
-
         <label class="block mb-2 text-sm font-semibold text-darkGray dark:text-white">
           Search
         </label>
@@ -28,12 +20,10 @@
           placeholder="Search by tracking number"
           (search)="onSearch($event)"
         ></app-search-input>
-
       </div>
 
       <!-- Status -->
       <div>
-
         <label class="block mb-2 text-sm font-semibold text-darkGray dark:text-white">
           Status
         </label>
@@ -43,12 +33,10 @@
           [selected]="selectedStatus"
           (valueChange)="onStatusChange($event)"
         ></app-dropdown>
-
       </div>
 
       <!-- Date From -->
       <div>
-
         <label class="block mb-2 text-sm font-semibold text-darkGray dark:text-white">
           Date From
         </label>
@@ -56,19 +44,12 @@
         <input
           type="date"
           [(ngModel)]="dateFrom"
-          class="w-full h-10 px-4 rounded-xl
-                 bg-white dark:bg-darkCard
-                 border border-gray-200 dark:border-darkBorder
-                 text-darkGray dark:text-white
-                 focus:outline-none
-                 focus:ring-2 focus:ring-lavender"
+          class="w-full h-10 px-4 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-darkGray dark:text-white dark:[color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-lavender"
         />
-
       </div>
 
       <!-- Date To -->
       <div>
-
         <label class="block mb-2 text-sm font-semibold text-darkGray dark:text-white">
           Date To
         </label>
@@ -76,36 +57,30 @@
         <input
           type="date"
           [(ngModel)]="dateTo"
-          class="w-full h-10 px-4 rounded-xl
-                 bg-white dark:bg-darkCard
-                 border border-gray-200 dark:border-darkBorder
-                 text-darkGray dark:text-white
-                 focus:outline-none
-                 focus:ring-2 focus:ring-lavender"
+          class="w-full h-10 px-4 rounded-xl bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder text-darkGray dark:text-white dark:[color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-lavender"
         />
-
       </div>
 
     </div>
-
   </div>
 
   <!-- ================= TABLE ================= -->
 
-  <div class="mt-6">
-
-    <app-tables
-
-      [columns]="columns"
-
-      [data]="data"
-
-      [showView]="true"
-
-      (view)="onEdit($event)"
-
-    ></app-tables>
-
-  </div>
-
+  <app-tables
+    *ngIf="data?.length"
+    [columns]="columns"
+    [data]="data"
+    [showView]="true"
+    [showEdit]="false"
+    (view)="onView($event)"
+  ></app-tables>
 </app-page-layout>
+
+<!-- ================= MODAL ================= -->
+
+<app-application-reviews-modal
+  *ngIf="isModalOpen"
+  [isOpen]="isModalOpen"
+  [data]="selectedRow"
+  (close)="closeModal()"
+></app-application-reviews-modal>

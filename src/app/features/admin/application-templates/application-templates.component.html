@@ -28,9 +28,9 @@
   [columns]="columns"
   [data]="data"
   [showActions]="true"
-  [showManage]="true"
+
   (edit)="onEdit($event)"
-  (manage)="onManageConnections($event)"
+
 ></app-tables>
 
   </div>
@@ -48,15 +48,9 @@
 <!-- 🔥 Create Modal -->
 <app-create-template-modal
   *ngIf="showCreateModal"
+  [templateId]="selectedTemplateId"
+  [initialData]="selectedTemplateData"
   (close)="closeCreateModal()"
   (submitForm)="onCreateTemplate($event)"
 ></app-create-template-modal>
-
-
-<!-- 🔥 Manage Connections Modal -->
-<app-template-connections
-  *ngIf="showConnectionsModal"
-  [template]="selectedTemplate"
-  (close)="closeConnectionsModal()"
-></app-template-connections>
 

@@ -23,11 +23,13 @@
 
         <!-- TITLE -->
         <div>
-          <div class="font-semibold text-base text-darkGray dark:text-white">Template Builder</div>
+          <div class="font-semibold text-base text-darkGray dark:text-white mb-1">Template Builder</div>
 
-          <div class="text-xs text-mediumGray">
-            {{ templateName }}
-          </div>
+          <input
+            [(ngModel)]="templateName"
+            placeholder="Template Name..."
+            class="text-sm bg-transparent border-b border-borderGray dark:border-darkBorder focus:border-primary dark:focus:border-primary outline-none text-darkGray dark:text-white pb-0.5 w-64 transition-colors"
+          />
         </div>
       </div>
 
@@ -86,7 +88,7 @@
         <div
           *ngFor="let f of fieldTypes"
           (click)="addField(f.type)"
-          class="flex items-center gap-3 p-3 rounded-xl mb-3 cursor-pointer border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard hover:bg-cardGray dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.03] transition-all duration-200 ease-out"
+          class="flex items-center gap-3 p-3 rounded-xl mb-3 cursor-pointer border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard hover:bg-cardGray dark:hover:bg-darkBorder hover:border-primary dark:hover:border-darkPrimary hover:scale-[1.03] transition-all duration-200"
         >
           <div
             class="w-10 h-10 flex items-center justify-center rounded-lg bg-cardGray dark:bg-darkBorder"
@@ -158,20 +160,21 @@
       >
         <div class="flex justify-between mb-3">
           <div class="font-medium flex items-center gap-2 text-darkGray dark:text-white">
+            <i *ngIf="section.system" class="fa-solid fa-users text-purple-500 text-sm"></i>
             {{ section.title }}
 
             <span
               *ngIf="section.repeatable"
-              class="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
+              class="text-[10px] bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300 px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
             >
               Repeatable
             </span>
 
             <span
               *ngIf="section.system"
-              class="text-xs bg-purple-100 text-purple-600
+              class="text-[10px] bg-purple-100 text-purple-600
                      dark:bg-purple-900/40 dark:text-purple-300
-                     px-2 py-1 rounded"
+                     px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
             >
               System
             </span>
@@ -189,40 +192,47 @@
 
         <div
           *ngFor="let field of section.fields || []"
-          class="border border-borderGray dark:border-darkBorder
-                 bg-white dark:bg-darkBg
-                 p-3 rounded-lg mb-2
-                 flex justify-between items-center
-                 cursor-pointer
-                 hover:border-primary transition-all"
+          class="border p-3 rounded-lg mb-2 flex justify-between items-center cursor-pointer transition-all duration-200"
+          [ngClass]="{
+            'border-primary ring-2 ring-primary/20 bg-primary/5': selectedField === field,
+            'border-borderGray dark:border-darkBorder bg-white dark:bg-darkBg hover:border-primary': selectedField !== field
+          }"
           draggable="true"
           (dragstart)="dragStartField(field)"
           (drop)="dropField(section)"
           (dragover)="$event.preventDefault()"
           (click)="selectField(field); $event.stopPropagation()"
         >
-          <div>
-            <div class="font-medium text-darkGray dark:text-white">
-              {{ field.label }}
+            <div>
+              <div class="font-medium text-sm text-darkGray dark:text-white flex items-center gap-1.5">
+                {{ field.label }}
+                <span *ngIf="field.required" class="text-danger text-xs">*</span>
+                <i *ngIf="isSystemField(field)" class="fa-solid fa-lock text-[10px] text-purple-400"></i>
+              </div>
+
+              <div class="text-[10px] font-mono text-mediumGray/70">
+                {{ field.key }}
+              </div>
             </div>
 
-            <div class="text-xs text-mediumGray">
-              {{ field.key }}
-            </div>
-          </div>
-
-          <div class="flex gap-2 items-center">
+          <div class="flex gap-3 items-center">
             <span
-              class="text-xs bg-primary/10 text-primary px-2 py-1 rounded"
+              class="text-[10px] font-extrabold uppercase tracking-widest text-primary"
             >
-              {{ field.type }}
+              {{ 
+                field.type === 'text' ? 'Short Text' : 
+                field.type === 'number' ? 'Number Field' :
+                field.type === 'date' ? 'Date Picker' :
+                field.type === 'file' ? 'File Upload' :
+                field.type === 'enum' ? 'Dropdown' : field.type
+              }}
             </span>
 
             <button
               (click)="deleteField(field); $event.stopPropagation()"
-              class="text-danger text-xs"
+              class="text-danger/40 hover:text-danger transition-colors"
             >
-              ✕
+              <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
         </div>
@@ -313,8 +323,17 @@
   <!-- FIELD PROPERTIES -->
   <div *ngIf="selectedType === 'field'" class="p-5">
 
-    <div class="font-semibold mb-4 text-darkGray dark:text-white">
-      Field Properties
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-bold text-darkGray dark:text-white">Field Properties</h3>
+    </div>
+
+    <!-- System Field Badge -->
+    <div *ngIf="isSystemField(selectedField)" 
+         class="flex items-center gap-2.5 px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-800/50 mb-6 shadow-sm">
+      <div class="w-6 h-6 flex items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-800">
+        <i class="fa-solid fa-lock text-xs"></i>
+      </div>
+      <span class="text-xs font-bold uppercase tracking-widest">System Field</span>
     </div>
 
     <!-- Label -->
@@ -331,6 +350,8 @@
     <label class="text-sm text-mediumGray mb-1 block">Key</label>
     <input
       [(ngModel)]="selectedField.key"
+      [disabled]="isSystemField(selectedField)"
+      [class.opacity-50]="isSystemField(selectedField)"
       class="w-full border border-borderGray dark:border-darkBorder
              p-2.5 rounded-xl mb-4
              bg-gray-50 dark:bg-darkCard
@@ -341,10 +362,12 @@
     <label class="text-sm text-mediumGray mb-1 block">Type</label>
     <select
       [(ngModel)]="selectedField.type"
+      [disabled]="isSystemField(selectedField)"
       class="w-full border border-borderGray dark:border-darkBorder
              p-2.5 rounded-xl mb-4
              bg-gray-50 dark:bg-darkCard
              text-darkGray dark:text-white"
+      [class.opacity-50]="isSystemField(selectedField)"
     >
       <option value="text">Short Text</option>
       <option value="number">Number</option>
@@ -362,10 +385,13 @@
     </div>
 
     <!-- Required -->
-    <label class="flex items-center gap-2 mb-3 cursor-pointer">
+    <label class="flex items-center gap-2 mb-3 cursor-pointer" 
+           [class.opacity-50]="!canOverrideRule(selectedField, 'isRequired')"
+           [class.cursor-not-allowed]="!canOverrideRule(selectedField, 'isRequired')">
       <input
         type="checkbox"
         [(ngModel)]="selectedField.required"
+        [disabled]="!canOverrideRule(selectedField, 'isRequired')"
         class="accent-primary w-4 h-4"
       />
       <span class="text-darkGray dark:text-white">
@@ -381,20 +407,24 @@
         <input
           type="number"
           [(ngModel)]="selectedField.minLength"
+          [disabled]="!canOverrideRule(selectedField, 'minLength')"
           class="w-full border border-borderGray dark:border-darkBorder
                  p-2.5 rounded-xl mb-3
                  bg-gray-50 dark:bg-darkCard
                  text-darkGray dark:text-white"
+          [class.opacity-50]="!canOverrideRule(selectedField, 'minLength')"
         />
 
         <label class="text-sm text-mediumGray mb-1 block">Max Length</label>
         <input
           type="number"
           [(ngModel)]="selectedField.maxLength"
+          [disabled]="!canOverrideRule(selectedField, 'maxLength')"
           class="w-full border border-borderGray dark:border-darkBorder
                  p-2.5 rounded-xl
                  bg-gray-50 dark:bg-darkCard
                  text-darkGray dark:text-white"
+          [class.opacity-50]="!canOverrideRule(selectedField, 'maxLength')"
         />
       </ng-container>
 
@@ -404,32 +434,34 @@
         <input
           type="number"
           [(ngModel)]="selectedField.minValue"
+          [disabled]="!canOverrideRule(selectedField, 'minValue')"
           class="w-full border border-borderGray dark:border-darkBorder
                  p-2.5 rounded-xl mb-3
                  bg-gray-50 dark:bg-darkCard
                  text-darkGray dark:text-white"
+          [class.opacity-50]="!canOverrideRule(selectedField, 'minValue')"
         />
 
         <label class="text-sm text-mediumGray mb-1 block">Max Value</label>
         <input
           type="number"
           [(ngModel)]="selectedField.maxValue"
+          [disabled]="!canOverrideRule(selectedField, 'maxValue')"
           class="w-full border border-borderGray dark:border-darkBorder
                  p-2.5 rounded-xl
                  bg-gray-50 dark:bg-darkCard
                  text-darkGray dark:text-white"
+          [class.opacity-50]="!canOverrideRule(selectedField, 'maxValue')"
         />
       </ng-container>
 
      <!-- DATE -->
 <ng-container *ngSwitchCase="'date'">
-  <label class="text-sm text-mediumGray mb-1 block">
-    Min Date
-  </label>
-
+  <label class="text-sm text-mediumGray mb-1 block">Min Date</label>
   <input
     type="date"
     [(ngModel)]="selectedField.minDate"
+    [disabled]="!canOverrideRule(selectedField, 'minDate')"
     class="w-full border border-borderGray dark:border-darkBorder
            p-2.5 rounded-xl mb-3
            bg-gray-50 dark:bg-darkCard
@@ -437,15 +469,14 @@
            dark:[color-scheme:dark]
            dark:placeholder:text-mediumGray
            focus:outline-none focus:ring-2 focus:ring-primary/30"
+    [class.opacity-50]="!canOverrideRule(selectedField, 'minDate')"
   />
 
-  <label class="text-sm text-mediumGray mb-1 block">
-    Max Date
-  </label>
-
+  <label class="text-sm text-mediumGray mb-1 block">Max Date</label>
   <input
     type="date"
     [(ngModel)]="selectedField.maxDate"
+    [disabled]="!canOverrideRule(selectedField, 'maxDate')"
     class="w-full border border-borderGray dark:border-darkBorder
            p-2.5 rounded-xl
            bg-gray-50 dark:bg-darkCard
@@ -453,6 +484,7 @@
            dark:[color-scheme:dark]
            dark:placeholder:text-mediumGray
            focus:outline-none focus:ring-2 focus:ring-primary/30"
+    [class.opacity-50]="!canOverrideRule(selectedField, 'maxDate')"
   />
 </ng-container>
 
@@ -475,6 +507,7 @@
           <input
             type="text"
             [(ngModel)]="enumInput"
+            [disabled]="isSystemField(selectedField)"
             (keydown.enter)="addEnumValue()"
             placeholder="Type and press Enter..."
             class="w-full border border-borderGray dark:border-darkBorder
@@ -482,6 +515,7 @@
                    bg-gray-50 dark:bg-darkCard
                    text-darkGray dark:text-white
                    focus:outline-none focus:ring-2 focus:ring-primary/30"
+            [class.opacity-50]="isSystemField(selectedField)"
           />
         </div>
 
@@ -495,6 +529,7 @@
           >
             {{ val }}
             <i
+              *ngIf="!isSystemField(selectedField)"
               class="fa-solid fa-xmark cursor-pointer text-xs"
               (click)="removeEnumValue(i)"
             ></i>

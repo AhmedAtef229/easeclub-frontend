@@ -73,14 +73,32 @@ export const routes: Routes = [
           import('./features/admin/payments/payments.component').then((c) => c.PaymentsComponent),
       },
 
-      // 🔥 Pricing Policies (NEW)
-      {
-        path: 'pricing-policies',
-        loadComponent: () =>
-          import('./features/admin/pricing-policies/pricing-policies.component').then(
-            (c) => c.PricingPoliciesComponent,
-          ),
-      },
+{
+  path: 'pricing-policies',
+  loadComponent: () =>
+    import('./features/admin/pricing-policies/pricing-policies.component')
+      .then(c => c.PricingPoliciesComponent),
+
+  children: [
+    {
+      path: '',
+      redirectTo: 'pricing-policy-content',
+      pathMatch: 'full'
+    },
+    {
+      path: 'pricing-policy-content',
+      loadComponent: () =>
+        import('./features/admin/pricing-policies/pricing-policy-content/pricing-policy-content.component')
+          .then(c => c.PricingPolicyContentComponent),
+    },
+    {
+      path: 'pricing-policy-assignment',
+      loadComponent: () =>
+        import('./features/admin/pricing-policies/pricing-policy-assignment/pricing-policy-assignment.component')
+          .then(c => c.PricingPolicyAssignmentComponent),
+    }
+  ]
+},
 
       {
         path: 'membership-plans',

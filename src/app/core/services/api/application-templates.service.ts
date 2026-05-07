@@ -116,7 +116,6 @@ export class ApplicationTemplateService {
     templateId: string,
     membershipPlansIds: string[]
   ): Observable<void> {
-
     return this.http.put<void>(
       `${this.api}/admin/application-templates/${templateId}/membership-plans`,
       {
@@ -125,4 +124,20 @@ export class ApplicationTemplateService {
       }
     );
   }
+
+  // ============================================
+  // SYSTEM SECTIONS
+  // ============================================
+
+  getSystemSection(intent: string): Observable<any> {
+    // Note: system-sections might not be under v1 according to documentation
+    const baseUrl = this.api.replace('/v1', '');
+    return this.http.get(`${baseUrl}/system-sections/${intent}`, {
+      responseType: 'text',
+    }).pipe(
+      map((res: string) => JSON.parse(res))
+    );
+  }
 }
+
+

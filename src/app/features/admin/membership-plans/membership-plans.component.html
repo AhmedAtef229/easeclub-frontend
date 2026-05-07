@@ -33,20 +33,38 @@
     [columns]="columns"
     [data]="filteredData"
     [showActions]="true"
+    [showManage]="true"
     (edit)="onEdit($event)"
+    (manage)="onManageTemplates($event)"
     (toggleStatus)="onToggleStatus($event)"
   ></app-tables>
 </app-page-layout>
 
-<!-- 🔥 Membership Modal -->
+<!-- 🔥 Membership Modal (Create) -->
 <app-membership-plan-modal
   *ngIf="showModal"
-  [plan]="selectedPlan"
+  [plan]="null"
   (close)="closeModal()"
   (save)="onSavePlan($event)"
 ></app-membership-plan-modal>
 
-<!-- 🔥 Installment Modal -->
+<!-- 🔥 Membership Edit Modal -->
+<app-membership-plan-edit-modal
+  *ngIf="showEditModal && selectedPlan"
+  [plan]="selectedPlan"
+  (close)="closeModal()"
+  (save)="onSaveEdit($event)"
+></app-membership-plan-edit-modal>
+
+<!-- 🔥 Membership Link Modal -->
+<app-membership-plan-link-modal
+  *ngIf="showLinkModal && selectedPlan"
+  [plan]="selectedPlan"
+  (close)="closeModal()"
+  (save)="onSaveLink($event)"
+></app-membership-plan-link-modal>
+
+<!-- 🔥 Installment Modal (View Only) -->
 <app-installment-plan-modal
   *ngIf="showInstallmentModal"
   [plan]="selectedPlanForInstallments"

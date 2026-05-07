@@ -3,14 +3,9 @@ import { CommonModule } from '@angular/common';
 
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
-import {
-  TablesComponent,
-  TableColumn,
-} from '../../../shared/components/tables/tables.component';
+import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
 
 import { CreateTemplateModalComponent } from '../../../shared/components/modals/template-builder/create-template-modal/create-template-modal.component';
-
-import { TemplateConnectionsComponent } from '../../../shared/components/modals/template-builder/manage-template-connections-modal/manage-template-connections-modal.component';
 
 import { BranchService } from '../../../core/services/api/branches.service';
 
@@ -25,19 +20,16 @@ import { ApplicationTemplateService } from '../../../core/services/api/applicati
     PageLayoutComponent,
     TablesComponent,
     PaginationComponent,
-    CreateTemplateModalComponent,
-    TemplateConnectionsComponent,
+    CreateTemplateModalComponent, // Ensure this is imported correctly
   ],
 
   templateUrl: './application-templates.component.html',
 })
-
 export class ApplicationTemplatesComponent implements OnInit {
-
- constructor(
-  private service: ApplicationTemplateService,
-  private branchService: BranchService
-) {}
+  constructor(
+    private service: ApplicationTemplateService,
+    private branchService: BranchService,
+  ) {}
 
   // =========================================================
   // STATE
@@ -58,6 +50,8 @@ export class ApplicationTemplatesComponent implements OnInit {
   showCreateModal = false;
 
   selectedTemplate: any = null;
+  selectedTemplateId: string | undefined = undefined;
+  selectedTemplateData: any = null;
 
   showConnectionsModal = false;
 
@@ -66,7 +60,6 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   columns: TableColumn[] = [
-
     {
       key: 'name',
       label: 'Template Name',
@@ -88,7 +81,6 @@ export class ApplicationTemplatesComponent implements OnInit {
       key: 'lastModified',
       label: 'Last Modified',
     },
-
   ];
 
   // =========================================================
@@ -96,11 +88,9 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   ngOnInit(): void {
-
     this.clubId = this.branchService.getClubId();
 
     this.loadData();
-
   }
 
   // =========================================================
@@ -108,46 +98,34 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   loadData(): void {
-
-    this.service.getTemplates(
-      this.clubId,
-      {
+    this.service
+      .getTemplates(this.clubId, {
         page: this.currentPage,
         limit: this.pageSize,
-      }
-    )
-    .subscribe({
+      })
+      .subscribe({
+        next: (res: any) => {
+          this.totalCount = res.totalCount;
 
-      next: (res: any) => {
+          this.hasMore = res.hasMore;
 
-        this.totalCount = res.totalCount;
+          this.data = (res.items || []).map((item: any) => ({
+            id: item.id,
 
-        this.hasMore = res.hasMore;
+            name: item.name,
 
-        this.data = (res.items || []).map((item: any) => ({
+            plans: item.connectedMembershipPlans || [],
 
-          id: item.id,
+            isActive: item.isActive,
 
-          name: item.name,
+            lastModified: this.formatDate(item.lastModified),
+          }));
+        },
 
-          plans: item.connectedMembershipPlans || [],
-
-          isActive: item.isActive,
-
-          lastModified: this.formatDate(item.lastModified),
-
-        }));
-
-      },
-
-      error: (err) => {
-
-        console.error('❌ Load Templates Error:', err);
-
-      },
-
-    });
-
+        error: (err) => {
+          console.error('❌ Load Templates Error:', err);
+        },
+      });
   }
 
   // =========================================================
@@ -155,11 +133,9 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   formatDate(date: string): string {
-
     if (!date) return '-';
 
     return new Date(date).toLocaleDateString();
-
   }
 
   // =========================================================
@@ -167,30 +143,19 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onEdit(row: any): void {
-
     console.log('✏️ Edit Template:', row);
 
-    // GET FULL TEMPLATE DETAILS
-
-    this.service.getTemplateById(row.id)
-      .subscribe({
-
-        next: (res) => {
-
-          console.log('📦 Template Details:', res);
-
-          // open edit modal here
-
-        },
-
-        error: (err) => {
-
-          console.error('❌ Details Error:', err);
-
-        },
-
-      });
-
+    this.service.getTemplateById(row.id).subscribe({
+      next: (res) => {
+        console.log('📦 Template Details:', res);
+        this.selectedTemplateId = row.id;
+        this.selectedTemplateData = res;
+        this.showCreateModal = true;
+      },
+      error: (err) => {
+        console.error('❌ Details Error:', err);
+      },
+    });
   }
 
   // =========================================================
@@ -198,17 +163,13 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onManageConnections(row: any): void {
-
     this.selectedTemplate = row;
 
     this.showConnectionsModal = true;
-
   }
 
   closeConnectionsModal(): void {
-
     this.showConnectionsModal = false;
-
   }
 
   // =========================================================
@@ -216,30 +177,19 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onDelete(row: any): void {
-
-    const confirmed = confirm(
-      'Are you sure you want to delete this template?'
-    );
+    const confirmed = confirm('Are you sure you want to delete this template?');
 
     if (!confirmed) return;
 
-    this.service.deleteTemplate(row.id)
-      .subscribe({
+    this.service.deleteTemplate(row.id).subscribe({
+      next: () => {
+        this.loadData();
+      },
 
-        next: () => {
-
-          this.loadData();
-
-        },
-
-        error: (err) => {
-
-          console.error('❌ Delete Error:', err);
-
-        },
-
-      });
-
+      error: (err) => {
+        console.error('❌ Delete Error:', err);
+      },
+    });
   }
 
   // =========================================================
@@ -247,31 +197,25 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onPageChange(page: number): void {
-
     this.currentPage = page;
 
     this.loadData();
-
   }
 
   nextPage(): void {
-
     if (!this.hasMore) return;
 
     this.currentPage++;
 
     this.loadData();
-
   }
 
   prevPage(): void {
-
     if (this.currentPage === 1) return;
 
     this.currentPage--;
 
     this.loadData();
-
   }
 
   // =========================================================
@@ -279,15 +223,13 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   openCreateModal(): void {
-
     this.showCreateModal = true;
-
   }
 
   closeCreateModal(): void {
-
     this.showCreateModal = false;
-
+    this.selectedTemplateId = undefined;
+    this.selectedTemplateData = null;
   }
 
   // =========================================================
@@ -295,36 +237,29 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onCreateTemplate(data: any): void {
-
     const payload = {
-
       clubId: this.clubId,
-
+      templateId: data.templateId,
       name: data.name,
-
       steps: data.steps,
-
     };
 
-    this.service.upsertTemplate(payload)
-      .subscribe({
+    console.log('🚀 EXACT PAYLOAD BEING SENT:', JSON.stringify(payload, null, 2));
 
-        next: () => {
+    this.service.upsertTemplate(payload).subscribe({
+      next: () => {
+        this.loadData();
 
-          this.loadData();
+        this.closeCreateModal();
+      },
 
-          this.closeCreateModal();
-
-        },
-
-        error: (err) => {
-
-          console.error('❌ Upsert Error:', err);
-
-        },
-
-      });
-
+      error: (err) => {
+        console.error('❌ Upsert Error Details:', err.error);
+        if (err.error && err.error.errors) {
+          console.table(err.error.errors);
+        }
+      },
+    });
   }
 
   // =========================================================
@@ -332,31 +267,18 @@ export class ApplicationTemplatesComponent implements OnInit {
   // =========================================================
 
   onSaveConnections(planIds: string[]): void {
-
     if (!this.selectedTemplate) return;
 
-    this.service.syncMembershipPlans(
-      this.selectedTemplate.id,
-      planIds
-    )
-    .subscribe({
-
+    this.service.syncMembershipPlans(this.selectedTemplate.id, planIds).subscribe({
       next: () => {
-
         this.closeConnectionsModal();
 
         this.loadData();
-
       },
 
       error: (err) => {
-
         console.error('❌ Sync Plans Error:', err);
-
       },
-
     });
-
   }
-
 }

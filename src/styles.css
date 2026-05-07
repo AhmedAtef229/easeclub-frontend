@@ -114,3 +114,14 @@
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+.tab-btn {
+  @apply pb-3 font-medium text-mediumGray dark:text-gray-400 transition-all duration-300;
+}
+
+.tab-btn:hover {
+  @apply text-primary;
+}
+
+.active-tab {
+  @apply text-primary border-b-2 border-primary;
+}

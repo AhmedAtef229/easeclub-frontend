@@ -94,10 +94,11 @@
             </button>
 
             <button
+              *ngIf="showEdit"
               class="w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center border border-gray-200 dark:border-darkBorder text-mediumGray hover:text-primary"
               (click)="edit.emit(row)"
             >
-              <i class="fa-regular fa-pen-to-square text-xs sm:text-sm"></i>
+              <i class="fa-regular fa-pen-to-square"></i>
             </button>
             <button
               *ngIf="showManage"

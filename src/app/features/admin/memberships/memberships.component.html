@@ -1,87 +1,76 @@
 <app-page-layout
   title="Membership Management"
-  subtitle="Manage membership applications and active members"
+  subtitle="View and manage club memberships"
 >
 
-  <!-- ===== Actions (Header Row) ===== -->
+  <!-- HEADER FILTERS (زي التصميم) -->
   <div
     actions
-    class="flex items-center justify-between gap-4
-           bg-white dark:bg-darkCard
+    class="flex items-center gap-3
+           bg-gray-50 dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
            rounded-2xl p-4 shadow-sm"
   >
 
-    <!-- Tabs -->
-    <div
-      class="flex items-center gap-2
-             bg-gray-100 dark:bg-darkBorder
-             p-1 rounded-xl"
-    >
-
-    
-
-      <!-- Active -->
-      <button
-        (click)="activeTab = 'active'"
-        [class.bg-white]="activeTab === 'active'"
-        [class.dark:bg-darkCard]="activeTab === 'active'"
-        class="px-4 py-2 rounded-lg text-sm font-medium
-               text-darkGray dark:text-white
-               transition hover:bg-white/80 dark:hover:bg-darkCard"
-      >
-        Active Members
-      </button>
-
-      <!-- Expired -->
-      <button
-        (click)="activeTab = 'expired'"
-        [class.bg-white]="activeTab === 'expired'"
-        [class.dark:bg-darkCard]="activeTab === 'expired'"
-        class="px-4 py-2 rounded-lg text-sm font-medium
-               text-darkGray dark:text-white
-               transition hover:bg-white/80 dark:hover:bg-darkCard"
-      >
-        Expired Members
-      </button>
-
+    <!-- SEARCH -->
+    <div class="flex-1">
+      <app-search-input
+        placeholder="Search by name, membership number, type, or plan..."
+        (search)="onSearch($event)"
+      ></app-search-input>
     </div>
 
-    <!-- Notification Templates Button -->
-    <button
-      class="bg-primary hover:bg-primaryHover
-             text-white
-             px-5 py-2 rounded-xl
-             flex items-center gap-2
-             transition shadow-sm"
-    >
-      <i class="fa-solid fa-paper-plane text-sm"></i>
-      Notification Templates
-    </button>
+    <!-- STATUS DROPDOWN -->
+    <div class="relative">
+      <button
+        (click)="toggleStatus()"
+        class="px-4 py-2 rounded-xl border
+               border-gray-200 dark:border-darkBorder
+               bg-white dark:bg-darkCard
+               text-sm flex items-center gap-2 min-w-[160px] justify-between"
+      >
+        {{ selectedStatus || 'All Statuses' }}
+        <i class="fa-solid fa-chevron-down text-xs"></i>
+      </button>
+
+      <div
+        *ngIf="showStatus"
+        class="absolute right-0 mt-2 w-full
+               bg-white dark:bg-darkCard
+               border border-gray-200 dark:border-darkBorder
+               rounded-xl shadow-lg z-50"
+      >
+        <button class="dropdown-item" (click)="setStatus('')">
+          All Statuses
+        </button>
+
+        <button class="dropdown-item" (click)="setStatus('Active')">
+          Active
+        </button>
+
+        <button class="dropdown-item" (click)="setStatus('Expired')">
+          Expired
+        </button>
+
+        <button class="dropdown-item" (click)="setStatus('Cancelled')">
+          Cancelled
+        </button>
+      </div>
+    </div>
 
   </div>
 
-  <!-- ===== Content ===== -->
+  <!-- TABLE -->
   <div
-    class="space-y-4
+    class="mt-4
            bg-white dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
-           rounded-2xl p-5 shadow-sm"
+           rounded-2xl shadow-sm overflow-hidden"
   >
-
-    <!-- Search -->
-    <app-search-input
-      placeholder="Search members..."
-      (search)="onSearch($event)"
-    ></app-search-input>
-
-    <!-- Table -->
     <app-tables
       [columns]="columns"
       [data]="data"
-      [showActions]="true"
     ></app-tables>
-
   </div>
 
 </app-page-layout>

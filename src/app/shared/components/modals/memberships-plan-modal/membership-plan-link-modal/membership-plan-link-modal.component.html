@@ -1,0 +1,90 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-darkCard w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 dark:border-darkBorder animate-in fade-in zoom-in duration-200">
+    
+    <!-- 🟢 Header -->
+    <div class="p-6 pb-4 flex justify-between items-start">
+      <div>
+        <h2 class="text-xl font-bold text-darkGray dark:text-white">Link Installment Templates</h2>
+        <p class="text-mediumGray text-sm">Select installment templates for {{ plan.name }}</p>
+      </div>
+      <button (click)="close.emit()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-darkBorder transition-colors">
+        <i class="fa-solid fa-xmark text-mediumGray text-lg"></i>
+      </button>
+    </div>
+
+    <!-- 🟢 Body -->
+    <div class="p-6 overflow-y-auto max-h-[60vh] space-y-4 custom-scrollbar">
+      
+      <!-- Loading State -->
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-10 space-y-3">
+        <div class="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+        <p class="text-mediumGray text-sm">Loading templates...</p>
+      </div>
+
+      <!-- Templates List -->
+      <div *ngIf="!loading" class="space-y-3">
+        <div
+          *ngFor="let t of templates"
+          (click)="toggleTemplate(t.id)"
+          class="p-4 rounded-2xl border-2 transition-all cursor-pointer group relative"
+          [ngClass]="selectedIds.includes(t.id) ? 'border-primary bg-primary/5' : 'border-gray-50 dark:border-darkBorder hover:border-gray-200'"
+        >
+          <div class="flex items-start gap-3">
+            <!-- Checkbox Custom -->
+            <div class="mt-1 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors"
+                 [ngClass]="selectedIds.includes(t.id) ? 'bg-primary border-primary shadow-sm shadow-primary/30' : 'border-gray-200 dark:border-darkBorder'">
+              <i class="fa-solid fa-check text-[10px] text-white" *ngIf="selectedIds.includes(t.id)"></i>
+            </div>
+
+            <div class="flex-1">
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="font-bold text-darkGray dark:text-white group-hover:text-primary transition-colors">
+                  {{ t.name }}
+                </h3>
+                <span class="text-xs font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-full">
+                   Total: {{ plan.price | currency }}
+                </span>
+              </div>
+              
+              <div class="flex gap-2 text-xs text-mediumGray font-medium mb-3">
+                <span>{{ t.numOfInstallments }} installments</span>
+                <span>•</span>
+                <span>{{ t.durationOfPaymentInDays }} days</span>
+              </div>
+
+              <!-- Breakdown Breakdown -->
+              <div class="bg-white/50 dark:bg-darkBorder/30 rounded-xl p-3 space-y-1.5">
+                <div *ngFor="let inst of t.details?.installments" class="flex justify-between text-[11px] text-mediumGray font-medium">
+                  <span>#{{ inst.order }}: {{ inst.percentage }}% = {{ getInstallmentAmount(inst.percentage) }}</span>
+                  <span class="text-gray-400">(due after {{ inst.dueAfterDays }} days)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="templates.length === 0" class="text-center py-10">
+          <i class="fa-solid fa-box-open text-3xl text-gray-200 mb-2"></i>
+          <p class="text-mediumGray text-sm font-medium">No templates found</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟢 Footer -->
+    <div class="p-6 border-t border-gray-100 dark:border-darkBorder flex justify-end gap-3 bg-gray-50/30">
+      <button
+        (click)="close.emit()"
+        class="px-6 py-2.5 font-bold text-mediumGray hover:text-darkGray transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="submit()"
+        class="px-8 py-2.5 rounded-xl bg-primary hover:bg-primaryHover text-white font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+      >
+        Save Templates
+      </button>
+    </div>
+  </div>
+</div>

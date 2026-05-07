@@ -1,177 +1,134 @@
-// application-reviews.component.ts
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
-
-import {
-  TableColumn,
-  TablesComponent,
-} from '../../../shared/components/tables/tables.component';
+import { ApplicationReviewsService } from '../../../core/services/api/application-reviews.service';
+import { BranchService } from '../../../core/services/api/branches.service';
+import { TableColumn, TablesComponent } from '../../../shared/components/tables/tables.component';
+import { ApplicationReviewsModalComponent } from '../../../shared/components/modals/application-reviews-modal/application-reviews-modal.component';
 
 @Component({
   selector: 'app-application-reviews',
   standalone: true,
-
   imports: [
     CommonModule,
     FormsModule,
-
     PageLayoutComponent,
     SearchInputComponent,
     DropdownComponent,
     TablesComponent,
+    ApplicationReviewsModalComponent
   ],
-
   templateUrl: './application-reviews.component.html',
 })
+export class ApplicationReviewsComponent implements OnInit {
 
-export class ApplicationReviewsComponent {
+  constructor(
+    private service: ApplicationReviewsService,
+    private branchService: BranchService,
+  ) {}
 
-  // =========================================================
-  // FILTERS
-  // =========================================================
+  /* ================= MODAL ================= */
+
+  isModalOpen = false;
+  selectedRow: any = null;
+
+  /* ================= FILTERS ================= */
 
   search = '';
-
   selectedStatus = 'All statuses';
 
-  statusOptions = [
-    'All statuses',
-    'Submitted',
-    'Approved',
-    'Rejected',
-    'UnderReview',
-  ];
+  statusOptions = ['All statuses', 'Submitted', 'NeedsChanges', 'Approved', 'Rejected'];
 
   dateFrom = '';
-
   dateTo = '';
 
-  // =========================================================
-  // TABLE COLUMNS
-  // =========================================================
+  clubId = '';
+
+  /* ================= TABLE ================= */
 
   columns: TableColumn[] = [
-
-    {
-      key: 'trackingNumber',
-      label: 'Tracking #',
-    },
-
-    {
-      key: 'member',
-      label: 'Member Name',
-    },
-
-    {
-      key: 'plan',
-      label: 'Plan',
-    },
-
-    {
-      key: 'submittedAt',
-      label: 'Submitted',
-    },
-
-    {
-      key: 'statusText',
-      label: 'Status',
-    },
-
+    { key: 'trackingNumber', label: 'Tracking #' },
+    { key: 'member', label: 'Member Name' },
+    { key: 'plan', label: 'Plan' },
+    { key: 'submittedAt', label: 'Submitted' },
+    { key: 'statusText', label: 'Status', type: 'badge' },
   ];
 
-  // =========================================================
-  // DATA
-  // =========================================================
+  data: any[] = [];
+  loading = false;
 
-  data: any[] = [
-    {
-      trackingNumber: 'APP-2025-001',
+  /* ================= INIT ================= */
 
-      member: `
-        John Smith
-        john.smith@email.com
-      `,
+  ngOnInit(): void {
+    this.clubId = this.branchService.getClubId();
+    this.loadData();
+  }
 
-      plan: 'Annual Gold Membership',
+  /* ================= API ================= */
 
-      submittedAt: 'Feb 10, 2025',
+  loadData() {
+    if (!this.clubId) return;
 
-      statusText: 'Submitted',
+    this.loading = true;
 
-      isActive: true,
-    },
+    this.service
+      .getApplications(
+        this.clubId,
+        this.selectedStatus === 'All statuses' ? undefined : this.selectedStatus,
+        this.dateFrom,
+        this.dateTo,
+        this.search,
+      )
+      .subscribe({
+        next: (res: any) => {
+          const items = res?.items ?? [];
 
-    {
-      trackingNumber: 'APP-2025-002',
+          this.data = items.map((item: any) => ({
+            id: item?.id ?? '',
+            trackingNumber: item?.trackingNumber ?? '',
+            member: `${item?.userName ?? ''} ${item?.email ?? ''}`,
+            plan: item?.membershipPlanName ?? '',
+            submittedAt: this.formatDate(item?.submittedAt),
+            statusText: item?.status ? [item.status] : [],
+          }));
 
-      member: `
-        Sarah Johnson
-        sarah.j@email.com
-      `,
+          this.loading = false;
+        },
+        error: () => (this.loading = false),
+      });
+  }
 
-      plan: 'Quarterly Silver Membership',
-
-      submittedAt: 'Feb 11, 2025',
-
-      statusText: 'Approved',
-
-      isActive: true,
-    },
-
-    {
-      trackingNumber: 'APP-2025-003',
-
-      member: `
-        Tech Corp Inc.
-        contact@techcorp.com
-      `,
-
-      plan: 'Family Platinum Membership',
-
-      submittedAt: 'Feb 13, 2025',
-
-      statusText: 'UnderReview',
-
-      isActive: true,
-    },
-  ];
-
-  // =========================================================
-  // EVENTS
-  // =========================================================
+  /* ================= EVENTS ================= */
 
   onSearch(value: string) {
-
     this.search = value;
-
-    console.log(value);
-
+    this.loadData();
   }
 
   onStatusChange(value: string) {
-
     this.selectedStatus = value;
-
-    console.log(value);
-
+    this.loadData();
   }
 
-  onEdit(row: any) {
+  /* ================= VIEW CLICK ================= */
 
-    console.log('View Application:', row);
-
+  onView(row: any) {
+    this.selectedRow = row;
+    this.isModalOpen = true;
   }
 
-  onToggleStatus(row: any) {
-
-    console.log('Toggle:', row);
-
+  closeModal() {
+    this.isModalOpen = false;
   }
 
+  /* ================= FORMAT ================= */
+
+  formatDate(date: string) {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString();
+  }
 }
