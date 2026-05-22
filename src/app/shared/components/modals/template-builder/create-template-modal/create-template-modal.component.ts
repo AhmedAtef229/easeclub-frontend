@@ -61,6 +61,191 @@ export class CreateTemplateModalComponent implements OnInit {
     { label: 'Enum', type: 'enum', icon: 'fa-solid fa-list' },
   ];
 
+  formatToInputDate(isoString: any): string | null {
+    if (!isoString) return null;
+    try {
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return null;
+      return isoString.substring(0, 10);
+    } catch {
+      return null;
+    }
+  }
+
+  getFallbackFamilyFields(): any[] {
+    return [
+      {
+        key: 'sys_family_member_full_name',
+        fieldType: 'Text',
+        type: 'text',
+        validationRules: {
+          isRequired: true,
+          minLength: 2,
+          maxLength: 100
+        },
+        canOverride: {
+          isRequired: false,
+          minLength: false,
+          maxLength: false,
+          minValue: false,
+          maxValue: false,
+          minDate: false,
+          maxDate: false
+        }
+      },
+      {
+        key: 'sys_family_member_dob',
+        fieldType: 'Date',
+        type: 'date',
+        validationRules: {
+          isRequired: true,
+          minDate: '1900-01-01T00:00:00.000Z',
+          maxDate: new Date().toISOString()
+        },
+        canOverride: {
+          isRequired: false,
+          minLength: false,
+          maxLength: false,
+          minValue: false,
+          maxValue: false,
+          minDate: true,
+          maxDate: true
+        }
+      },
+      {
+        key: 'sys_family_member_relationship',
+        fieldType: 'Enum',
+        type: 'enum',
+        allowedValues: ['Father', 'Mother', 'Spouse', 'Son', 'Daughter'],
+        validationRules: {
+          isRequired: true
+        },
+        canOverride: {
+          isRequired: false,
+          minLength: false,
+          maxLength: false,
+          minValue: false,
+          maxValue: false,
+          minDate: false,
+          maxDate: false
+        }
+      }
+    ];
+  }
+
+  enrichSystemSections() {
+    const hasSystemSection = this.steps.some(step =>
+      (step.sections || []).some((sec: any) => sec.system || sec.intent === 'FamilyMembers')
+    );
+
+    if (!hasSystemSection) {
+      return;
+    }
+
+    this.service.getSystemSection('FamilyMembers').subscribe({
+      next: (res: any) => {
+        console.log('✅ Loaded blueprint for enrichment:', res);
+        this.steps.forEach((step) => {
+          (step.sections || []).forEach((section: any) => {
+            if (section.system || section.intent === 'FamilyMembers') {
+              section.intent = 'FamilyMembers';
+              section.system = true;
+              section.fields.forEach((field: any) => {
+                const blueprintField = (res.fields || []).find((f: any) => f.key === field.key);
+                if (blueprintField) {
+                  const blueprintRules = blueprintField.validationRules || blueprintField.ruleSet || {};
+                  const canOverride = blueprintField.validationRulesCanBeOverriden || {};
+
+                  field.canOverride = canOverride;
+
+                  const apiFieldType = blueprintField.type || blueprintField.fieldType;
+                  if (apiFieldType) {
+                    field.fieldType = apiFieldType;
+                    field.type = this.reverseMapFieldType(apiFieldType);
+                  }
+                  if (blueprintField.allowedValues) {
+                    field.allowedValues = blueprintField.allowedValues;
+                  }
+
+                  if (!field.validationRules) {
+                    field.validationRules = { ...blueprintRules };
+                  }
+
+                  const ruleKeys = ['isRequired', 'minLength', 'maxLength', 'minValue', 'maxValue', 'minDate', 'maxDate'];
+                  ruleKeys.forEach((key) => {
+                    const cannotOverride = !canOverride[key];
+                    const isMissing = field.validationRules[key] === undefined || field.validationRules[key] === null;
+
+                    if (cannotOverride || isMissing) {
+                      field.validationRules[key] = blueprintRules[key];
+                    }
+                  });
+
+                  field.required = field.validationRules.isRequired ?? false;
+                  field.minLength = field.validationRules.minLength;
+                  field.maxLength = field.validationRules.maxLength;
+                  field.minValue = field.validationRules.minValue;
+                  field.maxValue = field.validationRules.maxValue;
+                  field.minDate = this.formatToInputDate(field.validationRules.minDate);
+                  field.maxDate = this.formatToInputDate(field.validationRules.maxDate);
+                }
+              });
+            }
+          });
+        });
+      },
+      error: (err) => {
+        console.error('❌ Failed to load blueprint for enrichment, using fallback metadata:', err);
+        const fallbackFields = this.getFallbackFamilyFields();
+        this.steps.forEach((step) => {
+          (step.sections || []).forEach((section: any) => {
+            if (section.system || section.intent === 'FamilyMembers') {
+              section.intent = 'FamilyMembers';
+              section.system = true;
+              section.fields.forEach((field: any) => {
+                const fallbackField = fallbackFields.find((f: any) => f.key === field.key);
+                if (fallbackField) {
+                  field.canOverride = fallbackField.canOverride;
+
+                  const apiFieldType = fallbackField.fieldType;
+                  if (apiFieldType) {
+                    field.fieldType = apiFieldType;
+                    field.type = this.reverseMapFieldType(apiFieldType);
+                  }
+                  if (fallbackField.allowedValues) {
+                    field.allowedValues = fallbackField.allowedValues;
+                  }
+
+                  if (!field.validationRules) {
+                    field.validationRules = { ...fallbackField.validationRules };
+                  }
+                  
+                  const ruleKeys = ['isRequired', 'minLength', 'maxLength', 'minValue', 'maxValue', 'minDate', 'maxDate'];
+                  ruleKeys.forEach((key) => {
+                    const cannotOverride = !fallbackField.canOverride[key];
+                    const isMissing = field.validationRules[key] === undefined || field.validationRules[key] === null;
+
+                    if (cannotOverride || isMissing) {
+                      field.validationRules[key] = fallbackField.validationRules[key];
+                    }
+                  });
+
+                  field.required = field.validationRules.isRequired ?? false;
+                  field.minLength = field.validationRules.minLength;
+                  field.maxLength = field.validationRules.maxLength;
+                  field.minValue = field.validationRules.minValue;
+                  field.maxValue = field.validationRules.maxValue;
+                  field.minDate = this.formatToInputDate(field.validationRules.minDate);
+                  field.maxDate = this.formatToInputDate(field.validationRules.maxDate);
+                }
+              });
+            }
+          });
+        });
+      }
+    });
+  }
+
   ngOnInit(): void {
     if (this.initialData) {
       this.templateName = this.initialData.name;
@@ -88,8 +273,8 @@ export class CreateTemplateModalComponent implements OnInit {
             minValue: field.validationRules?.minValue,
             maxValue: field.validationRules?.maxValue,
 
-            minDate: field.validationRules?.minDate,
-            maxDate: field.validationRules?.maxDate,
+            minDate: this.formatToInputDate(field.validationRules?.minDate),
+            maxDate: this.formatToInputDate(field.validationRules?.maxDate),
 
             allowedValues: field.allowedValues || [],
 
@@ -100,6 +285,7 @@ export class CreateTemplateModalComponent implements OnInit {
     }
 
     this.normalizeSteps();
+    this.enrichSystemSections();
   }
 
   closeModal() {
@@ -125,6 +311,12 @@ export class CreateTemplateModalComponent implements OnInit {
   /* ================= MAPPER ================= */
 
  mapSteps() {
+  const safeIsoDate = (val: any) => {
+    if (!val) return null;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   return this.steps.map((step: any, stepIndex: number) => ({
     id: step.id || undefined,
     title: step.title,
@@ -173,10 +365,10 @@ export class CreateTemplateModalComponent implements OnInit {
             rules.maxValue = field.maxValue;
           }
           if (this.canOverrideRule(field, 'minDate') && field.minDate !== undefined) {
-            rules.minDate = new Date(field.minDate).toISOString();
+            rules.minDate = safeIsoDate(field.minDate);
           }
           if (this.canOverrideRule(field, 'maxDate') && field.maxDate !== undefined) {
-            rules.maxDate = new Date(field.maxDate).toISOString();
+            rules.maxDate = safeIsoDate(field.maxDate);
           }
 
           return {
@@ -206,8 +398,8 @@ export class CreateTemplateModalComponent implements OnInit {
             maxLength: field.maxLength ?? null,
             minValue: field.minValue ?? null,
             maxValue: field.maxValue ?? null,
-            minDate: field.minDate ? new Date(field.minDate).toISOString() : null,
-            maxDate: field.maxDate ? new Date(field.maxDate).toISOString() : null,
+            minDate: safeIsoDate(field.minDate),
+            maxDate: safeIsoDate(field.maxDate),
           },
 
           ...(field.type === 'enum'
@@ -357,14 +549,15 @@ export class CreateTemplateModalComponent implements OnInit {
             // 🔥 الحفاظ على القواعد الأصلية (سواء جت في ruleSet أو validationRules)
             const originalRules = f.validationRules || f.ruleSet || {};
             const canOverride = f.validationRulesCanBeOverriden || {};
+            const apiFieldType = f.type || f.fieldType;
 
             return {
               ...f,
               id: f.id,
               label: f.label,
               key: f.key,
-              fieldType: f.fieldType,
-              type: this.reverseMapFieldType(f.fieldType),
+              fieldType: apiFieldType,
+              type: this.reverseMapFieldType(apiFieldType),
               system: true,
 
               // تخزين القواعد الأصلية للـ Payload
@@ -377,8 +570,8 @@ export class CreateTemplateModalComponent implements OnInit {
               maxLength: originalRules.maxLength,
               minValue: originalRules.minValue,
               maxValue: originalRules.maxValue,
-              minDate: originalRules.minDate,
-              maxDate: originalRules.maxDate,
+              minDate: this.formatToInputDate(originalRules.minDate),
+              maxDate: this.formatToInputDate(originalRules.maxDate),
 
               allowedValues: f.allowedValues || [],
             };
@@ -389,68 +582,55 @@ export class CreateTemplateModalComponent implements OnInit {
       },
 
       error: (err) => {
-        console.error('❌ Fetch System Section Error:', err);
+        console.error('❌ Fetch System Section Error, using fallback metadata:', err);
 
         /*
          * FALLBACK
          */
-
+        const fallbackFields = this.getFallbackFamilyFields();
         const fallbackSection = {
           title: 'Family Members',
-
           repeatable: true,
-
           deletable: true,
-
           system: true,
-
           intent: 'FamilyMembers',
-
           fields: [
             {
               label: 'Full Name',
-
               key: 'sys_family_member_full_name',
-
-
               fieldType: 'Text',
-
               type: 'text',
-
               system: true,
-
               required: true,
-
+              minLength: 2,
+              maxLength: 100,
+              validationRules: { ...fallbackFields[0].validationRules },
+              canOverride: { ...fallbackFields[0].canOverride },
+              allowedValues: []
             },
-
             {
               label: 'Date of Birth',
-
               key: 'sys_family_member_dob',
-
               fieldType: 'Date',
-
               type: 'date',
-
               system: true,
-
               required: true,
+              minDate: this.formatToInputDate(fallbackFields[1].validationRules.minDate),
+              maxDate: this.formatToInputDate(fallbackFields[1].validationRules.maxDate),
+              validationRules: { ...fallbackFields[1].validationRules },
+              canOverride: { ...fallbackFields[1].canOverride },
+              allowedValues: []
             },
-
             {
               label: 'Relationship',
-
               key: 'sys_family_member_relationship',
-
               fieldType: 'Enum',
-
               type: 'enum',
-
               system: true,
-
               required: true,
-
               allowedValues: ['Father', 'Mother', 'Spouse', 'Son', 'Daughter'],
+              validationRules: { ...fallbackFields[2].validationRules },
+              canOverride: { ...fallbackFields[2].canOverride }
             },
           ],
         };
