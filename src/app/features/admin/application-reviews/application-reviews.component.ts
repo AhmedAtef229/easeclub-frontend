@@ -90,7 +90,9 @@ export class ApplicationReviewsComponent implements OnInit {
           this.data = items.map((item: any) => ({
             id: item?.id ?? '',
             trackingNumber: item?.trackingNumber ?? '',
-            member: `${item?.userName ?? ''} ${item?.email ?? ''}`,
+            userName: item?.userName ?? '',
+            email: item?.email ?? '',
+            member: `${item?.userName ?? ''} (${item?.email ?? ''})`,
             plan: item?.membershipPlanName ?? '',
             submittedAt: this.formatDate(item?.submittedAt),
             statusText: item?.status ? [item.status] : [],

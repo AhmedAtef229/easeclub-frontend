@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ApplicationReviewsService } from '../../../../core/services/api/application-reviews.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-application-reviews-modal',
@@ -7,34 +9,60 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './application-reviews-modal.component.html',
 })
-export class ApplicationReviewsModalComponent {
+export class ApplicationReviewsModalComponent implements OnInit {
 
   @Input() isOpen = false;
+  @Input() data: any = null; // Clicked row data (has id, userName, email, plan, submittedAt, etc.)
   @Output() close = new EventEmitter<void>();
 
-  // 👇 بيانات تجريبية (بعد كده تربطها بالـ API)
-  @Input() data: any = {
-    name: 'John Smith',
-    email: 'john.smith@email.com',
-    plan: 'Annual Gold Membership',
-    submittedOn: 'February 10, 2025 02:00',
+  applicationDetails: any = null;
+  pricing: any = null;
+  loading = false;
+  activeStep = 1;
 
-    personalInfo: {
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'john.smith@email.com',
-      phone: '+1-555-0123',
-      dob: 'June 15, 1985'
-    },
+  constructor(
+    private service: ApplicationReviewsService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-    membership: {
-      type: 'Family',
-      trainer: true
+  ngOnInit(): void {
+    if (this.data?.id) {
+      this.loadApplicationDetails(this.data.id);
     }
-  };
+  }
 
-  // 👇 التحكم في الخطوات
-  activeStep: number = 1;
+  loadApplicationDetails(id: string) {
+    this.loading = true;
+    this.applicationDetails = null;
+    this.pricing = null;
+
+    // Load main application details
+    this.service.getApplicationDetails(id).subscribe({
+      next: (res) => {
+        this.applicationDetails = res;
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.log('Application details loaded successfully:', res);
+      },
+      error: (err) => {
+        console.error('Error loading application review details:', err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+
+    // Load pricing details (independent and graceful)
+    this.service.getApplicationPricing(id).subscribe({
+      next: (res) => {
+        this.pricing = res;
+        this.cdr.detectChanges();
+        console.log('Application pricing loaded successfully:', res);
+      },
+      error: (err) => {
+        console.error('Error loading application pricing details:', err);
+      }
+    });
+  }
 
   setStep(step: number) {
     this.activeStep = step;
@@ -44,18 +72,34 @@ export class ApplicationReviewsModalComponent {
     this.close.emit();
   }
 
-  installments = [
-  {
-    number: 1,
-    dueDate: 'February 10, 2025',
-    amount: '$1000.00',
-    status: 'Pending',
-  },
-  {
-    number: 2,
-    dueDate: 'March 12, 2025',
-    amount: '$1000.00',
-    status: 'Pending',
-  },
-];
+  // Helpers for file handling
+  getFileName(url: string): string {
+    if (!url) return '';
+    try {
+      const decodedUrl = decodeURIComponent(url);
+      const parts = decodedUrl.split('/');
+      const fileNameWithQuery = parts[parts.length - 1];
+      return fileNameWithQuery.split('?')[0];
+    } catch (e) {
+      const parts = url.split('/');
+      return parts[parts.length - 1];
+    }
+  }
+
+  isImage(url: string): boolean {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.includes('.png') || lower.includes('.jpg') || lower.includes('.jpeg') || lower.includes('.webp') || lower.includes('.gif');
+  }
+
+  previewFile(url: string): void {
+    window.open(url, '_blank');
+  }
+
+  markAsPaid(item: any): void {
+    item.status = 'Paid';
+    this.cdr.detectChanges();
+    alert(`Installment ${item.order} marked as paid successfully!`);
+  }
 }
+

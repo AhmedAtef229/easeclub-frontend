@@ -1,5 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -34,4 +36,33 @@ export class ApplicationReviewsService {
     );
   }
 
+  getApplicationDetails(id: string): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/membership-applications/admin/${id}`,
+      { responseType: 'text' }
+    ).pipe(
+      map((res: any) => {
+        if (typeof res === 'string') {
+          return res.trim() ? JSON.parse(res) : null;
+        }
+        return res;
+      })
+    );
+  }
+
+  getApplicationPricing(id: string): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/membership-applications/${id}/pricing`,
+      { responseType: 'text' }
+    ).pipe(
+      map((res: any) => {
+        if (typeof res === 'string') {
+          return res.trim() ? JSON.parse(res) : null;
+        }
+        return res;
+      })
+    );
+  }
+
 }
+

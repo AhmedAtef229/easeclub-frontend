@@ -1,140 +1,148 @@
-<!-- Overlay -->
+<!-- Absolute overlay container covering the content pane -->
 <div *ngIf="isOpen"
-     class="fixed inset-0 z-50 bg-black/40">
+     class="absolute inset-0 z-40 bg-white dark:bg-darkCard overflow-y-auto">
 
-  <!-- Modal -->
-  <div class="w-full h-full bg-white dark:bg-darkCard overflow-y-auto">
+  <!-- ================= HEADER ================= -->
+  <div
+    class="flex items-center justify-between px-6 py-4 border-b border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard sticky top-0 z-50">
 
-    <!-- ================= HEADER ================= -->
-    <div
-      class="flex items-center justify-between px-6 py-5 border-b border-borderGray dark:border-darkBorder">
+    <!-- Left -->
+    <div class="flex items-center gap-4">
 
-      <!-- Left -->
-      <div class="flex items-center gap-6">
+      <!-- Back Button -->
+      <button
+        (click)="closeModal()"
+        class="flex items-center gap-1.5 text-mediumGray hover:text-primary transition font-semibold text-xs">
+        <span class="text-base">←</span>
+        <span>Back</span>
+      </button>
 
-        <!-- Close -->
-        <button
-          (click)="closeModal()"
-          class="w-10 h-10 rounded-lg flex items-center justify-center
-                 hover:bg-gray-100 dark:hover:bg-darkBorder
-                 text-darkGray dark:text-white text-xl transition">
+      <!-- Vertical divider -->
+      <div class="h-5 w-[1px] bg-borderGray dark:bg-darkBorder"></div>
 
-          ✕
-        </button>
+      <!-- Title -->
+      <div>
+        <h2 class="text-lg font-bold text-primary dark:text-darkPrimary leading-none">
+          Application Review
+        </h2>
 
-        <!-- Title -->
-        <div>
-          <h2 class="text-[42px] leading-none font-bold text-primary dark:text-darkPrimary">
-            Application Review
-          </h2>
-
-          <p class="mt-2 text-lg text-mediumGray">
-            APP-2025-001
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Right Buttons -->
-      <div class="flex items-center gap-3">
-
-        <!-- Approve -->
-        <button
-          class="px-7 h-12 rounded-xl bg-cyan-500 hover:bg-cyan-600
-                 text-white font-medium transition">
-
-          ✓ Approve
-        </button>
-
-        <!-- Reject -->
-        <button
-          class="px-7 h-12 rounded-xl border border-red-400
-                 text-red-500 hover:bg-red-50
-                 font-medium transition">
-
-          ✕ Reject
-        </button>
-
+        <p class="text-[11px] text-mediumGray mt-1">
+          {{ data?.trackingNumber || 'Loading...' }}
+        </p>
       </div>
 
     </div>
 
-    <!-- ================= BODY ================= -->
-    <div class="p-8">
+    <!-- Right Buttons -->
+    <div class="flex items-center gap-3">
+
+      <!-- Approve -->
+      <button
+        class="px-4 h-9 rounded-xl bg-cyan-500 hover:bg-cyan-600
+               text-white font-semibold text-xs transition">
+        ✓ Approve
+      </button>
+
+      <!-- Reject -->
+      <button
+        class="px-4 h-9 rounded-xl border border-red-400
+               text-red-500 hover:bg-red-50
+               font-semibold text-xs transition">
+        ✕ Reject
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ================= BODY ================= -->
+  <div class="p-6">
+
+    <!-- ================= LOADING STATE ================= -->
+    <div *ngIf="loading" class="flex flex-col items-center justify-center py-24 space-y-4">
+      <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-mediumGray font-medium">Fetching application details from database...</p>
+    </div>
+
+    <div *ngIf="!loading">
 
       <!-- ================= MEMBER INFO CARD ================= -->
       <div
-        class="rounded-2xl border border-borderGray dark:border-darkBorder
-               bg-cardGray dark:bg-darkBg p-8">
+        class="rounded-xl border border-borderGray dark:border-darkBorder
+               bg-cardGray dark:bg-darkBg p-6 mb-6">
 
         <!-- Top -->
-        <div class="flex items-start justify-between mb-10">
+        <div class="flex items-start justify-between mb-8">
 
           <div>
-            <h3 class="text-2xl font-semibold text-darkGray dark:text-white">
+            <h3 class="text-base font-semibold text-darkGray dark:text-white">
               Member Information
             </h3>
 
-            <p class="text-lg text-mediumGray mt-1">
+            <p class="text-xs text-mediumGray mt-0.5">
               Applicant details and membership plan
             </p>
           </div>
 
           <!-- Status -->
           <div
-            class="px-4 py-2 rounded-full bg-primary/10
-                   text-primary text-sm font-medium">
-
-             Submitted
+            class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition"
+            [ngClass]="{
+              'bg-primary/10 text-primary': (applicationDetails?.status || data?.statusText[0]) === 'Submitted',
+              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': (applicationDetails?.status || data?.statusText[0]) === 'Approved',
+              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': (applicationDetails?.status || data?.statusText[0]) === 'Rejected',
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': (applicationDetails?.status || data?.statusText[0]) === 'NeedsChanges',
+              'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400': !(applicationDetails?.status || data?.statusText[0])
+            }">
+             {{ applicationDetails?.status || data?.statusText[0] || 'Draft' }}
           </div>
 
         </div>
 
         <!-- Info Grid -->
-        <div class="grid grid-cols-2 gap-y-10 gap-x-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
           <!-- Name -->
           <div>
-            <p class="text-base text-mediumGray mb-2">
+            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
               Member Name
             </p>
 
-            <p class="text-3xl font-medium text-darkGray dark:text-white">
-              {{ data.name }}
+            <p class="text-sm font-semibold text-darkGray dark:text-white">
+              {{ data?.userName || '—' }}
             </p>
           </div>
 
           <!-- Email -->
           <div>
-            <p class="text-base text-mediumGray mb-2">
+            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
               Email Address
             </p>
 
-            <p class="text-3xl font-medium text-darkGray dark:text-white">
-              {{ data.email }}
+            <p class="text-sm font-semibold text-darkGray dark:text-white truncate">
+              {{ data?.email || '—' }}
             </p>
           </div>
 
           <!-- Plan -->
           <div>
-            <p class="text-base text-mediumGray mb-2">
+            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
               Membership Plan
             </p>
 
-            <p class="text-3xl font-medium text-darkGray dark:text-white">
-              {{ data.plan }}
+            <p class="text-sm font-semibold text-darkGray dark:text-white">
+              {{ data?.plan || '—' }}
             </p>
           </div>
-
 
           <!-- Submitted -->
           <div>
-            <p class="text-base text-mediumGray mb-2">
+            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
               Submitted On
             </p>
 
-            <p class="text-3xl font-medium text-darkGray dark:text-white">
-              {{ data.submittedOn }}
+            <p class="text-sm font-semibold text-darkGray dark:text-white">
+              {{ data?.submittedAt || '—' }}
             </p>
           </div>
 
@@ -142,598 +150,341 @@
 
       </div>
 
-      <!-- ================= APPLICATION DATA ================= -->
+      <!-- ================= APPLICATION FORM DATA ================= -->
       <div
-        class="mt-8 rounded-2xl border border-borderGray dark:border-darkBorder
-               bg-cardGray dark:bg-darkBg p-8">
+        class="rounded-xl border border-borderGray dark:border-darkBorder
+               bg-cardGray dark:bg-darkBg p-6 mb-6"
+        *ngIf="applicationDetails?.steps?.length; else emptyStepsState">
 
         <!-- Title -->
-        <h3 class="text-2xl font-semibold text-darkGray dark:text-white">
+        <h3 class="text-base font-semibold text-darkGray dark:text-white">
           Application Form Data
         </h3>
 
-        <p class="text-lg text-mediumGray mt-1 mb-10">
+        <p class="text-xs text-mediumGray mt-0.5 mb-6">
           Review all submitted information step by step
         </p>
 
-        <!-- ================= STEPS ================= -->
+        <!-- ================= STEPS NAVIGATION ================= -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
 
-        <div class="flex items-center justify-between mb-14">
-
-          <!-- STEP 1 -->
-          <div
-            (click)="setStep(1)"
-            class="flex items-center flex-1 cursor-pointer">
+          <div *ngFor="let step of applicationDetails.steps; let i = index; let last = last"
+               (click)="setStep(i + 1)"
+               class="flex items-center flex-1 w-full cursor-pointer">
 
             <div
-              class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition"
+              class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition"
               [ngClass]="
-                activeStep === 1
+                activeStep === (i + 1)
                   ? 'bg-primary text-white'
                   : 'bg-gray-200 dark:bg-darkBorder text-mediumGray'
               ">
-
-              1
+              {{ i + 1 }}
             </div>
 
             <span
-              class="ml-3 text-lg transition"
+              class="ml-2 text-xs transition whitespace-nowrap"
               [ngClass]="
-                activeStep === 1
+                activeStep === (i + 1)
                   ? 'text-primary font-semibold'
                   : 'text-mediumGray'
               ">
-
-              Personal Information
+              {{ step.title }}
             </span>
 
-            <div class="flex-1 h-[1px] bg-borderGray mx-6"></div>
-
-          </div>
-
-          <!-- STEP 2 -->
-          <div
-            (click)="setStep(2)"
-            class="flex items-center flex-1 cursor-pointer">
-
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition"
-              [ngClass]="
-                activeStep === 2
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 dark:bg-darkBorder text-mediumGray'
-              ">
-
-              2
-            </div>
-
-            <span
-              class="ml-3 text-lg transition"
-              [ngClass]="
-                activeStep === 2
-                  ? 'text-primary font-semibold'
-                  : 'text-mediumGray'
-              ">
-
-              Membership Preferences
-            </span>
-
-            <div class="flex-1 h-[1px] bg-borderGray mx-6"></div>
-
-          </div>
-
-          <!-- STEP 3 -->
-          <div
-            (click)="setStep(3)"
-            class="flex items-center cursor-pointer">
-
-            <div
-              class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition"
-              [ngClass]="
-                activeStep === 3
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 dark:bg-darkBorder text-mediumGray'
-              ">
-
-              3
-            </div>
-
-            <span
-              class="ml-3 text-lg transition"
-              [ngClass]="
-                activeStep === 3
-                  ? 'text-primary font-semibold'
-                  : 'text-mediumGray'
-              ">
-
-              Documents & Verification
-            </span>
+            <div *ngIf="!last" class="hidden md:block flex-1 h-[1px] bg-borderGray dark:bg-darkBorder mx-4"></div>
 
           </div>
 
         </div>
 
-        <!-- ================================================= -->
-        <!-- ================= STEP 1 ======================== -->
-        <!-- ================================================= -->
-
-        <div
-          *ngIf="activeStep === 1"
-          class="rounded-2xl border border-borderGray dark:border-darkBorder
-                 bg-white dark:bg-darkCard p-8">
-
-          <!-- Header -->
-          <div class="flex items-center gap-4 mb-8">
-
-            <div
-              class="w-12 h-12 rounded-full bg-primary
-                     text-white flex items-center justify-center
-                     text-lg font-semibold">
-
-              1
-            </div>
-
-            <div>
-              <h4 class="text-2xl font-semibold text-darkGray dark:text-white">
-                Personal Information
-              </h4>
-
-              <p class="text-mediumGray">
-                Step 1 of 3
-              </p>
-            </div>
-
-          </div>
-
-          <!-- Content -->
-          <div class="grid grid-cols-2 gap-10">
-
-            <div>
-              <p class="text-base text-mediumGray mb-2">First Name</p>
-              <p class="text-2xl text-darkGray dark:text-white">
-                {{ data.personalInfo.firstName }}
-              </p>
-            </div>
-
-            <div>
-              <p class="text-base text-mediumGray mb-2">Last Name</p>
-              <p class="text-2xl text-darkGray dark:text-white">
-                {{ data.personalInfo.lastName }}
-              </p>
-            </div>
-
-            <div>
-              <p class="text-base text-mediumGray mb-2">Email</p>
-              <p class="text-2xl text-darkGray dark:text-white">
-                {{ data.personalInfo.email }}
-              </p>
-            </div>
-
-            <div>
-              <p class="text-base text-mediumGray mb-2">Phone</p>
-              <p class="text-2xl text-darkGray dark:text-white">
-                {{ data.personalInfo.phone }}
-              </p>
-            </div>
-
-            <div>
-              <p class="text-base text-mediumGray mb-2">Date of Birth</p>
-              <p class="text-2xl text-darkGray dark:text-white">
-                {{ data.personalInfo.dob }}
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ================================================= -->
-        <!-- ================= STEP 2 ======================== -->
-        <!-- ================================================= -->
-
-        <div
-          *ngIf="activeStep === 2"
-          class="rounded-2xl border border-borderGray dark:border-darkBorder
-                 bg-white dark:bg-darkCard p-8">
-
-          <!-- Header -->
-          <div class="flex items-center gap-4 mb-8">
-
-            <div
-              class="w-12 h-12 rounded-full bg-primary
-                     text-white flex items-center justify-center
-                     text-lg font-semibold">
-
-              2
-            </div>
-
-            <div>
-              <h4 class="text-2xl font-semibold text-darkGray dark:text-white">
-                Membership Preferences
-              </h4>
-
-              <p class="text-mediumGray">
-                Step 2 of 3
-              </p>
-            </div>
-
-          </div>
-
-          <!-- Card -->
+        <!-- ================= ACTIVE STEP CONTENT ================= -->
+        <div *ngFor="let step of applicationDetails.steps; let i = index">
           <div
-            class="rounded-2xl border border-borderGray
-                   dark:border-darkBorder p-8">
+            *ngIf="activeStep === (i + 1)"
+            class="rounded-xl border border-borderGray dark:border-darkBorder
+                   bg-white dark:bg-darkCard p-6">
 
-            <h5
-              class="text-2xl font-semibold text-darkGray dark:text-white
-                     border-b border-borderGray pb-5">
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
 
-              Club Preferences
-            </h5>
-
-            <div class="space-y-10 mt-8">
-
-              <div>
-                <p class="text-lg text-mediumGray mb-2">
-                  Membership Type
-                </p>
-
-                <p class="text-2xl text-darkGray dark:text-white">
-                  Family
-                </p>
+              <div
+                class="w-8 h-8 rounded-full bg-primary
+                       text-white flex items-center justify-center
+                       text-xs font-semibold">
+                {{ i + 1 }}
               </div>
 
               <div>
-                <p class="text-lg text-mediumGray mb-3">
-                  Add Personal Trainer
+                <h4 class="text-sm font-semibold text-darkGray dark:text-white">
+                  {{ step.title }}
+                </h4>
+
+                <p class="text-[11px] text-mediumGray">
+                  Step {{ i + 1 }} of {{ applicationDetails.steps.length }}
                 </p>
+              </div>
 
-                <div class="flex items-center gap-3">
+            </div>
 
-                  <div
-                    class="w-5 h-5 rounded-full border-2 border-cyan-500
-                           flex items-center justify-center">
+            <!-- Sections -->
+            <div class="space-y-6">
+              <div *ngFor="let section of step.sections"
+                   class="rounded-xl border border-borderGray dark:border-darkBorder p-6 bg-cardGray dark:bg-darkBg">
+                
+                <h5
+                  class="text-sm font-semibold text-darkGray dark:text-white
+                         border-b border-borderGray dark:border-darkBorder pb-2">
+                  {{ section.title }}
+                </h5>
 
-                    <div class="w-2.5 h-2.5 rounded-full bg-cyan-500"></div>
+                <!-- Fields Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+                  <div *ngFor="let field of section.fields">
+                    <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">{{ field.label }}</p>
+                    
+                    <!-- File Type Field -->
+                    <div *ngIf="field.type === 'File' || field.type === 'file'; else standardField">
+                      <div
+                        class="flex items-center justify-between
+                               border border-borderGray dark:border-darkBorder rounded-xl p-2.5 bg-white dark:bg-darkCard">
+
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <span class="text-xl flex-shrink-0">
+                            {{ isImage(field.value) ? '🖼' : '📄' }}
+                          </span>
+
+                          <div class="min-w-0">
+                            <p class="text-xs text-darkGray dark:text-white truncate font-medium">
+                              {{ getFileName(field.value) || 'No file uploaded' }}
+                            </p>
+
+                            <p class="text-[10px] text-mediumGray">
+                              {{ isImage(field.value) ? 'IMAGE' : 'PDF / DOCUMENT' }}
+                            </p>
+                          </div>
+
+                        </div>
+
+                        <div class="flex items-center gap-3 flex-shrink-0" *ngIf="field.value">
+                          <button *ngIf="isImage(field.value)" (click)="previewFile(field.value)" class="text-primary font-semibold text-xs hover:underline">
+                            Preview
+                          </button>
+
+                          <a [href]="field.value" target="_blank" download class="text-cyan-500 font-semibold text-xs hover:underline">
+                            Download
+                          </a>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <!-- Standard Text Fields -->
+                    <ng-template #standardField>
+                      <p class="text-xs font-semibold text-darkGray dark:text-white">
+                        {{ field.value || '—' }}
+                      </p>
+                    </ng-template>
 
                   </div>
+                </div>
 
-                  <span class="text-xl text-darkGray dark:text-white">
-                    Yes
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dynamic Empty/Draft Placeholder -->
+      <ng-template #emptyStepsState>
+        <div
+          class="rounded-xl border border-dashed border-gray-300 dark:border-darkBorder
+                 bg-white dark:bg-darkCard p-8 text-center mb-6">
+          <span class="text-3xl block mb-3">📝</span>
+          <h4 class="text-sm font-semibold text-darkGray dark:text-white">
+            Application Details Not Available
+          </h4>
+          <p class="text-xs text-mediumGray mt-1.5 max-w-md mx-auto">
+            This application is in <strong>Draft</strong> status. Full dynamic form data will be populated step-by-step for review once the applicant formally submits the application.
+          </p>
+        </div>
+      </ng-template>
+
+      <!-- ================= PAYMENT SUMMARY ================= -->
+      <div
+        class="rounded-xl border border-borderGray dark:border-darkBorder
+               bg-cardGray dark:bg-darkBg p-6 mb-6"
+        *ngIf="pricing?.pricingResult">
+
+        <!-- Title -->
+        <h3 class="text-base font-semibold text-darkGray dark:text-white">
+          Payment Summary
+        </h3>
+
+        <p class="text-xs text-mediumGray mt-0.5 mb-6">
+          Pricing breakdown and applied policies
+        </p>
+
+        <!-- Base Price -->
+        <div class="mb-5">
+          <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+            Base Price
+          </p>
+
+          <p class="text-xl font-bold text-primary dark:text-darkPrimary">
+            {{ pricing.pricingResult.basePrice | currency }}
+          </p>
+        </div>
+
+        <!-- Applied Policies -->
+        <div class="mb-5" *ngIf="pricing.pricingResult.appliedPolicies?.length">
+          <p class="text-xs font-semibold text-darkGray dark:text-white mb-2">
+            Applied Pricing Policies
+          </p>
+
+          <div class="space-y-2.5">
+
+            <!-- Policy Item -->
+            <div
+              *ngFor="let policy of pricing.pricingResult.appliedPolicies"
+              class="flex items-center justify-between
+                     border border-borderGray dark:border-darkBorder
+                     rounded-xl px-3 py-2 bg-white dark:bg-darkCard">
+
+              <div class="flex items-center gap-2">
+                <span [ngClass]="policy.adjustment >= 0 ? 'text-danger' : 'text-green-600'" class="text-base font-bold">
+                  {{ policy.adjustment >= 0 ? '↗' : '↘' }}
+                </span>
+
+                <p class="text-xs text-darkGray dark:text-white">
+                  {{ policy.name }}
+                </p>
+              </div>
+
+              <p [ngClass]="policy.adjustment >= 0 ? 'text-danger' : 'text-green-600'" class="font-semibold text-xs">
+                {{ policy.adjustment >= 0 ? '+' : '' }}{{ policy.adjustment | currency }}
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-borderGray dark:border-darkBorder my-4"></div>
+
+        <!-- Total -->
+        <div
+          class="rounded-xl bg-primary/10 dark:bg-darkPrimary/20
+                 px-4 py-3">
+
+          <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+            Total Price
+          </p>
+
+          <p class="text-xl font-bold text-primary dark:text-darkPrimary">
+            {{ pricing.pricingResult.totalPrice | currency }}
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ================= PAYMENT INSTALLMENTS ================= -->
+      <div
+        class="rounded-xl border border-borderGray dark:border-darkBorder
+               bg-cardGray dark:bg-darkBg p-6"
+        *ngIf="pricing?.installmentBlueprints">
+
+        <!-- Title -->
+        <h3 class="text-base font-semibold text-darkGray dark:text-white">
+          Payment Installments
+        </h3>
+
+        <p class="text-xs text-mediumGray mt-0.5 mb-6">
+          Track installment payments and status
+        </p>
+
+        <!-- Table -->
+        <div
+          class="overflow-x-auto rounded-xl border border-gray-200 dark:border-darkBorder
+                 bg-white dark:bg-darkCard">
+          <table class="w-full text-left border-collapse text-xs">
+
+            <!-- Header -->
+            <thead class="bg-gray-50 dark:bg-darkBorder">
+              <tr class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider">
+                <th class="p-2.5">Installment #</th>
+                <th class="p-2.5">Due Date</th>
+                <th class="p-2.5">Amount</th>
+                <th class="p-2.5">Status</th>
+                <th class="p-2.5 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <!-- Body -->
+            <tbody>
+              <tr
+                *ngFor="let item of pricing.installmentBlueprints"
+                class="border-t border-gray-200 dark:border-darkBorder
+                       text-darkGray dark:text-white align-middle text-xs">
+                <!-- Installment # -->
+                <td class="p-2.5 font-semibold">
+                  {{ item.order }}
+                </td>
+
+                <!-- Due Date -->
+                <td class="p-2.5">
+                  {{ item.dueDate | date:'longDate' }}
+                </td>
+
+                <!-- Amount -->
+                <td class="p-2.5 font-semibold">
+                  {{ item.amount | currency }}
+                </td>
+
+                <!-- Status -->
+                <td class="p-2.5">
+                  <span *ngIf="item.status === 'Paid' || item.status === 'paid'; else pendingStatus"
+                        class="flex items-center gap-1.5 text-[11px] font-semibold text-green-600">
+                    <span class="text-sm">✓</span>
+                    Paid
                   </span>
+                  <ng-template #pendingStatus>
+                    <span class="flex items-center gap-1.5 text-[11px] font-semibold text-mediumGray">
+                      <span class="text-sm">🕒</span>
+                      Pending
+                    </span>
+                  </ng-template>
+                </td>
 
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- ================================================= -->
-        <!-- ================= STEP 3 ======================== -->
-        <!-- ================================================= -->
-
-        <div
-          *ngIf="activeStep === 3"
-          class="rounded-2xl border border-borderGray dark:border-darkBorder
-                 bg-white dark:bg-darkCard p-8">
-
-          <!-- Header -->
-          <div class="flex items-center gap-4 mb-8">
-
-            <div
-              class="w-12 h-12 rounded-full bg-primary
-                     text-white flex items-center justify-center
-                     text-lg font-semibold">
-
-              3
-            </div>
-
-            <div>
-              <h4 class="text-2xl font-semibold text-darkGray dark:text-white">
-                Documents & Verification
-              </h4>
-
-              <p class="text-mediumGray">
-                Step 3 of 3
-              </p>
-            </div>
-
-          </div>
-
-          <!-- Documents Card -->
-          <div
-            class="rounded-2xl border border-borderGray
-                   dark:border-darkBorder p-8">
-
-            <h5
-              class="text-2xl font-semibold text-darkGray dark:text-white
-                     border-b border-borderGray pb-5">
-
-              Required Documents
-            </h5>
-
-            <div class="space-y-8 mt-8">
-
-              <!-- FILE 1 -->
-              <div>
-
-                <p class="text-lg text-mediumGray mb-4">
-                  Government ID
-                </p>
-
-                <div
-                  class="flex items-center justify-between
-                         border border-borderGray rounded-xl p-5">
-
-                  <div class="flex items-center gap-4">
-
-                    <span class="text-3xl">📄</span>
-
-                    <div>
-                      <p class="text-xl text-darkGray dark:text-white">
-                        id-john-smith.pdf
-                      </p>
-
-                      <p class="text-mediumGray">
-                        PDF
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <button class="text-cyan-500 font-medium text-lg">
-                    Download
+                <!-- Actions -->
+                <td class="p-2.5 text-right">
+                  <button
+                    *ngIf="item.status !== 'Paid' && item.status !== 'paid'"
+                    (click)="markAsPaid(item)"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold text-[11px] transition shadow-sm">
+                    <span class="text-[9px] font-bold bg-white/20 px-1 py-0.5 rounded">$</span>
+                    <span>Mark as Paid</span>
                   </button>
+                </td>
+              </tr>
 
-                </div>
+              <!-- Empty State -->
+              <tr *ngIf="!pricing.installmentBlueprints.length">
+                <td colspan="5" class="p-5 text-center text-mediumGray text-xs">
+                  No installments found
+                </td>
+              </tr>
+            </tbody>
 
-              </div>
-
-              <!-- FILE 2 -->
-              <div>
-
-                <p class="text-lg text-mediumGray mb-4">
-                  Proof of Address
-                </p>
-
-                <div
-                  class="flex items-center justify-between
-                         border border-borderGray rounded-xl p-5">
-
-                  <div class="flex items-center gap-4">
-
-                    <span class="text-3xl">🖼</span>
-
-                    <div>
-                      <p class="text-xl text-darkGray dark:text-white">
-                        utility-bill.jpg
-                      </p>
-
-                      <p class="text-mediumGray">
-                        IMAGE
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <div class="flex items-center gap-6">
-
-                    <button class="text-primary font-medium text-lg">
-                      Preview
-                    </button>
-
-                    <button class="text-cyan-500 font-medium text-lg">
-                      Download
-                    </button>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
+          </table>
         </div>
 
-
-      </div>
-
-<!-- ================= PAYMENT SUMMARY ================= -->
-<div
-  class="rounded-2xl border border-borderGray dark:border-darkBorder
-         bg-cardGray dark:bg-darkBg p-8 mt-8">
-
-  <!-- Title -->
-  <h3 class="text-2xl font-semibold text-darkGray dark:text-white">
-    Payment Summary
-  </h3>
-
-  <p class="text-lg text-mediumGray mt-1 mb-8">
-    Pricing breakdown and applied policies
-  </p>
-
-  <!-- Base Price -->
-  <div class="mb-8">
-    <p class="text-base text-mediumGray mb-2">
-      Base Price
-    </p>
-
-    <p class="text-3xl font-semibold text-primary dark:text-darkPrimary">
-      $1200.00
-    </p>
-  </div>
-
-  <!-- Applied Policies -->
-  <div class="mb-6">
-    <p class="text-lg font-medium text-darkGray dark:text-white mb-4">
-      Applied Pricing Policies
-    </p>
-
-    <div class="space-y-4">
-
-      <!-- Policy Item -->
-      <div
-        class="flex items-center justify-between
-               border border-borderGray dark:border-darkBorder
-               rounded-xl px-5 py-4 bg-white dark:bg-darkCard">
-
-        <div class="flex items-center gap-3">
-          <span class="text-danger text-xl">↗</span>
-
-          <p class="text-lg text-darkGray dark:text-white">
-            Family Membership Surcharge
-          </p>
-        </div>
-
-        <p class="text-danger font-medium text-lg">
-          +$600.00
-        </p>
-      </div>
-
-      <!-- Policy Item -->
-      <div
-        class="flex items-center justify-between
-               border border-borderGray dark:border-darkBorder
-               rounded-xl px-5 py-4 bg-white dark:bg-darkCard">
-
-        <div class="flex items-center gap-3">
-          <span class="text-danger text-xl">↗</span>
-
-          <p class="text-lg text-darkGray dark:text-white">
-            Personal Trainer Add-on
-          </p>
-        </div>
-
-        <p class="text-danger font-medium text-lg">
-          +$200.00
-        </p>
       </div>
 
     </div>
-  </div>
-
-  <!-- Divider -->
-  <div class="border-t border-borderGray dark:border-darkBorder my-6"></div>
-
-  <!-- Total -->
-  <div
-    class="rounded-xl bg-primary/10 dark:bg-darkPrimary/20
-           px-6 py-5">
-
-    <p class="text-base text-mediumGray mb-2">
-      Total Price
-    </p>
-
-    <p class="text-3xl font-bold text-primary dark:text-darkPrimary">
-      $2000.00
-    </p>
-  </div>
-
-</div>
-
-<!-- ================= PAYMENT INSTALLMENTS ================= -->
-<div
-  class="mt-8 rounded-2xl border border-borderGray dark:border-darkBorder
-         bg-cardGray dark:bg-darkBg p-8"
->
-
-  <!-- Title -->
-  <h3 class="text-2xl font-semibold text-darkGray dark:text-white">
-    Payment Installments
-  </h3>
-
-  <p class="text-lg text-mediumGray mt-1 mb-8">
-    Track installment payments and status
-  </p>
-
-  <!-- Table -->
-  <div
-    class="overflow-x-auto rounded-xl border border-gray-200 dark:border-darkBorder
-           bg-white dark:bg-darkCard"
-  >
-    <table class="w-full text-left border-collapse text-sm">
-
-      <!-- Header -->
-      <thead class="bg-gray-50 dark:bg-darkBorder">
-        <tr class="text-mediumGray">
-          <th class="p-4">Installment #</th>
-          <th class="p-4">Due Date</th>
-          <th class="p-4">Amount</th>
-          <th class="p-4">Status</th>
-        </tr>
-      </thead>
-
-      <!-- Body -->
-      <tbody>
-        <tr
-          *ngFor="let item of installments"
-          class="border-t border-gray-200 dark:border-darkBorder
-                 text-darkGray dark:text-white"
-        >
-          <!-- Installment # -->
-          <td class="p-4 font-medium">
-            {{ item.number }}
-          </td>
-
-          <!-- Due Date -->
-          <td class="p-4">
-            {{ item.dueDate }}
-          </td>
-
-          <!-- Amount -->
-          <td class="p-4 font-medium">
-            {{ item.amount }}
-          </td>
-
-          <!-- Status -->
-          <td class="p-4">
-            <span
-              class="flex items-center gap-2 text-sm font-medium"
-              [ngClass]="
-                item.status === 'Paid'
-                  ? 'text-green-600'
-                  : 'text-mediumGray'
-              "
-            >
-              <span
-                class="w-2 h-2 rounded-full"
-                [ngClass]="
-                  item.status === 'Paid'
-                    ? 'bg-green-500'
-                    : 'bg-gray-400'
-                "
-              ></span>
-
-              {{ item.status }}
-            </span>
-          </td>
-        </tr>
-
-        <!-- Empty State -->
-        <tr *ngIf="!installments.length">
-          <td colspan="4" class="p-6 text-center text-mediumGray">
-            No installments found
-          </td>
-        </tr>
-      </tbody>
-
-    </table>
-  </div>
-
-</div>
-
-    </div>
-
 
   </div>
-
-
 
 </div>
