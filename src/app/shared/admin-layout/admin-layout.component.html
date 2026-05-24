@@ -1,6 +1,6 @@
 <div class="h-screen w-full flex flex-col bg-pageBg dark:bg-darkBg overflow-hidden">
 
-  <app-navbar (menuClick)="toggleSidebar()"></app-navbar>
+  <app-navbar [isOpen]="isSidebarOpen" (menuClick)="toggleSidebar()"></app-navbar>
 
   <div class="flex flex-1 overflow-hidden">
 

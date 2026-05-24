@@ -9,7 +9,7 @@
 // export class NavbarComponent {
 
 // }
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-navbar',
@@ -18,7 +18,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
-
+  @Input() isOpen: boolean = false;
   @Output() menuClick = new EventEmitter<void>();
 
   toggle() {
