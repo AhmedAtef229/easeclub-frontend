@@ -55,7 +55,7 @@
   /* ===== Page Layout ===== */
 
   .ec-page {
-    @apply bg-lightGray min-h-screen text-darkGray;
+    @apply bg-pageBg min-h-screen text-darkGray;
   }
 
   .dark .ec-page {
@@ -65,7 +65,7 @@
   /* ===== Cards ===== */
 
   .ec-card {
-    @apply bg-white border border-gray-200 rounded-2xl shadow-sm;
+    @apply bg-cardGray border border-gray-200 rounded-2xl shadow-sm;
   }
 
   .dark .ec-card {
@@ -150,27 +150,28 @@
   background: #a8a8a8;
 }
 
-/* ================= DARK MODE ================= */
+/* ================= SCROLLBAR - DARK MODE ================= */
 
 .dark ::-webkit-scrollbar-track {
-  background: #1f2937; /* نفس لون darkBg أو قريب منه */
+  background: #0F0B1A;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #4b5563;
+  background: #2E2A4D;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+  background: #3F197A;
 }
+
 .tab-btn {
   @apply pb-3 font-medium text-mediumGray dark:text-gray-400 transition-all duration-300;
 }
 
 .tab-btn:hover {
-  @apply text-primary;
+  @apply text-primary dark:text-darkPrimary;
 }
 
 .active-tab {
-  @apply text-primary border-b-2 border-primary;
+  @apply text-primary border-b-2 border-primary dark:text-darkPrimary dark:border-darkPrimary;
 }

@@ -68,6 +68,7 @@ module.exports = {
 
         /* ✅ الكروت + سايد بار + تيبل */
         cardGray: '#F5F5F5',
+        lightGray: '#F5F5F5',
 
         /* borders */
         borderGray: '#E5E7EB',
