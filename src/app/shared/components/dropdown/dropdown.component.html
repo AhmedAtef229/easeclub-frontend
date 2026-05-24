@@ -1,38 +1,43 @@
-<div class="relative">
+<div class="relative w-full">
 
   <!-- Button -->
   <button
     (click)="toggle()"
-    class="px-4 py-2 rounded-xl border
-           bg-white dark:bg-darkCard
+    class="px-4 py-2.5 rounded-xl border
+           bg-cardGray dark:bg-darkCard
            border-gray-200 dark:border-darkBorder
            text-darkGray dark:text-white
-           hover:bg-gray-100 dark:hover:bg-darkBorder
-           transition w-full text-left"
+           hover:bg-gray-200/60 dark:hover:bg-darkBorder
+           transition w-full flex items-center justify-between text-left text-sm font-medium"
   >
-    {{ selected }}
+    <span>{{ selected }}</span>
+    <i class="fa-solid fa-chevron-down text-xs text-mediumGray dark:text-gray-400 transition-transform duration-200" [class.rotate-180]="isOpen"></i>
   </button>
 
-  <!-- Dropdown -->
+  <!-- Dropdown Menu -->
   <div
     *ngIf="isOpen"
-    class="absolute mt-2 {{width}}
+    class="absolute mt-2 w-full min-w-[150px]
            bg-white dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
            rounded-xl shadow-lg z-50 overflow-hidden"
   >
-
-    <div
-      *ngFor="let option of options"
-      (click)="select(option)"
-      class="px-4 py-2 cursor-pointer
-             text-darkGray dark:text-white
-             hover:bg-gray-100 dark:hover:bg-darkBorder
-             transition"
-    >
-      {{ option }}
+    <div class="py-1">
+      <div
+        *ngFor="let option of options"
+        (click)="select(option)"
+        class="px-4 py-2 cursor-pointer text-sm
+               flex items-center justify-between transition-colors duration-150"
+        [ngClass]="
+          option === selected
+            ? 'bg-primary/10 text-primary dark:bg-primary/30 dark:text-white font-semibold'
+            : 'text-darkGray dark:text-white hover:bg-gray-50 dark:hover:bg-darkBorder'
+        "
+      >
+        <span>{{ option }}</span>
+        <i *ngIf="option === selected" class="fa-solid fa-check text-xs text-primary dark:text-darkPrimary"></i>
+      </div>
     </div>
-
   </div>
 
 </div>

@@ -1,10 +1,10 @@
-<div class="rounded-xl border border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard flex flex-col">
+<div [ngClass]="borderless ? 'w-full flex flex-col' : 'rounded-2xl border border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard flex flex-col overflow-hidden'">
   <div class="overflow-x-auto w-full">
     <table class="w-full text-left border-collapse text-sm sm:text-base">
     <!-- Header -->
-    <thead class="bg-gray-50 dark:bg-darkBorder">
-      <tr class="text-xs sm:text-sm text-mediumGray">
-        <th *ngFor="let col of columns || []" class="p-2 sm:p-3 font-medium whitespace-nowrap">
+    <thead class="border-b border-gray-200 dark:border-darkBorder bg-transparent">
+      <tr class="text-xs sm:text-sm text-darkGray dark:text-gray-300">
+        <th *ngFor="let col of columns || []" class="p-2 sm:p-3 font-semibold whitespace-nowrap">
           {{ col?.label }}
         </th>
 
@@ -18,10 +18,10 @@
     <tbody>
       <tr
         *ngFor="let row of paginatedData || []"
-        class="border-t border-gray-200 dark:border-darkBorder text-darkGray dark:text-white hover:bg-gray-50 dark:hover:bg-darkBorder transition"
+        class="border-b border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-200 dark:hover:bg-darkBorder transition"
       >
         <!-- Dynamic Columns -->
-        <td *ngFor="let col of columns || []" class="p-2 sm:p-3">
+        <td *ngFor="let col of columns || []; let first = first" class="p-2 sm:p-3">
           <!-- STATUS -->
           <ng-container *ngIf="col?.type === 'status'">
             <label class="inline-flex items-center cursor-pointer">
@@ -32,7 +32,7 @@
                 (change)="toggleStatus.emit(row)"
               />
               <div
-                class="w-10 h-5 sm:w-11 sm:h-6 bg-gray-200 rounded-full peer peer-checked:bg-cyan-400 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:after:translate-x-full relative"
+                class="w-10 h-5 sm:w-11 sm:h-6 bg-gray-200 dark:bg-darkBorder rounded-full peer peer-checked:bg-cyan-400 dark:peer-checked:bg-darkPrimary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border dark:after:border-darkBorder after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:after:translate-x-full relative"
               ></div>
             </label>
           </ng-container>
@@ -42,7 +42,7 @@
             <div class="flex flex-wrap gap-1">
               <span
                 *ngFor="let item of row?.[col.key] || []"
-                class="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs"
+                class="px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:bg-darkPrimary/20 dark:text-darkPrimary text-xs font-semibold"
               >
                 {{ item }}
               </span>
@@ -69,7 +69,9 @@
 
           <!-- Text -->
           <ng-container *ngIf="!col?.type || col?.type === 'text'">
-            {{ row?.[col.key] ?? '-' }}
+            <span [ngClass]="first ? 'font-semibold text-darkGray dark:text-white' : 'text-mediumGray dark:text-gray-400'">
+              {{ row?.[col.key] ?? '-' }}
+            </span>
           </ng-container>
         </td>
 
@@ -115,9 +117,9 @@
   </div>
 
   <!-- Pagination Footer -->
-  <div *ngIf="totalPages > 1" class="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200 dark:border-darkBorder bg-white dark:bg-darkCard rounded-b-xl">
+  <div *ngIf="totalPages > 0" class="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard rounded-b-2xl">
     <div class="text-sm text-mediumGray dark:text-gray-400">
-      Showing <span class="font-medium text-darkGray dark:text-white">{{ showingStart }}&ndash;{{ showingEnd }}</span> of <span class="font-medium text-darkGray dark:text-white">{{ data?.length }}</span> items
+      Showing <span class="font-medium text-darkGray dark:text-white">{{ showingStart }}&ndash;{{ showingEnd }}</span> of <span class="font-medium text-darkGray dark:text-white">{{ serverSide ? totalCount : data?.length }}</span> {{ itemLabel }}
     </div>
     <div class="flex items-center gap-1 sm:gap-2">
       <button 
