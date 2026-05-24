@@ -1,15 +1,13 @@
 <app-page-layout
   title="Membership Management"
   subtitle="View and manage club memberships"
+  [hasActions]="true"
 >
 
   <!-- HEADER FILTERS (زي التصميم) -->
   <div
     actions
-    class="flex items-center gap-3
-           bg-gray-50 dark:bg-darkCard
-           border border-gray-200 dark:border-darkBorder
-           rounded-2xl p-4 shadow-sm"
+    class="flex items-center gap-3 w-full"
   >
 
     <!-- SEARCH -->
@@ -62,14 +60,25 @@
 
   <!-- TABLE -->
   <div
-    class="mt-4
-           bg-white dark:bg-darkCard
+    class="mt-4 p-4 sm:p-6
+           bg-cardGray dark:bg-darkCard
            border border-gray-200 dark:border-darkBorder
-           rounded-2xl shadow-sm overflow-hidden"
+           rounded-2xl"
   >
+    <!-- Title -->
+    <div class="mb-3 px-1">
+      <h3 class="font-bold text-lg text-darkGray dark:text-white">
+        Memberships
+      </h3>
+      <p class="text-sm text-mediumGray dark:text-gray-400">
+        {{ data.length }} memberships found
+      </p>
+    </div>
+
     <app-tables
       [columns]="columns"
       [data]="data"
+      [borderless]="true"
     ></app-tables>
   </div>
 

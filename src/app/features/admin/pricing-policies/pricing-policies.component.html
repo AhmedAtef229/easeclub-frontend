@@ -1,37 +1,29 @@
 <app-page-layout
   title="Pricing Policies"
   subtitle="Create dynamic pricing rules and assign them to templates or events"
+  [hasActions]="true"
 >
 
   <!-- ✅ حط التابس هنا -->
-  <div actions
-       class="w-full
-              bg-cardGray dark:bg-darkCard
-              border border-borderGray dark:border-darkBorder
-              rounded-2xl px-6 py-4 mt-4">
+  <div actions class="w-full">
+    <div class="flex gap-8 border-b border-borderGray dark:border-darkBorder relative pb-2">
+      <button
+        routerLink="pricing-policy-content"
+        routerLinkActive="active-tab"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="tab-btn"
+      >
+        Policies
+      </button>
 
-    <div actions class="w-full bg-cardGray dark:bg-darkCard border rounded-2xl px-6 py-4 mt-4">
-  <div class="flex gap-8 border-b border-borderGray dark:border-darkBorder relative">
-
-    <button
-      routerLink="pricing-policy-content"
-      routerLinkActive="active-tab"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="tab-btn"
-    >
-      Policies
-    </button>
-
-    <button
-      routerLink="pricing-policy-assignment"
-      routerLinkActive="active-tab"
-      class="tab-btn"
-    >
-      Assignments
-    </button>
-
-  </div>
-</div>
+      <button
+        routerLink="pricing-policy-assignment"
+        routerLinkActive="active-tab"
+        class="tab-btn"
+      >
+        Assignments
+      </button>
+    </div>
   </div>
 
   <!-- ✅ المحتوى -->

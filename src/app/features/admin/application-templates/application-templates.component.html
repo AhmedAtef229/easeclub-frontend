@@ -22,28 +22,20 @@
   </div>
 
   <!-- Table -->
-  <div class="rounded-2xl border border-gray-200 dark:border-darkBorder
-              bg-white dark:bg-darkCard p-4 overflow-x-auto">
-<app-tables
-  [columns]="columns"
-  [data]="data"
-  [showActions]="true"
-
-  (edit)="onEdit($event)"
-
-></app-tables>
-
-  </div>
+  <app-tables
+    [columns]="columns"
+    [data]="data"
+    [showActions]="true"
+    [serverSide]="true"
+    [currentPage]="currentPage"
+    [totalCount]="totalCount"
+    [pageSize]="pageSize"
+    itemLabel="templates"
+    (pageChange)="onPageChange($event)"
+    (edit)="onEdit($event)"
+  ></app-tables>
 
 </app-page-layout>
-
-<!-- 🔥 Pagination -->
-<app-pagination
-  [currentPage]="currentPage"
-  [totalCount]="totalCount"
-  [pageSize]="pageSize"
-  (pageChange)="onPageChange($event)"
-></app-pagination>
 
 <!-- 🔥 Create Modal -->
 <app-create-template-modal

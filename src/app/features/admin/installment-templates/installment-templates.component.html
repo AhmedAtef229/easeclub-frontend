@@ -1,12 +1,13 @@
 <app-page-layout
   title="Installment Template Management"
   subtitle="Create and manage payment installment templates for membership plans"
+  [hasActions]="true"
 >
 
   <!-- 🔥 Filters + Button -->
   <div
-    class="flex items-center justify-between mb-4 p-4 rounded-2xl
-           bg-gray-50 dark:bg-darkCard border border-gray-200 dark:border-darkBorder"
+    actions
+    class="flex items-center justify-between w-full"
   >
 
     <!-- Filters -->
@@ -45,7 +46,7 @@
   <!-- 🔥 Table Card -->
   <div
     class="rounded-2xl border border-gray-200 dark:border-darkBorder
-           bg-white dark:bg-darkCard p-4"
+           bg-cardGray dark:bg-darkCard p-4"
   >
 
     <!-- Title -->
@@ -64,6 +65,7 @@
       [data]="filteredData"
       [showActions]="true"
       [showView]="true"
+      [borderless]="true"
       (edit)="onEdit($event)"
       (view)="onView($event)"
     ></app-tables>

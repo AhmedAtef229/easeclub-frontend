@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
 
@@ -19,7 +18,6 @@ import { ApplicationTemplateService } from '../../../core/services/api/applicati
     CommonModule,
     PageLayoutComponent,
     TablesComponent,
-    PaginationComponent,
     CreateTemplateModalComponent, // Ensure this is imported correctly
   ],
 
