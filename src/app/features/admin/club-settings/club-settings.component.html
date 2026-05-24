@@ -23,19 +23,28 @@
       <div *ngIf="isEditing" class="flex gap-3">
         <button
           (click)="cancelEdit()"
-          class="px-5 py-2.5 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white hover:bg-gray-100 dark:hover:bg-darkCard transition"
+          [disabled]="isSaving"
+          class="px-5 py-2.5 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white hover:bg-gray-100 dark:hover:bg-darkCard transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
 
         <button
           (click)="saveEdit()"
-          class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl font-semibold transition"
+          [disabled]="isSaving"
+          class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save Changes
+          <span *ngIf="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ isSaving ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- ERROR MESSAGE -->
+  <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm flex justify-between items-center">
+    <span>{{ errorMessage }}</span>
+    <button (click)="errorMessage = ''" class="hover:opacity-75 font-semibold text-base px-2">✕</button>
   </div>
 
   <!-- Club Identity -->
@@ -70,10 +79,19 @@
     <div class="flex justify-between items-center">
       <p class="text-sm font-semibold text-darkGray dark:text-white">Club Logo</p>
 
+      <input
+        type="file"
+        #logoInput
+        (change)="onLogoSelected($event)"
+        accept="image/*"
+        class="hidden"
+      />
       <button
         *ngIf="isEditing"
-        (click)="showLogoModal = true"
-        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition"
+        [disabled]="isSaving"
+        (click)="logoInput.click()"
+        type="button"
+        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Change Logo
       </button>
@@ -103,10 +121,19 @@
     <div class="flex justify-between items-center">
       <p class="text-sm font-semibold text-darkGray dark:text-white">Club Image</p>
 
+      <input
+        type="file"
+        #coverInput
+        (change)="onCoverSelected($event)"
+        accept="image/*"
+        class="hidden"
+      />
       <button
         *ngIf="isEditing"
-        (click)="showImageModal = true"
-        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition"
+        [disabled]="isSaving"
+        (click)="coverInput.click()"
+        type="button"
+        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Change Image
       </button>
@@ -260,18 +287,6 @@
     </div>
   </div>
 </div>
-
-<app-change-logo-modal
-  *ngIf="showLogoModal"
-  (close)="showLogoModal = false"
-  (submit)="onLogoChange($event)"
-></app-change-logo-modal>
-
-<app-change-photo-modal
-  *ngIf="showImageModal"
-  (close)="showImageModal = false"
-  (submit)="onImageChange($event)"
-></app-change-photo-modal>
 
 <app-add-amenity-modal
   *ngIf="showAmenityModal"

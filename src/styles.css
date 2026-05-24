@@ -2,6 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    font-size: 14px; /* حجم الخط الأساسي للمحتوى */
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply text-darkGray bg-pageBg;
+  }
+
+  /* ===== Typography Hierarchy ===== */
+  h1 {
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-primary mb-4;
+  }
+  h2 {
+    @apply text-2xl md:text-3xl font-bold tracking-tight text-primary mb-3;
+  }
+  h3 {
+    @apply text-xl md:text-2xl font-semibold text-darkGray mb-3;
+  }
+  h4 {
+    @apply text-lg md:text-xl font-semibold text-darkGray mb-2;
+  }
+  h5 {
+    @apply text-base md:text-lg font-semibold text-darkGray mb-2;
+  }
+  h6 {
+    @apply text-sm md:text-base font-semibold text-darkGray mb-2;
+  }
+  
+  p {
+    @apply text-base leading-relaxed text-mediumGray mb-4;
+  }
+
+  /* Dark mode typography adjustments */
+  .dark body {
+    @apply bg-darkBg text-white;
+  }
+  .dark h1, .dark h2 {
+    @apply text-darkPrimary;
+  }
+  .dark h3, .dark h4, .dark h5, .dark h6 {
+    @apply text-white;
+  }
+  .dark p {
+    @apply text-gray-400;
+  }
+}
+
 @layer components {
   /* ===== Page Layout ===== */
 

@@ -86,64 +86,76 @@
 
           <!-- Status -->
           <div
-            class="px-2.5 py-1 rounded-full text-[11px] font-semibold transition"
+            class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition"
             [ngClass]="{
-              'bg-primary/10 text-primary': (applicationDetails?.status || data?.statusText[0]) === 'Submitted',
+              'bg-primary/10 text-primary': (applicationDetails?.status || data?.statusText[0] || 'Submitted') === 'Submitted',
               'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': (applicationDetails?.status || data?.statusText[0]) === 'Approved',
               'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': (applicationDetails?.status || data?.statusText[0]) === 'Rejected',
-              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': (applicationDetails?.status || data?.statusText[0]) === 'NeedsChanges',
-              'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400': !(applicationDetails?.status || data?.statusText[0])
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': (applicationDetails?.status || data?.statusText[0]) === 'NeedsChanges'
             }">
-             {{ applicationDetails?.status || data?.statusText[0] || 'Draft' }}
+             <i *ngIf="(applicationDetails?.status || data?.statusText[0] || 'Submitted') === 'Submitted'" class="fa-regular fa-eye"></i>
+             {{ applicationDetails?.status || data?.statusText[0] || 'Submitted' }}
           </div>
 
         </div>
 
         <!-- Info Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
 
-          <!-- Name -->
-          <div>
-            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-              Member Name
-            </p>
-
-            <p class="text-sm font-semibold text-darkGray dark:text-white">
-              {{ data?.userName || '—' }}
-            </p>
+          <!-- Left Column -->
+          <div class="space-y-6">
+            <!-- Name -->
+            <div>
+              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+                Member Name
+              </p>
+              <p class="text-sm font-semibold text-darkGray dark:text-white">
+                {{ data?.userName || '—' }}
+              </p>
+            </div>
+            
+            <!-- Plan -->
+            <div>
+              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+                Membership Plan
+              </p>
+              <p class="text-sm font-semibold text-darkGray dark:text-white">
+                {{ data?.plan || '—' }}
+              </p>
+            </div>
+            
+            <!-- Submitted -->
+            <div>
+              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+                Submitted On
+              </p>
+              <p class="text-sm font-semibold text-darkGray dark:text-white">
+                {{ data?.submittedAt || '—' }}
+              </p>
+            </div>
           </div>
 
-          <!-- Email -->
-          <div>
-            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-              Email Address
-            </p>
-
-            <p class="text-sm font-semibold text-darkGray dark:text-white truncate">
-              {{ data?.email || '—' }}
-            </p>
-          </div>
-
-          <!-- Plan -->
-          <div>
-            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-              Membership Plan
-            </p>
-
-            <p class="text-sm font-semibold text-darkGray dark:text-white">
-              {{ data?.plan || '—' }}
-            </p>
-          </div>
-
-          <!-- Submitted -->
-          <div>
-            <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-              Submitted On
-            </p>
-
-            <p class="text-sm font-semibold text-darkGray dark:text-white">
-              {{ data?.submittedAt || '—' }}
-            </p>
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Email -->
+            <div>
+              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+                Email Address
+              </p>
+              <p class="text-sm font-semibold text-darkGray dark:text-white truncate">
+                {{ data?.email || '—' }}
+              </p>
+            </div>
+            
+            <!-- User ID -->
+            <div>
+              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
+                User ID
+              </p>
+              <p class="text-sm font-semibold text-darkGray dark:text-white">
+                {{ data?.userId || 'user-1' }}
+              </p>
+            </div>
           </div>
 
         </div>
@@ -307,7 +319,7 @@
             Application Details Not Available
           </h4>
           <p class="text-xs text-mediumGray mt-1.5 max-w-md mx-auto">
-            This application is in <strong>Draft</strong> status. Full dynamic form data will be populated step-by-step for review once the applicant formally submits the application.
+            Full dynamic form data will be populated step-by-step for review once the applicant formally submits the application.
           </p>
         </div>
       </ng-template>
@@ -418,7 +430,6 @@
                 <th class="p-2.5">Due Date</th>
                 <th class="p-2.5">Amount</th>
                 <th class="p-2.5">Status</th>
-                <th class="p-2.5 text-right">Actions</th>
               </tr>
             </thead>
 
@@ -456,17 +467,6 @@
                       Pending
                     </span>
                   </ng-template>
-                </td>
-
-                <!-- Actions -->
-                <td class="p-2.5 text-right">
-                  <button
-                    *ngIf="item.status !== 'Paid' && item.status !== 'paid'"
-                    (click)="markAsPaid(item)"
-                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold text-[11px] transition shadow-sm">
-                    <span class="text-[9px] font-bold bg-white/20 px-1 py-0.5 rounded">$</span>
-                    <span>Mark as Paid</span>
-                  </button>
                 </td>
               </tr>
 
