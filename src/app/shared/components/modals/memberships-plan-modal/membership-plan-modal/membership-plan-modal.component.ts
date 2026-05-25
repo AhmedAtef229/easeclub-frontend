@@ -6,11 +6,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MembershipTypesService } from '../../../../../core/services/api/membership-types.service';
 import { InstallmentTemplatesService } from '../../../../../core/services/api/installment-templates.service';
 import { BranchService } from '../../../../../core/services/api/branches.service';
+import { FormDropdownComponent } from '../../../form-dropdown/form-dropdown.component';
 
 @Component({
   selector: 'app-membership-plan-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormDropdownComponent],
   templateUrl: './membership-plan-modal.component.html',
 })
 export class MembershipPlanModalComponent implements OnInit {
@@ -25,6 +26,10 @@ export class MembershipPlanModalComponent implements OnInit {
   installmentTemplates: any[] = [];
 
   clubId!: string;
+
+  get membershipTypeOptions() {
+    return this.membershipTypes.map(t => ({ value: t.id, label: t.name }));
+  }
 
   constructor(
     private fb: FormBuilder,
