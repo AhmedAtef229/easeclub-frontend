@@ -8,6 +8,7 @@ import { ApplicationTemplateService } from '../../../../../core/services/api/app
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './create-template-modal.component.html',
+  styleUrls: ['./create-template-modal.component.css'],
 })
 export class CreateTemplateModalComponent implements OnInit {
   @Input() templateId: string | undefined = undefined;

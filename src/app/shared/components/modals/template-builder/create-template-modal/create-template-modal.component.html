@@ -1,5 +1,5 @@
-<div class="fixed inset-0 bg-black/30 z-50 flex">
-  <div class="w-full h-full bg-white dark:bg-darkBg flex flex-col">
+<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 md:p-6">
+  <div class="w-full h-[90vh] max-h-[850px] max-w-7xl bg-white dark:bg-darkCard flex flex-col rounded-3xl overflow-hidden border border-borderGray dark:border-darkBorder shadow-2xl">
     <!-- HEADER -->
     <div
       class="h-16 flex items-center justify-between px-6 bg-cardGray dark:bg-darkCard border-b border-borderGray dark:border-darkBorder"
@@ -126,7 +126,7 @@
 
 
       <!-- CANVAS -->
-<div class="flex-1 bg-pageBg dark:bg-darkBg p-10 overflow-auto">
+      <div class="flex-1 bg-pageBg dark:bg-darkBg p-10 overflow-auto canvas-grid">
   <div class="w-[520px] mx-auto space-y-6">
     <div
       *ngFor="let step of steps || []; let si = index"

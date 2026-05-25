@@ -1,0 +1,35 @@
+.canvas-grid {
+  background-image: radial-gradient(#E5E7EB 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
+}
+
+:host-context(.dark) .canvas-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.5px, transparent 1.5px);
+}
+
+/* Local scrollbar overrides for clean template builder panes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+:host-context(.dark) ::-webkit-scrollbar-thumb {
+  background: #2E2A4D;
+}
+
+:host-context(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #3F197A;
+}
