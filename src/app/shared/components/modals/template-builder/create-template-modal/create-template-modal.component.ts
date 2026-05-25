@@ -259,6 +259,10 @@ export class CreateTemplateModalComponent implements OnInit {
 
           system: section.intent === 'FamilyMembers',
 
+          repeatable: section.repeatRule ? (section.repeatRule.mode === 'AtLeastOne' || section.repeatRule.numberOfRepeats > 1) : false,
+          repeatMode: section.repeatRule?.mode || 'ExactValue',
+          numberOfRepeats: section.repeatRule?.numberOfRepeats || 1,
+
           fields: (section.fields || []).map((field: any) => ({
             ...field,
 
@@ -330,8 +334,8 @@ export class CreateTemplateModalComponent implements OnInit {
       intent: section.system ? 'FamilyMembers' : 'General',
 
       repeatRule: {
-        mode: section.repeatable ? 'AtLeastOne' : 'ExactValue',
-        numberOfRepeats: section.repeatable ? 5 : 1,
+        mode: section.repeatable ? (section.repeatMode || 'AtLeastOne') : 'ExactValue',
+        numberOfRepeats: section.repeatable ? (section.numberOfRepeats || 1) : 1,
       },
 
       fields: (section.fields || []).map((field: any, fieldIndex: number) => {
@@ -512,6 +516,9 @@ export class CreateTemplateModalComponent implements OnInit {
     const section = {
       title: 'New Section',
       fields: [],
+      repeatable: false,
+      repeatMode: 'ExactValue',
+      numberOfRepeats: 1,
     };
 
     this.steps[this.selectedStepIndex].sections.push(section);
@@ -539,6 +546,8 @@ export class CreateTemplateModalComponent implements OnInit {
           title: res.title || 'Family Members',
 
           repeatable: true,
+          repeatMode: 'AtLeastOne',
+          numberOfRepeats: 3,
 
           deletable: true,
 
@@ -592,6 +601,8 @@ export class CreateTemplateModalComponent implements OnInit {
         const fallbackSection = {
           title: 'Family Members',
           repeatable: true,
+          repeatMode: 'AtLeastOne',
+          numberOfRepeats: 3,
           deletable: true,
           system: true,
           intent: 'FamilyMembers',
