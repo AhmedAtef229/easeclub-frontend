@@ -61,7 +61,7 @@
               {{ i + 1 }}. {{ step.title }}
             </div>
 
-            <button (click)="deleteStep(i)" class="text-danger text-xs">✕</button>
+            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1">✕</button>
           </div>
         </div>
 
@@ -138,8 +138,9 @@
       (drop)="dropSection(step)"
       (dragover)="$event.preventDefault()"
     >
-      <div class="font-semibold mb-4 text-darkGray dark:text-white">
-        {{ step.title }}
+      <div class="font-semibold mb-4 text-darkGray dark:text-white flex items-center gap-2">
+        <i class="fa-solid fa-grip text-mediumGray/50 dark:text-gray-500 cursor-grab text-xs"></i>
+        <span>Step {{ si + 1 }}: {{ step.title }}</span>
       </div>
 
       <div
@@ -160,8 +161,9 @@
       >
         <div class="flex justify-between mb-3">
           <div class="font-medium flex items-center gap-2 text-darkGray dark:text-white">
+            <i class="fa-solid fa-grip text-mediumGray/50 dark:text-gray-500 cursor-grab text-xs"></i>
             <i *ngIf="section.system" class="fa-solid fa-users text-purple-500 text-sm"></i>
-            {{ section.title }}
+            <span>{{ section.title }}</span>
 
             <span
               *ngIf="section.repeatable"
@@ -184,7 +186,7 @@
           <button
             *ngIf="!section.system || section.deletable"
             (click)="deleteSection(i); $event.stopPropagation()"
-            class="text-danger text-xs hover:underline"
+            class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-medium hover:underline"
           >
             Delete
           </button>
@@ -203,34 +205,37 @@
           (dragover)="$event.preventDefault()"
           (click)="selectField(field); $event.stopPropagation()"
         >
-            <div>
-              <div class="font-medium text-sm text-darkGray dark:text-white flex items-center gap-1.5">
-                {{ field.label }}
-                <span *ngIf="field.required" class="text-danger text-xs">*</span>
-                <i *ngIf="isSystemField(field)" class="fa-solid fa-lock text-[10px] text-purple-400"></i>
-              </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-grip-vertical text-mediumGray/40 dark:text-gray-600 cursor-grab text-[10px]"></i>
+              <div>
+                <div class="font-medium text-sm text-darkGray dark:text-white flex items-center gap-1.5">
+                  {{ field.label }}
+                  <span *ngIf="field.required" class="text-danger text-xs">*</span>
+                  <i *ngIf="isSystemField(field)" class="fa-solid fa-lock text-[10px] text-purple-400"></i>
+                </div>
 
-              <div class="text-[10px] font-mono text-mediumGray/70">
-                {{ field.key }}
+                <div class="text-[10px] font-mono text-mediumGray/70">
+                  {{ field.key }}
+                </div>
               </div>
             </div>
 
           <div class="flex gap-3 items-center">
             <span
-              class="text-[10px] font-extrabold uppercase tracking-widest text-primary"
+              class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-darkSecondary whitespace-nowrap"
             >
               {{ 
                 field.type === 'text' ? 'Short Text' : 
-                field.type === 'number' ? 'Number Field' :
-                field.type === 'date' ? 'Date Picker' :
-                field.type === 'file' ? 'File Upload' :
-                field.type === 'enum' ? 'Dropdown' : field.type
+                field.type === 'number' ? 'Number' :
+                field.type === 'date' ? 'Date' :
+                field.type === 'file' ? 'File' :
+                field.type === 'enum' ? 'Enum' : field.type
               }}
             </span>
 
             <button
               (click)="deleteField(field); $event.stopPropagation()"
-              class="text-danger/40 hover:text-danger transition-colors"
+              class="text-mediumGray/40 dark:text-gray-600 hover:text-danger transition-colors"
             >
               <i class="fa-solid fa-xmark"></i>
             </button>
