@@ -54,14 +54,14 @@
         <div class="space-y-1 mb-6">
           <div
             *ngFor="let step of steps || []; let i = index"
-            class="p-2 rounded-lg flex justify-between items-center cursor-pointer hover:bg-lightGray dark:hover:bg-darkCard"
+            class="group/step-nav p-2 rounded-lg flex justify-between items-center cursor-pointer hover:bg-lightGray dark:hover:bg-darkCard"
             [ngClass]="{ 'bg-primary/10': selectedStepIndex === i }"
           >
             <div (click)="selectStep(i)" class="text-darkGray dark:text-white flex-1">
               {{ i + 1 }}. {{ step.title }}
             </div>
 
-            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1">✕</button>
+            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1 opacity-0 group-hover/step-nav:opacity-100 duration-150">✕</button>
           </div>
         </div>
 
@@ -130,7 +130,7 @@
   <div class="w-[520px] mx-auto space-y-6">
     <div
       *ngFor="let step of steps || []; let si = index"
-      class="bg-cardGray dark:bg-darkCard rounded-xl border p-5 transition-all duration-150"
+      class="group/step bg-cardGray dark:bg-darkCard rounded-xl border p-5 transition-all duration-150"
       [class.border-primary]="selectedType === 'step' && selectedStep === step"
       [class.border-borderGray]="!(selectedType === 'step' && selectedStep === step)"
       [class.dark:border-darkBorder]="!(selectedType === 'step' && selectedStep === step)"
@@ -138,14 +138,24 @@
       (drop)="dropSection(step)"
       (dragover)="$event.preventDefault()"
     >
-      <div class="font-semibold mb-4 text-darkGray dark:text-white flex items-center gap-2">
-        <i class="fa-solid fa-grip text-mediumGray/50 dark:text-gray-500 cursor-grab text-xs"></i>
-        <span>Step {{ si + 1 }}: {{ step.title }}</span>
+      <div class="flex justify-between items-center mb-4">
+        <div class="font-semibold text-darkGray dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-grip text-mediumGray/50 dark:text-gray-500 cursor-grab text-xs"></i>
+          <span>Step {{ si + 1 }}: {{ step.title }}</span>
+        </div>
+
+        <button
+          (click)="deleteStep(si); $event.stopPropagation()"
+          class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors opacity-0 group-hover/step:opacity-100 duration-150 p-1 flex items-center justify-center"
+          title="Delete Step"
+        >
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
       </div>
 
       <div
         *ngFor="let section of step.sections || []; let i = index"
-        class="border rounded-xl p-4 mb-4 cursor-pointer transition-all duration-150
+        class="group/section border rounded-xl p-4 mb-4 cursor-pointer transition-all duration-150
                bg-white dark:bg-darkCard"
         [class.border-purple-400]="section.system"
         [class.bg-purple-50]="section.system"
@@ -186,15 +196,16 @@
           <button
             *ngIf="!section.system || section.deletable"
             (click)="deleteSection(i); $event.stopPropagation()"
-            class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-medium hover:underline"
+            class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors opacity-0 group-hover/section:opacity-100 duration-150 p-1 flex items-center justify-center"
+            title="Delete Section"
           >
-            Delete
+            <i class="fa-solid fa-xmark text-sm"></i>
           </button>
         </div>
 
         <div
           *ngFor="let field of section.fields || []"
-          class="border p-3 rounded-lg mb-2 flex justify-between items-center cursor-pointer transition-all duration-200"
+          class="group/field border p-3 rounded-lg mb-2 flex justify-between items-center cursor-pointer transition-all duration-200"
           [ngClass]="{
             'border-primary ring-2 ring-primary/20 bg-primary/5': selectedField === field,
             'border-borderGray dark:border-darkBorder bg-white dark:bg-darkBg hover:border-primary': selectedField !== field
@@ -235,7 +246,8 @@
 
             <button
               (click)="deleteField(field); $event.stopPropagation()"
-              class="text-mediumGray/40 dark:text-gray-600 hover:text-danger transition-colors"
+              class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors opacity-0 group-hover/field:opacity-100 duration-150 p-1 flex items-center justify-center"
+              title="Delete Field"
             >
               <i class="fa-solid fa-xmark"></i>
             </button>
