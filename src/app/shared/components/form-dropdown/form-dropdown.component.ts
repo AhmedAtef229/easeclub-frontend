@@ -24,6 +24,7 @@ export class FormDropdownComponent implements ControlValueAccessor {
   @Input() options: (string | DropdownOption)[] = [];
   @Input() placeholder: string = 'Select option';
   @Input() width: string = 'w-full';
+  @Input() disabled: boolean = false;
 
   isOpen = false;
   selectedValue: any = null;
@@ -47,10 +48,12 @@ export class FormDropdownComponent implements ControlValueAccessor {
   }
 
   toggle() {
+    if (this.disabled) return;
     this.isOpen = !this.isOpen;
   }
 
   select(value: any) {
+    if (this.disabled) return;
     this.selectedValue = value;
     this.onChange(value);
     this.onTouch();
@@ -68,5 +71,9 @@ export class FormDropdownComponent implements ControlValueAccessor {
 
   registerOnTouched(fn: any): void {
     this.onTouch = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 }

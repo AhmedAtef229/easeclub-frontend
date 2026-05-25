@@ -2,11 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApplicationTemplateService } from '../../../../../core/services/api/application-templates.service';
+import { FormDropdownComponent } from '../../../form-dropdown/form-dropdown.component';
 
 @Component({
   selector: 'app-create-template-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormDropdownComponent],
   templateUrl: './create-template-modal.component.html',
   styleUrls: ['./create-template-modal.component.css'],
 })
@@ -20,6 +21,19 @@ export class CreateTemplateModalComponent implements OnInit {
   @Output() submitForm = new EventEmitter<any>();
 
   templateName = 'Standard Membership Application';
+
+  fieldTypeDropdownOptions = [
+    { value: 'text', label: 'Short Text' },
+    { value: 'number', label: 'Number' },
+    { value: 'date', label: 'Date' },
+    { value: 'file', label: 'File' },
+    { value: 'enum', label: 'Enum' },
+  ];
+
+  repeatModeDropdownOptions = [
+    { value: 'ExactValue', label: 'Exact' },
+    { value: 'AtLeastOne', label: 'At Least' },
+  ];
 
   selectedStepIndex = 0;
   selectedSectionIndex = 0;
