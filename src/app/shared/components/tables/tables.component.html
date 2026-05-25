@@ -1,82 +1,128 @@
 <div [ngClass]="borderless ? 'w-full flex flex-col' : 'rounded-2xl border border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard flex flex-col overflow-hidden'">
   <div class="overflow-x-auto w-full">
-    <table class="w-full text-left border-collapse text-sm sm:text-base">
-    <!-- Header -->
-    <thead class="border-b border-gray-200 dark:border-darkBorder bg-transparent">
-      <tr class="text-xs sm:text-sm text-darkGray dark:text-gray-300">
-        <th *ngFor="let col of columns || []" class="p-2 sm:p-3 font-semibold whitespace-nowrap">
-          {{ col?.label }}
-        </th>
+    <div [ngClass]="bordered ? 'border border-borderGray dark:border-darkBorder rounded-xl overflow-hidden bg-white dark:bg-darkCard' : ''">
+      <table class="w-full text-left border-collapse text-sm sm:text-base">
+      <!-- Header -->
+      <thead [ngClass]="bordered ? 'bg-gray-50 dark:bg-darkBg border-b border-borderGray dark:border-darkBorder' : 'border-b border-gray-200 dark:border-darkBorder bg-transparent'">
+        <tr class="text-xs sm:text-sm text-darkGray dark:text-gray-300">
+          <th
+            *ngFor="let col of columns || []"
+            class="p-2 sm:p-3 font-semibold whitespace-nowrap"
+            [ngClass]="bordered ? 'border-r border-borderGray dark:border-darkBorder last:border-r-0' : ''"
+          >
+            {{ col?.label }}
+          </th>
 
-        <th *ngIf="showActions" class="p-2 sm:p-3 text-right font-medium whitespace-nowrap">
-          Actions
-        </th>
-      </tr>
-    </thead>
+          <th
+            *ngIf="showActions"
+            class="p-2 sm:p-3 text-right font-medium whitespace-nowrap"
+            [ngClass]="bordered ? 'border-r border-borderGray dark:border-darkBorder last:border-r-0' : ''"
+          >
+            Actions
+          </th>
+        </tr>
+      </thead>
 
-    <!-- Body -->
-    <tbody>
-      <tr
-        *ngFor="let row of paginatedData || []"
-        class="border-b border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-200 dark:hover:bg-darkBorder transition"
-      >
-        <!-- Dynamic Columns -->
-        <td *ngFor="let col of columns || []; let first = first" class="p-2 sm:p-3">
-          <!-- STATUS -->
-          <ng-container *ngIf="col?.type === 'status'">
-            <label class="inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                class="sr-only peer"
-                [checked]="row?.[col.key] ?? false"
-                (change)="toggleStatus.emit(row)"
-              />
-              <div
-                class="w-10 h-5 sm:w-11 sm:h-6 bg-gray-200 dark:bg-darkBorder rounded-full peer peer-checked:bg-cyan-400 dark:peer-checked:bg-darkPrimary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border dark:after:border-darkBorder after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:after:translate-x-full relative"
-              ></div>
-            </label>
-          </ng-container>
+      <!-- Body -->
+      <tbody>
+        <tr
+          *ngFor="let row of paginatedData || []"
+          [ngClass]="bordered ? 
+            'border-b border-borderGray dark:border-darkBorder last:border-b-0 bg-white dark:bg-darkCard hover:bg-gray-50 dark:hover:bg-darkBg/50 text-darkGray dark:text-white transition' : 
+            'border-b border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-200 dark:hover:bg-darkBorder transition'"
+        >
+          <!-- Dynamic Columns -->
+          <td
+            *ngFor="let col of columns || []; let first = first"
+            class="p-2 sm:p-3"
+            [ngClass]="bordered ? 'border-r border-borderGray dark:border-darkBorder last:border-r-0' : ''"
+          >
+            <!-- STATUS -->
+            <ng-container *ngIf="col?.type === 'status'">
+              <label class="inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  class="sr-only peer"
+                  [checked]="row?.[col.key] ?? false"
+                  (change)="toggleStatus.emit(row)"
+                />
+                <div
+                  class="w-10 h-5 sm:w-11 sm:h-6 bg-gray-200 dark:bg-darkBorder rounded-full peer peer-checked:bg-cyan-400 dark:peer-checked:bg-darkPrimary after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border dark:after:border-darkBorder after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:after:translate-x-full relative"
+                ></div>
+              </label>
+            </ng-container>
 
-          <!-- Badge -->
-          <ng-container *ngIf="col?.type === 'badge'">
-            <div class="flex flex-wrap gap-1">
-              <span
-                *ngFor="let item of row?.[col.key] || []"
-                class="px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:bg-darkPrimary/20 dark:text-darkPrimary text-xs font-semibold"
-              >
-                {{ item }}
+            <!-- Badge -->
+            <ng-container *ngIf="col?.type === 'badge'">
+              <div class="flex flex-wrap gap-1">
+                <span
+                  *ngFor="let item of row?.[col.key] || []"
+                  class="px-2.5 py-1 rounded-full bg-primary/10 text-primary dark:bg-darkPrimary/20 dark:text-darkPrimary text-xs font-semibold"
+                >
+                  {{ item }}
+                </span>
+
+                <span *ngIf="!row?.[col.key]?.length" class="text-gray-400 text-xs sm:text-sm">
+                  None
+                </span>
+              </div>
+            </ng-container>
+
+            <!-- Boolean -->
+            <ng-container *ngIf="col?.type === 'boolean'">
+              <div class="flex items-center justify-start">
+                <i
+                  *ngIf="row?.[col.key]"
+                  class="fa-solid fa-check text-green-500 text-sm font-semibold"
+                ></i>
+                <i
+                  *ngIf="!row?.[col.key]"
+                  class="fa-solid fa-xmark text-gray-300 dark:text-gray-600 text-sm font-semibold"
+                ></i>
+              </div>
+            </ng-container>
+
+            <!-- Currency -->
+            <ng-container *ngIf="col?.type === 'currency'">
+              <div class="flex items-center gap-1 text-darkGray dark:text-white font-medium">
+                <span class="text-gray-400 dark:text-gray-500 font-normal">$</span>
+                <span>{{ (row?.[col.key] !== null && row?.[col.key] !== undefined) ? (row?.[col.key] | number:'1.2-2') : '0.00' }}</span>
+              </div>
+            </ng-container>
+
+            <!-- Pill -->
+            <ng-container *ngIf="col?.type === 'pill'">
+              <div class="flex">
+                <span
+                  *ngIf="row?.[col.key] === 'ApplicationForm' || row?.[col.key] === 'Application Form'"
+                  class="inline-flex items-center px-2.5 py-1 rounded-lg bg-primary text-white dark:bg-darkPrimary text-xs font-semibold shadow-sm"
+                >
+                  <i class="fa-solid fa-file-invoice mr-1 text-xs"></i>
+                  {{ row?.[col.key] }}
+                </span>
+                <span
+                  *ngIf="row?.[col.key] !== 'ApplicationForm' && row?.[col.key] !== 'Application Form'"
+                  class="inline-flex items-center px-2.5 py-1 rounded-lg border border-borderGray dark:border-darkBorder bg-gray-50 dark:bg-darkBg text-darkGray dark:text-gray-300 text-xs font-semibold"
+                >
+                  {{ row?.[col.key] ?? '-' }}
+                </span>
+              </div>
+            </ng-container>
+
+            <!-- Text -->
+            <ng-container *ngIf="!col?.type || col?.type === 'text'">
+              <span [ngClass]="first ? 'font-semibold text-darkGray dark:text-white' : 'text-mediumGray dark:text-gray-400'">
+                {{ row?.[col.key] ?? '-' }}{{ col.suffix ? ' ' + (row?.[col.key] === 1 || row?.[col.key] === '1' ? col.suffix : col.suffix + 's') : '' }}
               </span>
+            </ng-container>
+          </td>
 
-              <span *ngIf="!row?.[col.key]?.length" class="text-gray-400 text-xs sm:text-sm">
-                None
-              </span>
-            </div>
-          </ng-container>
-
-          <!-- Boolean -->
-          <ng-container *ngIf="col?.type === 'boolean'">
-            <span
-              class="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm"
-              [ngClass]="
-                row?.[col.key]
-                  ? 'bg-cyan-100 text-cyan-700 dark:bg-darkBorder dark:text-success'
-                  : 'bg-gray-200 text-gray-600 dark:bg-darkBorder dark:text-gray-400'
-              "
-            >
-              {{ row?.[col.key] ? 'Yes' : 'No' }}
-            </span>
-          </ng-container>
-
-          <!-- Text -->
-          <ng-container *ngIf="!col?.type || col?.type === 'text'">
-            <span [ngClass]="first ? 'font-semibold text-darkGray dark:text-white' : 'text-mediumGray dark:text-gray-400'">
-              {{ row?.[col.key] ?? '-' }}
-            </span>
-          </ng-container>
-        </td>
-
-        <!-- Actions -->
-        <td *ngIf="showActions" class="p-2 sm:p-3 text-right">
+          <!-- Actions -->
+          <td
+            *ngIf="showActions"
+            class="p-2 sm:p-3 text-right"
+            [ngClass]="bordered ? 'border-r border-borderGray dark:border-darkBorder last:border-r-0' : ''"
+          >
           <div class="flex justify-end gap-1 sm:gap-2">
             <button
               *ngIf="showView"
@@ -115,13 +161,14 @@
     </tbody>
   </table>
   </div>
+  </div>
 
   <!-- Pagination Footer -->
-  <div *ngIf="totalPages > 0" class="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard rounded-b-2xl">
-    <div class="text-sm text-mediumGray dark:text-gray-400">
+  <div *ngIf="showPagination && totalPages > 0" class="px-4 py-3 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-t border-gray-200 dark:border-darkBorder bg-cardGray dark:bg-darkCard rounded-b-2xl">
+    <div class="text-sm text-mediumGray dark:text-gray-400 text-center md:text-left">
       Showing <span class="font-medium text-darkGray dark:text-white">{{ showingStart }}&ndash;{{ showingEnd }}</span> of <span class="font-medium text-darkGray dark:text-white">{{ serverSide ? totalCount : data?.length }}</span> {{ itemLabel }}
     </div>
-    <div class="flex items-center gap-1 sm:gap-2">
+    <div class="flex items-center justify-center gap-1 sm:gap-2">
       <button 
         (click)="goToPage(currentPage - 1)" 
         [disabled]="currentPage === 1" 
@@ -147,5 +194,6 @@
         <i class="fa-solid fa-chevron-right text-xs"></i>
       </button>
     </div>
+    <div class="hidden md:block"></div>
   </div>
 </div>

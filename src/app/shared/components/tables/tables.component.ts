@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 export interface TableColumn {
   key: string;
   label: string;
-  type?: 'text' | 'badge' | 'boolean' | 'status';
+  type?: 'text' | 'badge' | 'boolean' | 'status' | 'currency' | 'pill';
+  suffix?: string;
 }
 
 @Component({
@@ -30,6 +31,8 @@ export class TablesComponent implements OnChanges {
   @Input() totalCount?: number;
   @Input() itemLabel: string = 'items';
   @Input() borderless: boolean = false;
+  @Input() bordered: boolean = false;
+  @Input() showPagination: boolean = true;
 
   @Output() edit = new EventEmitter<any>();
   @Output() view = new EventEmitter<any>();
@@ -46,6 +49,7 @@ export class TablesComponent implements OnChanges {
   get paginatedData() {
     if (!this.data) return [];
     if (this.serverSide) return this.data;
+    if (!this.showPagination) return this.data;
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
     return this.data.slice(start, end);
