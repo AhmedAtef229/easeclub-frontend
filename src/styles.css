@@ -9,6 +9,7 @@
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     @apply text-darkGray bg-pageBg;
   }
 
