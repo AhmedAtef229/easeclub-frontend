@@ -64,5 +64,9 @@ export class ApplicationReviewsService {
     );
   }
 
+  submitApplicationReview(id: string, decision: 'Approved' | 'Rejected', rejectionReason?: string): Observable<any> {
+    const body = { decision, rejectionReason };
+    return this.http.post(`${this.baseUrl}/membership-applications/${id}/reviews`, body);
+  }
 }
 

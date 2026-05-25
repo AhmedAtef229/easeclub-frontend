@@ -1,0 +1,26 @@
+/* Local scrollbar overrides for clean steps navigation bar */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+:host-context(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2E2A4D;
+}
+
+:host-context(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3F197A;
+}

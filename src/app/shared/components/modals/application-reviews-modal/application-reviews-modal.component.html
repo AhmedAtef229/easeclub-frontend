@@ -12,8 +12,9 @@
       <!-- Back Button -->
       <button
         (click)="closeModal()"
-        class="flex items-center gap-1.5 text-mediumGray hover:text-primary transition font-semibold text-xs">
-        <span class="text-base">←</span>
+        class="flex items-center gap-2 text-mediumGray hover:text-primary transition font-bold text-xs"
+      >
+        <i class="fa-solid fa-arrow-left text-sm"></i>
         <span>Back</span>
       </button>
 
@@ -36,20 +37,38 @@
     <!-- Right Buttons -->
     <div class="flex items-center gap-3">
 
-      <!-- Approve -->
-      <button
-        class="px-4 h-9 rounded-xl bg-cyan-500 hover:bg-cyan-600
-               text-white font-semibold text-xs transition">
-        ✓ Approve
-      </button>
+      <!-- Status Badges / Action Buttons -->
+      <ng-container *ngIf="data?.statusText?.[0] as status">
+        <span *ngIf="status === 'Approved'"
+              class="px-3 py-1.5 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-semibold text-xs border border-green-200 dark:border-green-800 flex items-center gap-1">
+          ✓ Approved
+        </span>
 
-      <!-- Reject -->
-      <button
-        class="px-4 h-9 rounded-xl border border-red-400
-               text-red-500 hover:bg-red-50
-               font-semibold text-xs transition">
-        ✕ Reject
-      </button>
+        <span *ngIf="status === 'Rejected'"
+              class="px-3 py-1.5 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold text-xs border border-red-200 dark:border-red-800 flex items-center gap-1">
+          ✕ Rejected
+        </span>
+
+        <!-- Action Buttons (Only show if not approved/rejected) -->
+        <ng-container *ngIf="status !== 'Approved' && status !== 'Rejected'">
+          <!-- Approve -->
+          <button
+            (click)="openApproveConfirm()"
+            class="px-4 h-9 rounded-xl bg-cyan-500 hover:bg-cyan-600
+                   text-white font-semibold text-xs transition">
+            ✓ Approve
+          </button>
+
+          <!-- Reject -->
+          <button
+            (click)="openRejectConfirm()"
+            class="px-4 h-9 rounded-xl border border-red-400
+                   text-red-500 hover:bg-red-50
+                   font-semibold text-xs transition">
+            ✕ Reject
+          </button>
+        </ng-container>
+      </ng-container>
 
     </div>
 
@@ -65,102 +84,6 @@
     </div>
 
     <div *ngIf="!loading">
-
-      <!-- ================= MEMBER INFO CARD ================= -->
-      <div
-        class="rounded-xl border border-borderGray dark:border-darkBorder
-               bg-cardGray dark:bg-darkBg p-6 mb-6">
-
-        <!-- Top -->
-        <div class="flex items-start justify-between mb-8">
-
-          <div>
-            <h3 class="text-base font-semibold text-darkGray dark:text-white">
-              Member Information
-            </h3>
-
-            <p class="text-xs text-mediumGray mt-0.5">
-              Applicant details and membership plan
-            </p>
-          </div>
-
-          <!-- Status -->
-          <div
-            class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition"
-            [ngClass]="{
-              'bg-primary/10 text-primary': (applicationDetails?.status || data?.statusText[0] || 'Submitted') === 'Submitted',
-              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': (applicationDetails?.status || data?.statusText[0]) === 'Approved',
-              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400': (applicationDetails?.status || data?.statusText[0]) === 'Rejected',
-              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': (applicationDetails?.status || data?.statusText[0]) === 'NeedsChanges'
-            }">
-             <i *ngIf="(applicationDetails?.status || data?.statusText[0] || 'Submitted') === 'Submitted'" class="fa-regular fa-eye"></i>
-             {{ applicationDetails?.status || data?.statusText[0] || 'Submitted' }}
-          </div>
-
-        </div>
-
-        <!-- Info Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-
-          <!-- Left Column -->
-          <div class="space-y-6">
-            <!-- Name -->
-            <div>
-              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-                Member Name
-              </p>
-              <p class="text-sm font-semibold text-darkGray dark:text-white">
-                {{ data?.userName || '—' }}
-              </p>
-            </div>
-            
-            <!-- Plan -->
-            <div>
-              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-                Membership Plan
-              </p>
-              <p class="text-sm font-semibold text-darkGray dark:text-white">
-                {{ data?.plan || '—' }}
-              </p>
-            </div>
-            
-            <!-- Submitted -->
-            <div>
-              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-                Submitted On
-              </p>
-              <p class="text-sm font-semibold text-darkGray dark:text-white">
-                {{ data?.submittedAt || '—' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Right Column -->
-          <div class="space-y-6">
-            <!-- Email -->
-            <div>
-              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-                Email Address
-              </p>
-              <p class="text-sm font-semibold text-darkGray dark:text-white truncate">
-                {{ data?.email || '—' }}
-              </p>
-            </div>
-            
-            <!-- User ID -->
-            <div>
-              <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">
-                User ID
-              </p>
-              <p class="text-sm font-semibold text-darkGray dark:text-white">
-                {{ data?.userId || 'user-1' }}
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
 
       <!-- ================= APPLICATION FORM DATA ================= -->
       <div
@@ -178,36 +101,39 @@
         </p>
 
         <!-- ================= STEPS NAVIGATION ================= -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-
+        <div class="flex items-center gap-2 mb-8 overflow-x-auto pb-3 custom-scrollbar border-b border-borderGray dark:border-darkBorder">
           <div *ngFor="let step of applicationDetails.steps; let i = index; let last = last"
                (click)="setStep(i + 1)"
-               class="flex items-center flex-1 w-full cursor-pointer">
+               class="flex items-center shrink-0 cursor-pointer pb-2 transition-all"
+               [class.border-b-2]="activeStep === (i + 1)"
+               [class.border-primary]="activeStep === (i + 1)"
+               [class.dark:border-darkPrimary]="activeStep === (i + 1)"
+               [class.border-transparent]="activeStep !== (i + 1)">
 
             <div
               class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition"
               [ngClass]="
                 activeStep === (i + 1)
                   ? 'bg-primary text-white'
-                  : 'bg-gray-200 dark:bg-darkBorder text-mediumGray'
+                  : 'bg-gray-100 dark:bg-darkBorder text-mediumGray'
               ">
               {{ i + 1 }}
             </div>
 
             <span
-              class="ml-2 text-xs transition whitespace-nowrap"
+              class="ml-2 mr-4 text-xs transition whitespace-nowrap"
               [ngClass]="
                 activeStep === (i + 1)
-                  ? 'text-primary font-semibold'
-                  : 'text-mediumGray'
+                  ? 'text-primary font-bold dark:text-darkPrimary'
+                  : 'text-mediumGray hover:text-darkGray dark:hover:text-white font-medium'
               ">
               {{ step.title }}
             </span>
 
-            <div *ngIf="!last" class="hidden md:block flex-1 h-[1px] bg-borderGray dark:bg-darkBorder mx-4"></div>
+            <!-- divider bullet/caret if not last step -->
+            <i *ngIf="!last" class="fa-solid fa-chevron-right text-[10px] text-mediumGray/50 mr-4"></i>
 
           </div>
-
         </div>
 
         <!-- ================= ACTIVE STEP CONTENT ================= -->
@@ -252,41 +178,47 @@
 
                 <!-- Fields Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-                  <div *ngFor="let field of section.fields">
+                  <div *ngFor="let field of section.fields" class="min-w-0">
                     <p class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider mb-1">{{ field.label }}</p>
                     
                     <!-- File Type Field -->
-                    <div *ngIf="field.type === 'File' || field.type === 'file'; else standardField">
-                      <div
-                        class="flex items-center justify-between
-                               border border-borderGray dark:border-darkBorder rounded-xl p-2.5 bg-white dark:bg-darkCard">
+                    <div *ngIf="field.type === 'File' || field.type === 'file'; else standardField" class="min-w-0">
+                      <div class="flex items-center bg-transparent py-1.5 w-full min-w-0">
 
-                        <div class="flex items-center gap-2.5 min-w-0">
-                          <span class="text-xl flex-shrink-0">
-                            {{ isImage(field.value) ? '🖼' : '📄' }}
-                          </span>
+                        <!-- If metadata is loaded -->
+                        <ng-container *ngIf="loadedFiles[field.value] as fileMeta; else loadingFileMeta">
+                          <div class="flex items-center gap-2.5 min-w-0 w-full">
+                            <button
+                              (click)="previewFile(fileMeta.url)"
+                              class="text-xl flex-shrink-0 hover:scale-110 active:scale-95 transition cursor-pointer p-1 rounded hover:bg-gray-100 dark:hover:bg-darkBorder focus:outline-none"
+                              title="Click to preview file"
+                            >
+                              {{ isImage(fileMeta.contentType, fileMeta.fileName) ? '🖼' : '📄' }}
+                            </button>
 
-                          <div class="min-w-0">
-                            <p class="text-xs text-darkGray dark:text-white truncate font-medium">
-                              {{ getFileName(field.value) || 'No file uploaded' }}
-                            </p>
+                            <div class="min-w-0 flex-1">
+                              <p class="text-xs text-darkGray dark:text-white truncate font-semibold" [title]="fileMeta.fileName">
+                                {{ fileMeta.fileName || 'No file name' }}
+                              </p>
 
-                            <p class="text-[10px] text-mediumGray">
-                              {{ isImage(field.value) ? 'IMAGE' : 'PDF / DOCUMENT' }}
-                            </p>
+                              <p class="text-[10px] text-mediumGray">
+                                {{ isImage(fileMeta.contentType, fileMeta.fileName) ? 'IMAGE' : (fileMeta.contentType || 'PDF / DOCUMENT') }}
+                              </p>
+                            </div>
                           </div>
+                        </ng-container>
 
-                        </div>
-
-                        <div class="flex items-center gap-3 flex-shrink-0" *ngIf="field.value">
-                          <button *ngIf="isImage(field.value)" (click)="previewFile(field.value)" class="text-primary font-semibold text-xs hover:underline">
-                            Preview
-                          </button>
-
-                          <a [href]="field.value" target="_blank" download class="text-cyan-500 font-semibold text-xs hover:underline">
-                            Download
-                          </a>
-                        </div>
+                        <!-- Loading metadata fallback -->
+                        <ng-template #loadingFileMeta>
+                          <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+                            <div class="min-w-0">
+                              <p class="text-xs text-mediumGray truncate">
+                                Loading file metadata...
+                              </p>
+                            </div>
+                          </div>
+                        </ng-template>
 
                       </div>
                     </div>
@@ -304,6 +236,30 @@
               </div>
             </div>
 
+            <!-- Step Navigation Buttons -->
+            <div class="flex items-center justify-between border-t border-borderGray dark:border-darkBorder pt-6 mt-6">
+              <!-- Previous Step Button -->
+              <button
+                type="button"
+                [disabled]="activeStep === 1"
+                (click)="setStep(activeStep - 1)"
+                class="px-4 py-2.5 rounded-2xl border border-gray-100 dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-50 dark:hover:bg-darkBorder transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
+              >
+                <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                Previous
+              </button>
+
+              <!-- Next Step Button -->
+              <button
+                type="button"
+                [disabled]="activeStep === applicationDetails.steps.length"
+                (click)="setStep(activeStep + 1)"
+                class="px-5 py-2.5 rounded-2xl bg-primary hover:bg-primaryHover text-white transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
+              >
+                Next
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -414,22 +370,20 @@
         </h3>
 
         <p class="text-xs text-mediumGray mt-0.5 mb-6">
-          Track installment payments and status
+          Installment breakdown for this plan
         </p>
 
         <!-- Table -->
         <div
-          class="overflow-x-auto rounded-xl border border-gray-200 dark:border-darkBorder
-                 bg-white dark:bg-darkCard">
+          class="overflow-x-auto rounded-xl border border-borderGray dark:border-darkBorder
+                 bg-cardGray dark:bg-darkBg">
           <table class="w-full text-left border-collapse text-xs">
 
             <!-- Header -->
-            <thead class="bg-gray-50 dark:bg-darkBorder">
+            <thead class="bg-gray-100 dark:bg-darkBorder/40">
               <tr class="text-[10px] font-semibold text-mediumGray uppercase tracking-wider">
                 <th class="p-2.5">Installment #</th>
-                <th class="p-2.5">Due Date</th>
                 <th class="p-2.5">Amount</th>
-                <th class="p-2.5">Status</th>
               </tr>
             </thead>
 
@@ -437,42 +391,22 @@
             <tbody>
               <tr
                 *ngFor="let item of pricing.installmentBlueprints"
-                class="border-t border-gray-200 dark:border-darkBorder
+                class="border-t border-borderGray dark:border-darkBorder
                        text-darkGray dark:text-white align-middle text-xs">
                 <!-- Installment # -->
                 <td class="p-2.5 font-semibold">
                   {{ item.order }}
                 </td>
 
-                <!-- Due Date -->
-                <td class="p-2.5">
-                  {{ item.dueDate | date:'longDate' }}
-                </td>
-
                 <!-- Amount -->
                 <td class="p-2.5 font-semibold">
                   {{ item.amount | currency }}
-                </td>
-
-                <!-- Status -->
-                <td class="p-2.5">
-                  <span *ngIf="item.status === 'Paid' || item.status === 'paid'; else pendingStatus"
-                        class="flex items-center gap-1.5 text-[11px] font-semibold text-green-600">
-                    <span class="text-sm">✓</span>
-                    Paid
-                  </span>
-                  <ng-template #pendingStatus>
-                    <span class="flex items-center gap-1.5 text-[11px] font-semibold text-mediumGray">
-                      <span class="text-sm">🕒</span>
-                      Pending
-                    </span>
-                  </ng-template>
                 </td>
               </tr>
 
               <!-- Empty State -->
               <tr *ngIf="!pricing.installmentBlueprints.length">
-                <td colspan="5" class="p-5 text-center text-mediumGray text-xs">
+                <td colspan="2" class="p-5 text-center text-mediumGray text-xs">
                   No installments found
                 </td>
               </tr>
@@ -481,6 +415,127 @@
           </table>
         </div>
 
+      </div>
+
+      <!-- ================= APPROVE CONFIRMATION MODAL ================= -->
+      <div *ngIf="showApproveConfirm"
+           class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xs flex items-center justify-center">
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-6 max-w-md w-full shadow-2xl border border-borderGray dark:border-darkBorder relative mx-4 animate-in fade-in zoom-in-95 duration-200">
+          
+          <!-- Close button -->
+          <button (click)="closeConfirm()"
+                  class="absolute top-4 right-4 text-mediumGray hover:text-darkGray dark:hover:text-white transition">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
+    
+          <!-- Content -->
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-base font-bold text-darkGray dark:text-white">
+                Approve Application
+              </h4>
+              <p class="text-xs text-mediumGray mt-0.5">
+                Confirm approval of this membership application
+              </p>
+            </div>
+    
+            <p class="text-xs text-mediumGray leading-relaxed">
+              Are you sure you want to approve this application? This action will update the application status to approved.
+            </p>
+    
+            <!-- Error feedback -->
+            <p *ngIf="errorMessage" class="text-xs text-red-500 font-semibold mt-2">
+              ⚠️ {{ errorMessage }}
+            </p>
+    
+            <!-- Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                [disabled]="submitting"
+                (click)="closeConfirm()"
+                class="px-4 py-2.5 rounded-2xl border border-gray-100 dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-50 dark:hover:bg-darkBorder transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold"
+              >
+                Cancel
+              </button>
+    
+              <button
+                type="button"
+                [disabled]="submitting"
+                (click)="submitReview('Approved')"
+                class="px-5 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
+              >
+                <span *ngIf="submitting" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Approve
+              </button>
+            </div>
+          </div>
+    
+        </div>
+      </div>
+    
+      <!-- ================= REJECT CONFIRMATION MODAL ================= -->
+      <div *ngIf="showRejectConfirm"
+           class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-xs flex items-center justify-center">
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-6 max-w-md w-full shadow-2xl border border-borderGray dark:border-darkBorder relative mx-4 animate-in fade-in zoom-in-95 duration-200">
+          
+          <!-- Close button -->
+          <button (click)="closeConfirm()"
+                  class="absolute top-4 right-4 text-mediumGray hover:text-darkGray dark:hover:text-white transition">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
+    
+          <!-- Content -->
+          <div class="space-y-4">
+            <div>
+              <h4 class="text-base font-bold text-darkGray dark:text-white">
+                Reject Application
+              </h4>
+              <p class="text-xs text-mediumGray mt-0.5">
+                Provide a reason for rejection
+              </p>
+            </div>
+    
+            <div>
+              <label class="text-xs font-semibold text-darkGray dark:text-white block mb-1.5">
+                Rejection Reason *
+              </label>
+              <textarea
+                [(ngModel)]="rejectionReason"
+                placeholder="Explain why this application is being rejected..."
+                class="w-full h-24 px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard border border-gray-100 dark:border-darkBorder text-darkGray dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-gray-300 resize-none text-xs"
+              ></textarea>
+            </div>
+    
+            <!-- Error feedback -->
+            <p *ngIf="errorMessage" class="text-xs text-red-500 font-semibold mt-2">
+              ⚠️ {{ errorMessage }}
+            </p>
+    
+            <!-- Buttons -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                [disabled]="submitting"
+                (click)="closeConfirm()"
+                class="px-4 py-2.5 rounded-2xl border border-gray-100 dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white hover:bg-gray-50 dark:hover:bg-darkBorder transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold"
+              >
+                Cancel
+              </button>
+    
+              <button
+                type="button"
+                [disabled]="submitting || !rejectionReason.trim()"
+                (click)="submitReview('Rejected')"
+                class="px-5 py-2.5 rounded-2xl bg-red-500 hover:bg-red-600 text-white transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
+              >
+                <span *ngIf="submitting" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Reject
+              </button>
+            </div>
+          </div>
+    
+        </div>
       </div>
 
     </div>

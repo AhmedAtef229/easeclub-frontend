@@ -85,5 +85,6 @@
     [isOpen]="isModalOpen"
     [data]="selectedRow"
     (close)="closeModal()"
+    (reviewSubmitted)="loadData(); closeModal()"
   ></app-application-reviews-modal>
 </div>
