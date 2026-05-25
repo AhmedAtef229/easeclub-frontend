@@ -7,6 +7,7 @@ import { MembershipPlanEditModalComponent } from '../../../shared/components/mod
 import { MembershipPlanLinkModalComponent } from '../../../shared/components/modals/memberships-plan-modal/membership-plan-link-modal/membership-plan-link-modal.component';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { InstallmentPlanModalComponent } from '../../../shared/components/modals/installment-plan-modal/installment-plan-modal.component';
+import { CardTableWrapperComponent } from '../../../shared/components/card-table-wrapper/card-table-wrapper.component';
 import {
   MembershipPlansService,
   MembershipPlan,
@@ -24,6 +25,7 @@ type StatusFilter = 'All' | 'Active' | 'Inactive';
     CommonModule,
     PageLayoutComponent,
     TablesComponent,
+    CardTableWrapperComponent,
     MembershipPlanModalComponent,
     MembershipPlanEditModalComponent,
     MembershipPlanLinkModalComponent,
@@ -61,13 +63,13 @@ export class MembershipPlansComponent implements OnInit {
   columns: TableColumn[] = [
     { key: 'name', label: 'Plan Name' },
     { key: 'membershipTypeName', label: 'Type', type: 'badge' },
-    { key: 'price', label: 'Price' },
-    { key: 'renewPrice', label: 'Renew Price' },
+    { key: 'price', label: 'Price', type: 'currency' },
+    { key: 'renewPrice', label: 'Renew Price', type: 'currency' },
     { key: 'maxFamilyMembers', label: 'Max Family Members' },
-    { key: 'paymentMode', label: 'Payment Mode' },
+    { key: 'paymentMode', label: 'Payment Mode', type: 'pill' },
     { key: 'installmentsAllowedInRenewal', label: 'Installment in Renew', type: 'boolean' },
-    { key: 'subscriptionValidityInYears', label: 'Validity (Years)' },
-    { key: 'enrollmentMode', label: 'Enrollment Mode' },
+    { key: 'subscriptionValidityInYears', label: 'Validity (Years)', suffix: 'year' },
+    { key: 'enrollmentMode', label: 'Enrollment Mode', type: 'pill' },
     { key: 'isActive', label: 'Status', type: 'status' },
   ];
 

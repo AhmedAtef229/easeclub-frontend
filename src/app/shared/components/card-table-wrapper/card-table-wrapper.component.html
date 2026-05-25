@@ -1,0 +1,21 @@
+<div class="ec-card p-5 sm:p-6 flex flex-col gap-4">
+  <!-- Header -->
+  <div *ngIf="title || subtitle || (count !== undefined && count !== null)">
+    <h3 *ngIf="title" class="text-lg font-bold text-darkGray dark:text-white mb-0.5">
+      {{ title }}
+    </h3>
+    
+    <!-- Custom Subtitle -->
+    <span *ngIf="subtitle" class="text-xs sm:text-sm text-mediumGray dark:text-gray-400">
+      {{ subtitle }}
+    </span>
+    
+    <!-- Item Count with Pluralization -->
+    <span *ngIf="!subtitle && count !== undefined && count !== null" class="text-xs sm:text-sm text-mediumGray dark:text-gray-400">
+      {{ count }} {{ count === 1 ? itemLabel : (itemLabel.endsWith('s') ? itemLabel : itemLabel + 's') }} found
+    </span>
+  </div>
+
+  <!-- projected content (the table) -->
+  <ng-content></ng-content>
+</div>

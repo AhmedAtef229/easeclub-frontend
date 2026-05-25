@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { TablesComponent, TableColumn } from '../../../shared/components/tables/tables.component';
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
+import { CardTableWrapperComponent } from '../../../shared/components/card-table-wrapper/card-table-wrapper.component';
+import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { MembershipsService } from '../../../core/services/api/memberships.service';
 import { BranchService } from '../../../core/services/api/branches.service';
 
@@ -13,7 +15,9 @@ import { BranchService } from '../../../core/services/api/branches.service';
     CommonModule,
     PageLayoutComponent,
     TablesComponent,
-    SearchInputComponent
+    SearchInputComponent,
+    CardTableWrapperComponent,
+    DropdownComponent
   ],
   templateUrl: './memberships.component.html',
 })
@@ -30,7 +34,6 @@ export class MembershipsComponent implements OnInit {
 
   search = '';
   selectedStatus: string | undefined = undefined;
-  showStatus = false;
 
   columns: TableColumn[] = [
     { key: 'memberName', label: 'Member' },
@@ -115,13 +118,8 @@ export class MembershipsComponent implements OnInit {
 
   /* ================= STATUS ================= */
 
-  toggleStatus() {
-    this.showStatus = !this.showStatus;
-  }
-
-  setStatus(status?: string) {
-    this.selectedStatus = status;
-    this.showStatus = false;
+  setStatus(status: string) {
+    this.selectedStatus = status === 'All Statuses' ? '' : status;
     this.loadMemberships();
   }
 

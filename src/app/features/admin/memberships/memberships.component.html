@@ -13,73 +13,34 @@
     <!-- SEARCH -->
     <div class="flex-1">
       <app-search-input
-        placeholder="Search by name, membership number, type, or plan..."
+        placeholder="Search by name, membership number"
         (search)="onSearch($event)"
       ></app-search-input>
     </div>
 
     <!-- STATUS DROPDOWN -->
-    <div class="relative">
-      <button
-        (click)="toggleStatus()"
-        class="px-4 py-2 rounded-xl border
-               border-gray-200 dark:border-darkBorder
-               bg-white dark:bg-darkCard
-               text-sm flex items-center gap-2 min-w-[160px] justify-between"
-      >
-        {{ selectedStatus || 'All Statuses' }}
-        <i class="fa-solid fa-chevron-down text-xs"></i>
-      </button>
-
-      <div
-        *ngIf="showStatus"
-        class="absolute right-0 mt-2 w-full
-               bg-white dark:bg-darkCard
-               border border-gray-200 dark:border-darkBorder
-               rounded-xl shadow-lg z-50"
-      >
-        <button class="dropdown-item" (click)="setStatus('')">
-          All Statuses
-        </button>
-
-        <button class="dropdown-item" (click)="setStatus('Active')">
-          Active
-        </button>
-
-        <button class="dropdown-item" (click)="setStatus('Expired')">
-          Expired
-        </button>
-
-        <button class="dropdown-item" (click)="setStatus('Cancelled')">
-          Cancelled
-        </button>
-      </div>
-    </div>
+    <app-dropdown
+      [options]="['All Statuses', 'Active', 'Expired', 'Cancelled']"
+      [selected]="selectedStatus || 'All Statuses'"
+      (valueChange)="setStatus($event)"
+      class="min-w-[160px]"
+    ></app-dropdown>
 
   </div>
 
   <!-- TABLE -->
-  <div
-    class="mt-4 p-4 sm:p-6
-           bg-cardGray dark:bg-darkCard
-           border border-gray-200 dark:border-darkBorder
-           rounded-2xl"
+  <app-card-table-wrapper
+    title="Memberships"
+    [count]="data.length"
+    itemLabel="membership"
+    class="mt-4 block"
   >
-    <!-- Title -->
-    <div class="mb-3 px-1">
-      <h3 class="font-bold text-lg text-darkGray dark:text-white">
-        Memberships
-      </h3>
-      <p class="text-sm text-mediumGray dark:text-gray-400">
-        {{ data.length }} memberships found
-      </p>
-    </div>
-
     <app-tables
       [columns]="columns"
       [data]="data"
-      [borderless]="true"
+      [borderless]="false"
+      [bordered]="false"
     ></app-tables>
-  </div>
+  </app-card-table-wrapper>
 
 </app-page-layout>
