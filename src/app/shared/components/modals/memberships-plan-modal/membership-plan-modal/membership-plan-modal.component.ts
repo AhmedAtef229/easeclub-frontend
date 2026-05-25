@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MembershipTypesService } from '../../../../../core/services/api/membership-types.service';
 import { InstallmentTemplatesService } from '../../../../../core/services/api/installment-templates.service';
 import { BranchService } from '../../../../../core/services/api/branches.service';
+import { ApplicationTemplateService } from '../../../../../core/services/api/application-templates.service';
 import { FormDropdownComponent } from '../../../form-dropdown/form-dropdown.component';
 
 @Component({
@@ -24,6 +25,7 @@ export class MembershipPlanModalComponent implements OnInit {
 
   membershipTypes: any[] = [];
   installmentTemplates: any[] = [];
+  applicationTemplates: any[] = [];
 
   clubId!: string;
 
@@ -31,11 +33,16 @@ export class MembershipPlanModalComponent implements OnInit {
     return this.membershipTypes.map(t => ({ value: t.id, label: t.name }));
   }
 
+  get applicationTemplateOptions() {
+    return this.applicationTemplates.map(t => ({ value: t.id, label: t.name }));
+  }
+
   constructor(
     private fb: FormBuilder,
     private membershipTypesService: MembershipTypesService,
     private installmentService: InstallmentTemplatesService,
     private branchService: BranchService,
+    private applicationTemplateService: ApplicationTemplateService,
   ) {}
 
   ngOnInit() {
@@ -52,8 +59,9 @@ export class MembershipPlanModalComponent implements OnInit {
         Validators.required,
       ],
       maxFamilyMembers: [this.plan?.maxFamilyMembers || 0],
-      durationInDays: [this.plan?.durationInDays || 0],
+      durationInDays: [this.plan?.durationInDays || 0, Validators.required],
       enrollmentMode: [this.plan?.enrollmentMode || 'DirectPay', Validators.required],
+      applicationTemplateId: [this.plan?.applicationTemplateId || ''],
       paymentMode: [this.plan?.paymentMode || 'Cash', Validators.required],
       installmentsAllowedInRenewal: [this.plan?.installmentsAllowedInRenewal || false],
       isActive: [this.plan?.isActive ?? true],
@@ -62,6 +70,17 @@ export class MembershipPlanModalComponent implements OnInit {
 
     this.loadMembershipTypes();
     this.loadTemplates();
+
+    // Listen to enrollment mode changes
+    this.form.get('enrollmentMode')?.valueChanges.subscribe(mode => {
+      this.handleEnrollmentModeChange(mode);
+    });
+
+    // Initialize state
+    const initialMode = this.form.get('enrollmentMode')?.value;
+    if (initialMode) {
+      this.handleEnrollmentModeChange(initialMode);
+    }
   }
 
   loadMembershipTypes() {
@@ -73,6 +92,26 @@ export class MembershipPlanModalComponent implements OnInit {
   loadTemplates() {
     this.installmentService.getAll(this.clubId).subscribe((res: any) => {
       this.installmentTemplates = res || [];
+    });
+  }
+
+  handleEnrollmentModeChange(mode: string) {
+    const templateControl = this.form.get('applicationTemplateId');
+    if (mode === 'ApplicationForm') {
+      templateControl?.setValidators([Validators.required]);
+      this.loadApplicationTemplates();
+    } else {
+      templateControl?.clearValidators();
+      templateControl?.setValue('');
+    }
+    templateControl?.updateValueAndValidity();
+  }
+
+  loadApplicationTemplates() {
+    if (this.applicationTemplates.length > 0) return;
+
+    this.applicationTemplateService.getTemplates(this.clubId).subscribe((res: any) => {
+      this.applicationTemplates = res?.items || res || [];
     });
   }
 

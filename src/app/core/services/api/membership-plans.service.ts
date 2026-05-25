@@ -15,6 +15,7 @@ export interface MembershipPlan {
   maxPaymentPeriod: number;
   subscriptionValidityInYears: number;
   maxFamilyMembers: number;
+  durationInDays?: number;
   isActive: boolean;
   createdAt: string;
   enrollmentMode?: string;

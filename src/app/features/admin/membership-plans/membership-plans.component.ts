@@ -174,8 +174,9 @@ export class MembershipPlansComponent implements OnInit {
       renewPrice: +form.renewPrice || 0,
       subscriptionValidityInYears: years,
       maxFamilyMembers: +form.maxFamilyMembers || 0,
-      durationInDays: years * 365,
+      durationInDays: +form.durationInDays,
       enrollmentMode: form.enrollmentMode,
+      applicationTemplateId: form.enrollmentMode === 'ApplicationForm' ? form.applicationTemplateId : undefined,
       paymentMode: form.paymentMode,
       installmentTemplateIds: form.templateIds || [],
       installmentsAllowedInRenewal: form.installmentsAllowedInRenewal || false,
@@ -191,14 +192,22 @@ export class MembershipPlansComponent implements OnInit {
                 this.loadPlans();
                 this.closeModal();
               },
-              error: (err) => console.error('TEMPLATES ERROR', err),
+              error: (err) => {
+                console.error('TEMPLATES ERROR', err);
+                alert(`Plan created, but failed to link installment templates: ${err.error?.message || err.error || err.message || 'Unknown error'}`);
+                this.loadPlans();
+                this.closeModal();
+              },
             });
         } else {
           this.loadPlans();
           this.closeModal();
         }
       },
-      error: (err) => console.error('CREATE ERROR', err),
+      error: (err) => {
+        console.error('CREATE ERROR', err);
+        alert(`Failed to create plan: ${err.error?.message || err.error || err.message || 'Unknown error'}`);
+      },
     });
   }
   onSaveEdit(form: any): void {
@@ -212,7 +221,7 @@ export class MembershipPlansComponent implements OnInit {
       totalPrice: +form.price || this.selectedPlan.price,
       renewPrice: +form.renewPrice || this.selectedPlan.renewPrice || this.selectedPlan.price,
       subscriptionValidityInYears: years,
-      durationInDays: years * 365,
+      durationInDays: this.selectedPlan.durationInDays || (years * 365),
       maxFamilyMembers: this.selectedPlan.maxFamilyMembers,
       enrollmentMode: this.selectedPlan.enrollmentMode,
       paymentMode: this.selectedPlan.paymentMode,
@@ -224,7 +233,8 @@ export class MembershipPlansComponent implements OnInit {
         this.closeModal();
       },
       error: (err) => {
-        console.error('UPDATE ERROR DETAILS:', err.error); // ✅ عرض تفاصيل الخطأ بدقة
+        console.error('UPDATE ERROR DETAILS:', err.error);
+        alert(`Failed to update plan: ${err.error?.message || err.error || err.message || 'Unknown error'}`);
       },
     });
   }
@@ -237,7 +247,10 @@ export class MembershipPlansComponent implements OnInit {
         this.loadPlans();
         this.closeModal();
       },
-      error: (err) => console.error('LINK TEMPLATES ERROR', err),
+      error: (err) => {
+        console.error('LINK TEMPLATES ERROR', err);
+        alert(`Failed to update installment templates: ${err.error?.message || err.error || err.message || 'Unknown error'}`);
+      },
     });
   }
 }
