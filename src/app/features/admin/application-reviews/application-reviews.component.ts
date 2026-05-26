@@ -41,7 +41,7 @@ export class ApplicationReviewsComponent implements OnInit {
   search = '';
   selectedStatus = 'All statuses';
 
-  statusOptions = ['All statuses', 'Submitted', 'NeedsChanges', 'Approved', 'Rejected'];
+  statusOptions = ['All statuses', 'Submitted', 'Approved', 'Rejected'];
 
   dateFrom = '';
   dateTo = '';
