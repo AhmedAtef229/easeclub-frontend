@@ -111,4 +111,12 @@ export class PaymentsService {
       `${this.baseUrl}/invoices/${invoiceId}/status`
     );
   }
+
+  /* ================= STATISTICS ================= */
+
+  getClubPaymentStats(clubId: string) {
+    return this.http.get(
+      `${this.baseUrl}/clubs/${clubId}/invoices/stats`
+    );
+  }
 }
