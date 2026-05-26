@@ -10,7 +10,7 @@ import { AppConfig } from '../../appconfig';
 export const CLUB_FILE_PURPOSE = {
   General: 'General',
   LOGO: 'ClubLogo',
-  COVER: 'ClubCover',
+  COVER: 'ClubBanner',
   IMAGE: 'ClubImage',
   UserProfileImage: 'UserProfileImage',
   ApplicationDocument: 'ApplicationDocument',

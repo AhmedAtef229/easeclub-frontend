@@ -175,7 +175,7 @@ export class ClubSettingsComponent implements OnInit {
 
       if (this.selectedCoverFile) {
         const res = await firstValueFrom(
-          this.fileService.uploadClubFile(this.selectedCoverFile, this.clubId, 'ClubCover')
+          this.fileService.uploadClubFile(this.selectedCoverFile, this.clubId, 'ClubBanner')
         );
         console.log('COVER UPLOADED:', res);
         this.uploadedCoverId = res.fileId;
