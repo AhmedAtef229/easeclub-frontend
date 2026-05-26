@@ -8,12 +8,11 @@ import { AppConfig } from '../../appconfig';
  * (Prevents enum mismatch completely)
  */
 export const CLUB_FILE_PURPOSE = {
-  General: 'General',
   LOGO: 'ClubLogo',
   COVER: 'ClubBanner',
-  IMAGE: 'ClubImage',
   UserProfileImage: 'UserProfileImage',
   ApplicationDocument: 'ApplicationDocument',
+  EventImage: 'EventImage',
 } as const;
 
 export type ClubFilePurpose =
@@ -40,7 +39,7 @@ export class FileService {
   uploadClubFile(
     file: File,
     clubId: string,
-    purpose: ClubFilePurpose = CLUB_FILE_PURPOSE.IMAGE
+    purpose: ClubFilePurpose = CLUB_FILE_PURPOSE.LOGO
   ): Observable<any> {
 
     const formData = new FormData();

@@ -12,29 +12,21 @@
     </div>
 
     <div>
-      <button
-        *ngIf="!isEditing"
-        (click)="startEdit()"
-        class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition"
-      >
+      <button *ngIf="!isEditing" (click)="startEdit()"
+        class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition">
         Edit Settings
       </button>
 
       <div *ngIf="isEditing" class="flex gap-3">
-        <button
-          (click)="cancelEdit()"
-          [disabled]="isSaving"
-          class="px-5 py-2.5 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white hover:bg-gray-100 dark:hover:bg-darkCard transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button (click)="cancelEdit()" [disabled]="isSaving"
+          class="px-5 py-2.5 rounded-xl border border-borderGray dark:border-darkBorder text-darkGray dark:text-white hover:bg-gray-100 dark:hover:bg-darkCard transition disabled:opacity-50 disabled:cursor-not-allowed">
           Cancel
         </button>
 
-        <button
-          (click)="saveEdit()"
-          [disabled]="isSaving"
-          class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span *ngIf="isSaving" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+        <button (click)="saveEdit()" [disabled]="isSaving"
+          class="bg-primary hover:bg-primaryHover text-white px-5 py-2.5 rounded-xl font-semibold transition flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="isSaving"
+            class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
           {{ isSaving ? 'Saving...' : 'Save Changes' }}
         </button>
       </div>
@@ -42,27 +34,18 @@
   </div>
 
   <!-- ERROR MESSAGE -->
-  <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm flex justify-between items-center">
+  <div *ngIf="errorMessage"
+    class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm flex justify-between items-center">
     <span>{{ errorMessage }}</span>
     <button (click)="errorMessage = ''" class="hover:opacity-75 font-semibold text-base px-2">✕</button>
   </div>
 
   <!-- Club Identity -->
-  <div
-    class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6 space-y-6"
-  >
+  <div class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6 space-y-6">
     <h2 class="flex items-center gap-2 text-lg font-semibold text-darkGray dark:text-white">
       <!-- Branches Icon -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="w-5 h-5 text-primary"
-      >
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-primary">
         <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
         <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path>
         <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>
@@ -79,30 +62,16 @@
     <div class="flex justify-between items-center">
       <p class="text-sm font-semibold text-darkGray dark:text-white">Club Logo</p>
 
-      <input
-        type="file"
-        #logoInput
-        (change)="onLogoSelected($event)"
-        accept="image/*"
-        class="hidden"
-      />
-      <button
-        *ngIf="isEditing"
-        [disabled]="isSaving"
-        (click)="logoInput.click()"
-        type="button"
-        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+      <input type="file" #logoInput (change)="onLogoSelected($event)" accept="image/*" class="hidden" />
+      <button *ngIf="isEditing" [disabled]="isSaving" (click)="logoInput.click()" type="button"
+        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed">
         Change Logo
       </button>
     </div>
 
     <!-- Render only if image URL is available (either loaded or previewed) -->
-    <img
-      *ngIf="isEditing ? editData.logo : club.logo"
-      [src]="isEditing ? editData.logo : club.logo"
-      class="w-24 h-24 rounded-full object-cover border"
-    />
+    <img *ngIf="isEditing ? editData.logo : club.logo" [src]="isEditing ? editData.logo : club.logo"
+      class="w-24 h-24 rounded-full object-cover border" />
 
     <!-- NAME -->
     <div>
@@ -112,47 +81,28 @@
         {{ club.name }}
       </p>
 
-      <input
-        *ngIf="isEditing"
-        [(ngModel)]="editData.name"
-        class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
+      <input *ngIf="isEditing" [(ngModel)]="editData.name"
+        class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />
     </div>
 
     <!-- IMAGE -->
     <div class="flex justify-between items-center">
       <p class="text-sm font-semibold text-darkGray dark:text-white">Club Image</p>
 
-      <input
-        type="file"
-        #coverInput
-        (change)="onCoverSelected($event)"
-        accept="image/*"
-        class="hidden"
-      />
-      <button
-        *ngIf="isEditing"
-        [disabled]="isSaving"
-        (click)="coverInput.click()"
-        type="button"
-        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+      <input type="file" #coverInput (change)="onCoverSelected($event)" accept="image/*" class="hidden" />
+      <button *ngIf="isEditing" [disabled]="isSaving" (click)="coverInput.click()" type="button"
+        class="text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed">
         Change Image
       </button>
     </div>
 
     <!-- Render only if image URL is available (either loaded or previewed) -->
-    <img
-      *ngIf="isEditing ? editData.cover : club.cover"
-      [src]="isEditing ? editData.cover : club.cover"
-      class="w-full h-56 object-cover rounded-xl border"
-    />
+    <img *ngIf="isEditing ? editData.cover : club.cover" [src]="isEditing ? editData.cover : club.cover"
+      class="w-full h-56 object-cover rounded-xl border" />
   </div>
 
   <!-- About -->
-  <div
-    class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6"
-  >
+  <div class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6">
     <h2 class="flex items-center gap-2 text-lg font-semibold text-darkGray dark:text-white">
       <i class="fa-regular fa-circle-question w-5 h-5 text-primary"></i>
 
@@ -162,56 +112,38 @@
       {{ club.description }}
     </p>
 
-    <textarea
-      *ngIf="isEditing"
-      [(ngModel)]="editData.description"
-      class="w-full mt-3 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-    ></textarea>
+    <textarea *ngIf="isEditing" [(ngModel)]="editData.description"
+      class="w-full mt-3 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"></textarea>
   </div>
 
   <!-- Amenities -->
-  <div
-    class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6"
-  >
+  <div class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6">
     <div class="flex justify-between items-center mb-3">
       <h2 class="flex items-center gap-2 text-lg font-semibold text-darkGray dark:text-white">
         <!-- check icon -->
-        <svg
-          class="w-5 h-5 text-primary dark:text-darkPrimary"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg class="w-5 h-5 text-primary dark:text-darkPrimary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
           <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
           <path d="m9 11 3 3L22 4"></path>
         </svg>
         Amenities
       </h2>
 
-      <button
-        *ngIf="isEditing"
-        (click)="showAmenityModal = true"
-        class="text-primary font-semibold"
-      >
+      <button *ngIf="isEditing" (click)="showAmenityModal = true" class="text-primary font-semibold">
         + Add Amenity
       </button>
     </div>
 
     <div class="flex flex-wrap gap-2">
-      <span
-        *ngFor="let item of isEditing ? editData.amenities : club.amenities"
-        class="px-3 py-1 rounded-lg bg-primary/10 text-primary"
-      >
+      <span *ngFor="let item of isEditing ? editData.amenities : club.amenities"
+        class="px-3 py-1 rounded-lg bg-primary/10 text-primary">
         {{ item }}
       </span>
     </div>
   </div>
 
   <!-- Contact -->
-  <div
-    class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6"
-  >
+  <div class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6">
     <!-- Header -->
     <h2 class="flex items-center gap-2 text-lg font-semibold text-darkGray dark:text-white">
       <i class="fa-solid fa-phone w-5 h-5 text-primary"></i>
@@ -230,10 +162,8 @@
 
         <div *ngIf="isEditing" class="flex items-center gap-2">
           <i class="fa-solid fa-phone text-primary"></i>
-          <input
-            [(ngModel)]="editData.phone"
-            class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
+          <input [(ngModel)]="editData.phone"
+            class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </div>
       </div>
 
@@ -248,27 +178,18 @@
 
         <div *ngIf="isEditing" class="flex items-center gap-2">
           <i class="fa-regular fa-envelope text-primary"></i>
-          <input
-            [(ngModel)]="editData.email"
-            class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-          />
+          <input [(ngModel)]="editData.email"
+            class="w-full p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20" />
         </div>
       </div>
     </div>
   </div>
 
   <!-- Work Hours -->
-  <div
-    class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6"
-  >
+  <div class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6">
     <h2 class="flex items-center gap-2 text-lg font-semibold text-darkGray dark:text-white">
-      <svg
-        class="w-5 h-5 text-primary dark:text-darkPrimary"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
+      <svg class="w-5 h-5 text-primary dark:text-darkPrimary" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
       </svg>
@@ -287,42 +208,27 @@
     <div *ngIf="isEditing" class="mt-3 space-y-3">
       <div *ngFor="let item of editData.workSchedules; let i = index" class="flex gap-3 items-center">
         <!-- Label -->
-        <input
-          [(ngModel)]="item.label"
-          placeholder="e.g., Monday - Friday"
-          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-        />
+        <input [(ngModel)]="item.label" placeholder="e.g., Monday - Friday"
+          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" />
         <!-- Time Range -->
-        <input
-          [(ngModel)]="item.timeRange"
-          placeholder="e.g., 06:00 AM - 10:00 PM"
-          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-        />
+        <input [(ngModel)]="item.timeRange" placeholder="e.g., 06:00 AM - 10:00 PM"
+          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" />
         <!-- Delete Button -->
-        <button
-          type="button"
-          (click)="removeWorkSchedule(i)"
+        <button type="button" (click)="removeWorkSchedule(i)"
           class="w-10 h-10 rounded-xl border border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center transition"
-          title="Delete Schedule"
-        >
+          title="Delete Schedule">
           <i class="fa-regular fa-trash-can"></i>
         </button>
       </div>
 
       <!-- Add Button -->
-      <button
-        type="button"
-        (click)="addWorkSchedule()"
-        class="text-primary dark:text-darkPrimary text-sm font-semibold hover:underline flex items-center gap-1 mt-2"
-      >
+      <button type="button" (click)="addWorkSchedule()"
+        class="text-primary dark:text-darkPrimary text-sm font-semibold hover:underline flex items-center gap-1 mt-2">
         + Add Schedule
       </button>
     </div>
   </div>
 </div>
 
-<app-add-amenity-modal
-  *ngIf="showAmenityModal"
-  (close)="showAmenityModal = false"
-  (submit)="onAddAmenity($event)"
-></app-add-amenity-modal>
+<app-add-amenity-modal *ngIf="showAmenityModal" (close)="showAmenityModal = false"
+  (submit)="onAddAmenity($event)"></app-add-amenity-modal>
