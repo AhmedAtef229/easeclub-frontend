@@ -135,6 +135,22 @@ export const routes: Routes = [
           ),
       },
 
+      // 🎟 Events
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./features/admin/events/events.component').then(
+            (c) => c.EventsComponent,
+          ),
+      },
+      {
+        path: 'events/:id',
+        loadComponent: () =>
+          import('./features/admin/events/event-details/event-details.component').then(
+            (c) => c.EventDetailsComponent,
+          ),
+      },
+
       // ✅ Default داخل admin
       {
         path: '',
