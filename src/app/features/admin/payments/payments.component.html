@@ -45,93 +45,75 @@
 
   </div>
 
-  <!-- ================= FILTERS + TABS ================= -->
+  <!-- ================= TABS ================= -->
 
   <div
-    class="mt-6
-           bg-cardGray dark:bg-darkCard
-           border border-borderGray dark:border-darkBorder
-           rounded-2xl overflow-hidden"
+    class="flex items-center gap-6 mt-8
+           border-b border-borderGray dark:border-darkBorder"
   >
 
-    <!-- Tabs -->
-
-    <div
-      class="flex items-center gap-8
-             px-6 pt-5
-             border-b border-borderGray dark:border-darkBorder"
+    <button
+      (click)="switchTab('installments')"
+      class="pb-3 text-sm font-semibold border-b-2 transition-all duration-200"
+      [ngClass]="
+        activeTab === 'installments'
+          ? 'border-primary text-primary dark:border-darkPrimary dark:text-darkPrimary'
+          : 'border-transparent text-mediumGray hover:text-darkGray dark:hover:text-white'
+      "
     >
+      Installments
+    </button>
 
-      <button
-        (click)="switchTab('installments')"
-        class="pb-4 text-sm font-semibold border-b-2 transition"
-        [ngClass]="
-          activeTab === 'installments'
-            ? 'border-primary text-primary'
-            : 'border-transparent text-darkGray dark:text-white'
-        "
-      >
-        Installments
-      </button>
+    <button
+      (click)="switchTab('invoices')"
+      class="pb-3 text-sm font-semibold border-b-2 transition-all duration-200"
+      [ngClass]="
+        activeTab === 'invoices'
+          ? 'border-primary text-primary dark:border-darkPrimary dark:text-darkPrimary'
+          : 'border-transparent text-mediumGray hover:text-darkGray dark:hover:text-white'
+      "
+    >
+      Invoices (Finance Ledger)
+    </button>
 
-      <button
-        (click)="switchTab('invoices')"
-        class="pb-4 text-sm font-semibold border-b-2 transition"
-        [ngClass]="
-          activeTab === 'invoices'
-            ? 'border-primary text-primary'
-            : 'border-transparent text-darkGray dark:text-white'
-        "
+  </div>
+
+  <!-- ================= FILTERS (SEARCH & STATUS) ================= -->
+
+  <div class="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-4 items-end">
+
+    <!-- Search -->
+
+    <div class="lg:col-span-3">
+
+      <label
+        class="block mb-2 text-xs font-bold uppercase tracking-wider text-mediumGray"
       >
-        Invoices (Finance Ledger)
-      </button>
+        Search
+      </label>
+
+      <app-search-input
+        [placeholder]="searchPlaceholder"
+        (search)="onSearch($event)"
+      ></app-search-input>
 
     </div>
 
-    <!-- Filters -->
+    <!-- Status Dropdown -->
 
-    <div class="p-4 md:p-6">
+    <div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <label
+        class="block mb-2 text-xs font-bold uppercase tracking-wider text-mediumGray"
+      >
+        Status Filter
+      </label>
 
-        <!-- Search -->
-
-        <div class="lg:col-span-3">
-
-          <label
-            class="block mb-2 text-sm font-semibold
-                   text-darkGray dark:text-white"
-          >
-            Search
-          </label>
-
-          <app-search-input
-            placeholder="Search by Installment ID or Membership Number..."
-            (search)="onSearch($event)"
-          ></app-search-input>
-
-        </div>
-
-        <!-- Status -->
-
-        <div>
-
-          <label
-            class="block mb-2 text-sm font-semibold
-                   text-darkGray dark:text-white"
-          >
-            Status
-          </label>
-
-          <app-dropdown
-            [options]="statusOptions"
-            [selected]="selectedStatus"
-            (valueChange)="onStatusChange($event)"
-          ></app-dropdown>
-
-        </div>
-
-      </div>
+      <app-dropdown
+        [options]="statusOptions"
+        [selected]="selectedStatus"
+        (valueChange)="onStatusChange($event)"
+      ></app-dropdown>
 
     </div>
 
@@ -145,6 +127,11 @@
       [columns]="columns"
       [data]="filteredPayments"
       [showActions]="false"
+      [serverSide]="true"
+      [totalCount]="totalCount"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)"
     ></app-tables>
 
   </div>
@@ -153,9 +140,10 @@
 
   <div
     *ngIf="filteredPayments?.length === 0"
-    class="text-center py-10 text-gray-400"
+    class="text-center py-16 text-gray-400 font-medium"
   >
-    No Data Found
+    <span class="block text-2xl mb-2">🔍</span>
+    No records found matching your filters
   </div>
 
 </app-page-layout>

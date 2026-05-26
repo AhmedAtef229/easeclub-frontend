@@ -36,17 +36,30 @@ export class PaymentsComponent implements OnInit {
 
   /* ================= FILTERS ================= */
 
-  statusOptions = [
-    'All Statuses',
-    'Pending',
-    'Paid',
-    'Overdue',
-    'Issued',
-    'Void'
-  ];
+  get statusOptions(): string[] {
+    if (this.activeTab === 'installments') {
+      return ['All Statuses', 'Pending', 'Paid', 'Overdue', 'Cancelled'];
+    } else {
+      return ['All Statuses', 'Issued', 'Paid', 'Void'];
+    }
+  }
 
   selectedStatus = 'All Statuses';
   searchValue = '';
+
+  get searchPlaceholder(): string {
+    if (this.activeTab === 'installments') {
+      return 'Search by Membership Number or Installment ID...';
+    } else {
+      return 'Search by Invoice ID or Billing Item ID...';
+    }
+  }
+
+  /* ================= PAGINATION ================= */
+
+  currentPage = 1;
+  pageSize = 10;
+  totalCount = 0;
 
   /* ================= STATS (DYNAMIC) ================= */
 
@@ -56,7 +69,7 @@ export class PaymentsComponent implements OnInit {
       value: '$0',
       subtitle: 'Unpaid Installments',
       icon: 'fa-dollar-sign',
-      iconBg: 'bg-lavender/30',
+      iconBg: 'bg-[#6900ff4d]',
       iconColor: 'text-primary',
     },
     {
@@ -92,14 +105,26 @@ export class PaymentsComponent implements OnInit {
   ngOnInit() {
     this.clubId = this.branchService.getClubId();
     this.setColumns();
-    this.loadInstallments();
-    this.loadInvoices(); // 🔥 مهم عشان نحسب stats
+    this.loadStats();
+    if (this.activeTab === 'installments') {
+      this.loadInstallments();
+    } else {
+      this.loadInvoices();
+    }
   }
 
   /* ================= SWITCH TAB ================= */
 
   switchTab(tab: 'installments' | 'invoices') {
     this.activeTab = tab;
+    this.currentPage = 1;
+
+    // Reset status filter if not compatible with the new tab
+    const allowed = this.statusOptions;
+    if (!allowed.includes(this.selectedStatus)) {
+      this.selectedStatus = 'All Statuses';
+    }
+
     this.setColumns();
 
     if (tab === 'installments') {
@@ -119,10 +144,9 @@ export class PaymentsComponent implements OnInit {
         { key: 'membershipNumber', label: 'Membership Number' },
         { key: 'readableId', label: 'Installment ID' },
         { key: 'membershipPeriod', label: 'Membership Period' },
-        { key: 'amount', label: 'Amount' },
+        { key: 'amount', label: 'Amount', type: 'currency' },
         { key: 'dueDate', label: 'Due Date' },
         { key: 'status', label: 'Status' },
-        { key: 'invoiceId', label: 'Invoice ID' },
       ];
 
       this.filteredPayments = [...this.installments];
@@ -133,7 +157,8 @@ export class PaymentsComponent implements OnInit {
         { key: 'invoiceReadableId', label: 'Invoice ID' },
         { key: 'userName', label: 'User Name' },
         { key: 'billingItemType', label: 'Type' },
-        { key: 'amount', label: 'Amount' },
+        { key: 'billingItemReadableId', label: 'Billing Item ID' },
+        { key: 'amount', label: 'Amount', type: 'currency' },
         { key: 'status', label: 'Status' },
         { key: 'paidAt', label: 'Paid At' },
         { key: 'method', label: 'Method' },
@@ -152,12 +177,12 @@ export class PaymentsComponent implements OnInit {
         this.clubId,
         this.selectedStatus,
         this.searchValue,
-        1,
-        10
+        this.currentPage,
+        this.pageSize
       )
       .subscribe((res: any) => {
 
-        this.installments = res.items.map((x: any) => ({
+        this.installments = (res.items || []).map((x: any) => ({
 
           membershipNumber: x.membershipNumber,
 
@@ -177,8 +202,8 @@ export class PaymentsComponent implements OnInit {
           invoiceId: x.invoiceId ?? '—'
         }));
 
+        this.totalCount = res.totalCount || 0;
         this.setColumns();
-        this.calculateStats(); // 🔥
       });
   }
 
@@ -191,18 +216,20 @@ export class PaymentsComponent implements OnInit {
         this.clubId,
         this.selectedStatus,
         this.searchValue,
-        1,
-        10
+        this.currentPage,
+        this.pageSize
       )
       .subscribe((res: any) => {
 
-        this.invoices = res.items.map((x: any) => ({
+        this.invoices = (res.items || []).map((x: any) => ({
 
           invoiceReadableId: x.invoiceReadableId,
 
           userName: x.userName,
 
           billingItemType: x.billingItemType,
+
+          billingItemReadableId: x.billingItemReadableId || '—',
 
           amount: x.amount,
 
@@ -215,39 +242,22 @@ export class PaymentsComponent implements OnInit {
           method: x.method || '—'
         }));
 
+        this.totalCount = res.totalCount || 0;
         this.setColumns();
-        this.calculateStats(); // 🔥
       });
   }
 
-  /* ================= CALCULATE STATS ================= */
+  /* ================= LOAD STATS ================= */
 
-  calculateStats() {
-
-    // Total Receivables = Pending + Overdue
-    const unpaid = this.installments
-      .filter(i => i.status === 'Pending' || i.status === 'Overdue')
-      .reduce((sum, i) => sum + i.amount, 0);
-
-    // Overdue فقط
-    const overdue = this.installments
-      .filter(i => i.status === 'Overdue')
-      .reduce((sum, i) => sum + i.amount, 0);
-
-    const overdueCount =
-      this.installments.filter(i => i.status === 'Overdue').length;
-
-    // Paid invoices
-    const paid = this.invoices
-      .filter(i => i.status === 'Paid')
-      .reduce((sum, i) => sum + i.amount, 0);
-
-    /* ================= UPDATE UI ================= */
-
-    this.stats[0].value = `$${unpaid.toFixed(2)}`;
-    this.stats[1].value = `$${overdue.toFixed(2)}`;
-    this.stats[1].subtitle = `${overdueCount} High Priority`;
-    this.stats[2].value = `$${paid.toFixed(2)}`;
+  loadStats() {
+    this.service
+      .getClubPaymentStats(this.clubId)
+      .subscribe((res: any) => {
+        this.stats[0].value = `$${(res.totalReceivables || 0).toFixed(2)}`;
+        this.stats[1].value = `$${(res.overdueDues || 0).toFixed(2)}`;
+        this.stats[1].subtitle = `${res.overdueCount || 0} High Priority`;
+        this.stats[2].value = `$${(res.monthlyRevenue || 0).toFixed(2)}`;
+      });
   }
 
   /* ================= SEARCH ================= */
@@ -255,6 +265,7 @@ export class PaymentsComponent implements OnInit {
   onSearch(value: string) {
 
     this.searchValue = value;
+    this.currentPage = 1;
 
     if (this.activeTab === 'installments')
       this.loadInstallments();
@@ -267,11 +278,23 @@ export class PaymentsComponent implements OnInit {
   onStatusChange(status: string) {
 
     this.selectedStatus = status;
+    this.currentPage = 1;
 
     if (this.activeTab === 'installments')
       this.loadInstallments();
     else
       this.loadInvoices();
+  }
+
+  /* ================= PAGE CHANGE ================= */
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    if (this.activeTab === 'installments') {
+      this.loadInstallments();
+    } else {
+      this.loadInvoices();
+    }
   }
 
 }
