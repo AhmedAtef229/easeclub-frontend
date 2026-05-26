@@ -44,7 +44,7 @@ export class ClubSettingsComponent implements OnInit {
     description: '',
     phone: '',
     email: '',
-    workHours: [] as string[],
+    workSchedules: [] as { label: string; timeRange: string }[],
     amenities: [] as string[],
     logo: '',
     cover: '',
@@ -52,7 +52,7 @@ export class ClubSettingsComponent implements OnInit {
     coverImageId: '',
   };
 
-  editData = { ...this.club };
+  editData = JSON.parse(JSON.stringify(this.club));
 
   constructor(
     private clubService: ClubSettingService,
@@ -108,14 +108,17 @@ export class ClubSettingsComponent implements OnInit {
       description: res.about || '',
       phone: res.contactInfo?.phone?.value || '',
       email: res.contactInfo?.email?.value || '',
-      workHours: res.workSchedules?.map(
-        (x: any) => `${x.label}: ${x.timeRange}`
+      workSchedules: res.workSchedules?.map(
+        (x: any) => ({
+          label: x.label || '',
+          timeRange: x.timeRange || ''
+        })
       ) || [],
       amenities: res.amenities?.map(
         (x: any) => x.name
       ) || [],
-      logo: res.logoUrl || 'assets/images/logo_image.png',
-      cover: res.coverImageUrl || 'assets/images/club_image.png',
+      logo: res.logoUrl || '',
+      cover: res.coverImageUrl || '',
       logoId: logoId || '',
       coverImageId: coverImageId || '',
     };
@@ -151,18 +154,28 @@ export class ClubSettingsComponent implements OnInit {
       return;
     }
 
-    console.log(
-      'SELECTED COVER FILE:',
-      this.selectedCoverFile
-    );
-
-    console.log(
-      'SELECTED LOGO FILE:',
-      this.selectedLogoFile
-    );
-
     this.isSaving = true;
     this.errorMessage = '';
+
+    // Frontend validation for work hours matching backend requirements
+    const timeRegex = /^\d{1,2}:\d{2}\s?(AM|PM)\s?-\s?\d{1,2}:\d{2}\s?(AM|PM)$/i;
+    for (const schedule of this.editData.workSchedules) {
+      if (!schedule.label.trim()) {
+        this.errorMessage = 'Schedule label is required.';
+        this.isSaving = false;
+        return;
+      }
+      if (!schedule.timeRange.trim()) {
+        this.errorMessage = 'Time range is required.';
+        this.isSaving = false;
+        return;
+      }
+      if (!timeRegex.test(schedule.timeRange.trim())) {
+        this.errorMessage = `Time range for "${schedule.label}" must be in format 'HH:mm AM/PM - HH:mm AM/PM' (e.g. 06:00 AM - 10:00 PM).`;
+        this.isSaving = false;
+        return;
+      }
+    }
 
     try {
       if (this.selectedLogoFile) {
@@ -186,14 +199,11 @@ export class ClubSettingsComponent implements OnInit {
         phone: this.editData.phone,
         email: this.editData.email,
         amenities: this.editData.amenities || [],
-        workSchedules: (this.editData.workHours || []).map(
-          (item: string) => {
-            const [label, ...rest] = item.split(':');
-            return {
-              label: label.trim(),
-              timeRange: rest.join(':').trim(),
-            };
-          }
+        workSchedules: (this.editData.workSchedules || []).map(
+          (s: any) => ({
+            label: s.label.trim(),
+            timeRange: s.timeRange.trim(),
+          })
         ),
         logoId: this.uploadedLogoId || undefined,
         coverImageId: this.uploadedCoverId || undefined,
@@ -210,12 +220,10 @@ export class ClubSettingsComponent implements OnInit {
       this.loadClub();
     } catch (err: any) {
       console.log('FULL ERROR:', err);
-      console.log('VALIDATION ERRORS:', err.error?.errors);
       console.error('SAVE EDIT ERROR:', err);
       this.isSaving = false;
       
       if (err.error && err.error.errors) {
-        console.log(err.error.errors);
         const validationMsgs = Object.entries(err.error.errors)
           .map(([field, msgs]: any) => `${field}: ${msgs.join(', ')}`)
           .join(' | ');
@@ -256,5 +264,14 @@ export class ClubSettingsComponent implements OnInit {
   removeAmenity(index: number) {
     this.editData.amenities.splice(index, 1);
   }
-}
 
+  // ================= WORK SCHEDULE ACTIONS =================
+  addWorkSchedule() {
+    this.editData.workSchedules ??= [];
+    this.editData.workSchedules.push({ label: '', timeRange: '' });
+  }
+
+  removeWorkSchedule(index: number) {
+    this.editData.workSchedules.splice(index, 1);
+  }
+}

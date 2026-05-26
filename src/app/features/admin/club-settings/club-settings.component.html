@@ -97,10 +97,12 @@
       </button>
     </div>
 
-<img
-  [src]="(isEditing ? editData.logo : club.logo) || 'assets/images/logo_image.png'"
-  class="w-24 h-24 rounded-full object-cover border"
-/>
+    <!-- Render only if image URL is available (either loaded or previewed) -->
+    <img
+      *ngIf="isEditing ? editData.logo : club.logo"
+      [src]="isEditing ? editData.logo : club.logo"
+      class="w-24 h-24 rounded-full object-cover border"
+    />
 
     <!-- NAME -->
     <div>
@@ -139,10 +141,12 @@
       </button>
     </div>
 
-  <img
-  [src]="(isEditing ? editData.cover : club.cover) || 'assets/images/club_image.png'"
-  class="w-full h-56 object-cover rounded-xl border"
-/>
+    <!-- Render only if image URL is available (either loaded or previewed) -->
+    <img
+      *ngIf="isEditing ? editData.cover : club.cover"
+      [src]="isEditing ? editData.cover : club.cover"
+      class="w-full h-56 object-cover rounded-xl border"
+    />
   </div>
 
   <!-- About -->
@@ -204,7 +208,6 @@
     </div>
   </div>
 
-  <!-- Contact -->
   <!-- Contact -->
   <div
     class="bg-cardGray dark:bg-darkCard border border-borderGray dark:border-darkBorder rounded-2xl p-6"
@@ -272,18 +275,48 @@
       Work Hours
     </h2>
 
-    <div *ngIf="!isEditing" class="mt-3 text-mediumGray">
-      <p *ngFor="let item of club.workHours">
-        {{ item }}
+    <!-- View Mode -->
+    <div *ngIf="!isEditing" class="mt-3 text-mediumGray space-y-1 text-sm font-medium">
+      <p *ngFor="let item of club.workSchedules">
+        <span class="text-darkGray dark:text-white font-semibold">{{ item.label }}:</span>
+        {{ item.timeRange }}
       </p>
     </div>
 
-    <div *ngIf="isEditing" class="mt-3">
-      <input
-        *ngFor="let item of editData.workHours; let i = index"
-        [(ngModel)]="editData.workHours[i]"
-        class="w-full mb-2 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-      />
+    <!-- Edit Mode -->
+    <div *ngIf="isEditing" class="mt-3 space-y-3">
+      <div *ngFor="let item of editData.workSchedules; let i = index" class="flex gap-3 items-center">
+        <!-- Label -->
+        <input
+          [(ngModel)]="item.label"
+          placeholder="e.g., Monday - Friday"
+          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+        />
+        <!-- Time Range -->
+        <input
+          [(ngModel)]="item.timeRange"
+          placeholder="e.g., 06:00 AM - 10:00 PM"
+          class="flex-1 p-3 rounded-xl border border-borderGray dark:border-darkBorder bg-white dark:bg-darkCard text-darkGray dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+        />
+        <!-- Delete Button -->
+        <button
+          type="button"
+          (click)="removeWorkSchedule(i)"
+          class="w-10 h-10 rounded-xl border border-red-200 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center justify-center transition"
+          title="Delete Schedule"
+        >
+          <i class="fa-regular fa-trash-can"></i>
+        </button>
+      </div>
+
+      <!-- Add Button -->
+      <button
+        type="button"
+        (click)="addWorkSchedule()"
+        class="text-primary dark:text-darkPrimary text-sm font-semibold hover:underline flex items-center gap-1 mt-2"
+      >
+        + Add Schedule
+      </button>
     </div>
   </div>
 </div>
