@@ -1,0 +1,196 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-3xl shadow-2xl
+              max-h-[95vh] flex flex-col overflow-hidden border border-gray-100 dark:border-darkBorder">
+
+    <!-- Header -->
+    <div class="p-6 pb-4 flex justify-between items-start">
+      <div>
+        <h2 class="text-2xl font-bold text-darkGray dark:text-white mb-1">
+          {{ event ? 'Edit Event' : 'Create New Event' }}
+        </h2>
+        <p class="text-mediumGray text-sm">
+          {{ event ? 'Modify this draft event\'s details' : 'Fill in the event details to create a draft' }}
+        </p>
+      </div>
+      <button
+        (click)="close.emit()"
+        class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-darkBorder transition-colors"
+      >
+        <i class="fa-solid fa-xmark text-lg text-mediumGray"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="flex-1 overflow-y-auto p-6 pt-2 custom-scrollbar">
+      <form *ngIf="form" [formGroup]="form" class="space-y-5">
+
+        <!-- Event Name -->
+        <div>
+          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">
+            Event Name <span class="text-red-400">*</span>
+          </label>
+          <input
+            formControlName="name"
+            placeholder="e.g., Swimming Championship 2026"
+            class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                   border border-gray-100 dark:border-darkBorder
+                   text-darkGray dark:text-white
+                   focus:ring-2 focus:ring-primary/20 focus:border-primary
+                   outline-none transition-all placeholder:text-gray-300"
+          />
+          <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+             class="text-xs text-red-400 mt-1">Event name is required.</p>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">Description</label>
+          <textarea
+            formControlName="description"
+            rows="3"
+            placeholder="Brief description of the event..."
+            class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                   border border-gray-100 dark:border-darkBorder
+                   text-darkGray dark:text-white
+                   focus:ring-2 focus:ring-primary/20 focus:border-primary
+                   outline-none transition-all placeholder:text-gray-300 resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Dates Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">
+              Start Date & Time <span class="text-red-400">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              formControlName="startDate"
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">
+              End Date & Time <span class="text-red-400">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              formControlName="endDate"
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Venue + Capacity -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">Venue</label>
+            <input
+              formControlName="venue"
+              placeholder="e.g., Main Branch Pool"
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all placeholder:text-gray-300"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">
+              Max Capacity <span class="text-red-400">*</span>
+            </label>
+            <input
+              type="number"
+              formControlName="capacity"
+              min="1"
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Access Type -->
+        <div>
+          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-2">Access Type</label>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              (click)="setAccessType('MembersOnly')"
+              class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
+              [ngClass]="form.get('accessType')?.value === 'MembersOnly'
+                ? 'border-primary bg-primary/5 text-primary dark:text-darkPrimary dark:border-darkPrimary'
+                : 'border-gray-200 dark:border-darkBorder text-mediumGray hover:border-primary/50'"
+            >
+              <i class="fa-solid fa-lock mr-2"></i>Members Only
+            </button>
+            <button
+              type="button"
+              (click)="setAccessType('Public')"
+              class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
+              [ngClass]="form.get('accessType')?.value === 'Public'
+                ? 'border-sky-500 bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-500'
+                : 'border-gray-200 dark:border-darkBorder text-mediumGray hover:border-sky-400/50'"
+            >
+              <i class="fa-solid fa-globe mr-2"></i>Public
+            </button>
+          </div>
+        </div>
+
+        <!-- Image URL + Badge -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">Image URL</label>
+            <input
+              formControlName="imageUrl"
+              placeholder="https://..."
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all placeholder:text-gray-300"
+            />
+          </div>
+          <div>
+            <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">Badge Label</label>
+            <input
+              formControlName="badge"
+              placeholder="e.g., Ramadan Special"
+              class="w-full px-4 py-3 rounded-2xl bg-gray-50 dark:bg-darkCard
+                     border border-gray-100 dark:border-darkBorder
+                     text-darkGray dark:text-white
+                     focus:ring-2 focus:ring-primary/20 focus:border-primary
+                     outline-none transition-all placeholder:text-gray-300"
+            />
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-6 border-t border-gray-100 dark:border-darkBorder flex justify-end gap-3 bg-gray-50/50 dark:bg-darkCard/50">
+      <button
+        (click)="close.emit()"
+        class="px-8 py-3 rounded-2xl font-bold text-mediumGray hover:text-darkGray transition-colors"
+      >Cancel</button>
+      <button
+        (click)="submit()"
+        class="px-10 py-3 rounded-2xl bg-primary hover:bg-primaryHover text-white font-bold
+               shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95"
+      >
+        {{ event ? 'Save Changes' : 'Create Draft' }}
+      </button>
+    </div>
+  </div>
+</div>
