@@ -194,3 +194,29 @@ app-sidebar nav::-webkit-scrollbar-thumb:hover {
 .active-tab {
   @apply text-primary border-b-2 border-primary dark:text-darkPrimary dark:border-darkPrimary;
 }
+
+/* ================= GLOBAL DARK MODE COLOR MAPPINGS ================= */
+.dark .bg-primary {
+  @apply bg-darkPrimary;
+}
+
+.dark .hover\:bg-primaryHover:hover {
+  @apply bg-darkSecondary;
+}
+
+.dark .text-primary {
+  @apply text-darkPrimary;
+}
+
+.dark .border-primary {
+  @apply border-darkPrimary;
+}
+
+.dark .checked\:bg-primary:checked {
+  @apply bg-darkPrimary;
+}
+
+.dark .checked\:border-primary:checked {
+  @apply border-darkPrimary;
+}
+
