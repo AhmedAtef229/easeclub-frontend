@@ -122,8 +122,12 @@ export class MembershipPlansComponent implements OnInit {
   /* ================= STATUS TOGGLE ================= */
 
   onToggleStatus(row: MembershipPlan): void {
-    row.isActive = !row.isActive;
-    console.log('STATUS TOGGLED:', row);
+    this.plansService.toggleStatus(row.id).subscribe({
+      next: () => this.loadPlans(),
+      error: (err) => {
+        console.error('Failed to toggle status', err);
+      }
+    });
   }
 
   /* ================= MODAL ================= */

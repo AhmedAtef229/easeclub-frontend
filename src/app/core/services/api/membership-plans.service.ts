@@ -165,6 +165,15 @@ export class MembershipPlansService {
     );
   }
 
+  /* ================= TOGGLE STATUS ================= */
+
+  toggleStatus(planId: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/membership-plans/${planId}/toggle-status`,
+      {}
+    );
+  }
+
   /* ================= DIRECT PAY ================= */
 
   directPay(planId: string, body: {
