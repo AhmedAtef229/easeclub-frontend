@@ -30,7 +30,7 @@ export class BranchService {
   }
 
   /* ================= CREATE ================= */
-  createBranch(data: { name: string }): Observable<string> {
+  createBranch(data: { name: string; address: string }): Observable<string> {
     return this.http.post<string>(
       `${this.baseUrl}/branches`,
       {
@@ -41,7 +41,7 @@ export class BranchService {
   }
 
   /* ================= UPDATE ================= */
-  updateBranch(branchId: string, data: { name: string }): Observable<void> {
+  updateBranch(branchId: string, data: { name: string; address: string }): Observable<void> {
     return this.http.put<void>(
       `${this.baseUrl}/branches/${branchId}`,
       data
@@ -49,10 +49,10 @@ export class BranchService {
   }
 
   /* 🔥 TOGGLE STATUS */
-  toggleStatus(branchId: string, isActive: boolean): Observable<void> {
-    return this.http.put<void>(
-      `${this.baseUrl}/branches/${branchId}`,
-      { isActive }
+  toggleStatus(branchId: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/branches/${branchId}/toggle-status`,
+      {}
     );
   }
 }

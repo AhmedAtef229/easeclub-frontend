@@ -25,6 +25,7 @@ export class BranchesComponent implements OnInit {
 
   columns: TableColumn[] = [
     { key: 'name', label: 'Branch Name' },
+    { key: 'address', label: 'Address' },
     { key: 'createdAt', label: 'Created At' },
     { key: 'isActive', label: 'Status', type: 'status' },
   ];
@@ -86,7 +87,7 @@ applyFilter(option: string) {
 
   /* ================= STATUS ================= */
   onToggleStatus(row: any) {
-    this.branchService.toggleStatus(row.id, !row.isActive).subscribe({
+    this.branchService.toggleStatus(row.id).subscribe({
       next: () => this.loadBranches(),
       error: (err) => console.error(err)
     });
@@ -97,7 +98,8 @@ applyFilter(option: string) {
 
     if (branch.id) {
       this.branchService.updateBranch(branch.id, {
-        name: branch.name
+        name: branch.name,
+        address: branch.address
       }).subscribe({
         next: () => {
           this.loadBranches();
@@ -106,7 +108,8 @@ applyFilter(option: string) {
       });
     } else {
       this.branchService.createBranch({
-        name: branch.name
+        name: branch.name,
+        address: branch.address
       }).subscribe({
         next: () => {
           this.loadBranches();

@@ -23,13 +23,15 @@ export class BranchModalComponent implements OnInit {
     this.form = this.fb.group({
       id: [''],
       name: ['', Validators.required],
+      address: ['', Validators.required]
     });
 
     if (this.data) {
 
       this.form.patchValue({
         id: this.data.id,
-        name: this.data.name
+        name: this.data.name,
+        address: this.data.address
       });
 
     }
