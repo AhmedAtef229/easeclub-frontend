@@ -129,7 +129,7 @@ resetPassword(token: string, email: string, password: string): Observable<any> {
   const payload = {
     token,
     email,
-    password
+    newPassword: password
   };
 
   return this.http.post(

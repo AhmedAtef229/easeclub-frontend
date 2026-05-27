@@ -26,6 +26,7 @@ export class ResetPasswordComponent implements OnInit {
   email: string | null = null;
   loading = false;
   error: string | null = null;
+  showSuccessModal = false;
 
   constructor() {
     // Using inject() inside the constructor
@@ -60,13 +61,16 @@ export class ResetPasswordComponent implements OnInit {
     this.authService.resetPassword(this.token, this.email, this.form.value.password).subscribe({
       next: () => {
         this.loading = false;
-        alert('Password reset successfully');
-        //this.router.navigate(['/auth/login']);
+        this.showSuccessModal = true;
       },
       error: (err) => {
         this.loading = false;
         this.error = err.error?.message || 'Something went wrong';
       },
     });
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 }
