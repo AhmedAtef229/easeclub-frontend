@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
 import { Event, EventStatus, EventAccessType, CreateEventCommand } from './events.model';
-import { MOCK_EVENTS } from './events.mock';
 import { EventModalComponent } from './event-modal/event-modal.component';
+import { EventsService } from '../../../core/services/api/events.service';
+import { AdminContextService } from '../../../core/services/api/admin-context.service';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageLayoutComponent,EventModalComponent],
+  imports: [CommonModule, FormsModule, PageLayoutComponent, EventModalComponent],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css'],
 })
@@ -27,30 +28,85 @@ export class EventsComponent implements OnInit {
   statusOptions = ['All', 'Draft', 'Published', 'Cancelled'];
   accessOptions = ['All', 'MembersOnly', 'Public'];
 
-  constructor(private router: Router) {}
+  clubId = '';
+  totalCount = 0;
+  publishedCount = 0;
+  draftCount = 0;
+  cancelledCount = 0;
+  isLoading = false;
+
+  constructor(
+    private router: Router,
+    private eventsService: EventsService,
+    private adminContextService: AdminContextService
+  ) {}
 
   ngOnInit() {
-    this.allEvents = [...MOCK_EVENTS];
-    this.applyFilters();
-  }
-
-  get totalCount() { return this.allEvents.length; }
-  get publishedCount() { return this.allEvents.filter(e => e.status === 'Published').length; }
-  get draftCount() { return this.allEvents.filter(e => e.status === 'Draft').length; }
-  get cancelledCount() { return this.allEvents.filter(e => e.status === 'Cancelled').length; }
-
-  applyFilters() {
-    this.filteredEvents = this.allEvents.filter(e => {
-      const matchSearch = e.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-      const matchStatus = this.selectedStatus === 'All' || e.status === this.selectedStatus;
-      const matchAccess = this.selectedAccess === 'All' || e.accessType === this.selectedAccess;
-      return matchSearch && matchStatus && matchAccess;
+    this.adminContextService.getAdminContext().subscribe(ctx => {
+      this.clubId = ctx.managedClubId;
+      if (this.clubId) {
+        this.loadStatusCounts();
+        this.loadEvents();
+      }
     });
   }
 
-  onSearch() { this.applyFilters(); }
-  setStatus(s: string) { this.selectedStatus = s; this.applyFilters(); }
-  setAccess(a: string) { this.selectedAccess = a; this.applyFilters(); }
+  loadStatusCounts() {
+    if (!this.clubId) return;
+    this.eventsService.getStatusCounts(this.clubId).subscribe({
+      next: (counts) => {
+        this.totalCount = counts.total;
+        this.publishedCount = counts.published;
+        this.draftCount = counts.draft;
+        this.cancelledCount = counts.cancelled;
+      },
+      error: (err) => console.error('Failed to load status counts', err)
+    });
+  }
+
+  loadEvents() {
+    if (!this.clubId) return;
+    this.isLoading = true;
+    const statusFilter = this.selectedStatus === 'All' ? undefined : (this.selectedStatus as EventStatus);
+
+    this.eventsService.getClubEvents(this.clubId, {
+      search: this.searchQuery || undefined,
+      status: statusFilter,
+      page: 1,
+      limit: 100
+    }).subscribe({
+      next: (res) => {
+        this.allEvents = res.items;
+        this.applyLocalFilters();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load events', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  applyLocalFilters() {
+    this.filteredEvents = this.allEvents.filter(e => {
+      const matchAccess = this.selectedAccess === 'All' || e.accessType === this.selectedAccess;
+      return matchAccess;
+    });
+  }
+
+  onSearch() {
+    this.loadEvents();
+  }
+
+  setStatus(s: string) {
+    this.selectedStatus = s;
+    this.loadEvents();
+  }
+
+  setAccess(a: string) {
+    this.selectedAccess = a;
+    this.applyLocalFilters();
+  }
 
   manageEvent(event: Event) {
     this.router.navigate(['/admin/events', event.id]);
@@ -58,39 +114,42 @@ export class EventsComponent implements OnInit {
 
   publishEvent(event: Event, domEvent: MouseEvent) {
     domEvent.stopPropagation();
-    event.status = 'Published';
-    this.applyFilters();
+    this.eventsService.publishEvent(event.id).subscribe({
+      next: () => {
+        event.status = 'Published';
+        this.loadStatusCounts();
+        this.loadEvents();
+      },
+      error: (err) => console.error('Failed to publish event', err)
+    });
   }
 
   cancelEvent(event: Event, domEvent: MouseEvent) {
     domEvent.stopPropagation();
-    event.status = 'Cancelled';
-    this.applyFilters();
+    this.eventsService.cancelEvent(event.id).subscribe({
+      next: () => {
+        event.status = 'Cancelled';
+        this.loadStatusCounts();
+        this.loadEvents();
+      },
+      error: (err) => console.error('Failed to cancel event', err)
+    });
   }
 
   openCreateModal() { this.showCreateModal = true; }
   closeCreateModal() { this.showCreateModal = false; }
 
   onCreateEvent(cmd: CreateEventCommand) {
-    const newEvent: Event = {
-      id: Date.now().toString(),
-      name: cmd.name,
-      description: cmd.description,
-      startDate: cmd.startDate,
-      endDate: cmd.endDate,
-      venue: cmd.venue,
-      capacity: cmd.capacity,
-      registrationsCount: 0,
-      accessType: cmd.accessType,
-      status: 'Draft',
-      imageUrl: cmd.imageUrl,
-      badge: cmd.badge,
-      ticketTypes: [],
-    };
-    this.allEvents.unshift(newEvent);
-    this.closeCreateModal();
-    this.applyFilters();
-    this.router.navigate(['/admin/events', newEvent.id]);
+    if (!this.clubId) return;
+    this.eventsService.createEvent({ ...cmd, clubId: this.clubId }).subscribe({
+      next: (res) => {
+        this.closeCreateModal();
+        this.loadStatusCounts();
+        this.loadEvents();
+        this.router.navigate(['/admin/events', res.id]);
+      },
+      error: (err) => console.error('Failed to create event', err)
+    });
   }
 
   getStatusClass(status: EventStatus): string {

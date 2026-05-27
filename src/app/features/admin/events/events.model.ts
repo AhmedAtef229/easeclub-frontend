@@ -70,7 +70,7 @@ export interface CreateEventCommand {
   venue: string;
   capacity: number;
   accessType: EventAccessType;
-  imageUrl: string | null;
+  imageId: string | null;
   badge: string | null;
 }
 

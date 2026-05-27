@@ -5,9 +5,9 @@ import {
   Event, TicketType, EventRegistration,
   EventStatus, CreateEventCommand, CreateTicketCommand
 } from '../events.model';
-import { MOCK_EVENTS, MOCK_REGISTRATIONS } from '../events.mock';
 import { EventModalComponent } from '../event-modal/event-modal.component';
 import { TicketModalComponent } from '../ticket-modal/ticket-modal.component';
+import { EventsService } from '../../../../core/services/api/events.service';
 
 type Tab = 'tickets' | 'registrations';
 
@@ -22,6 +22,7 @@ export class EventDetailsComponent implements OnInit {
   event: Event | null = null;
   registrations: EventRegistration[] = [];
   registrationsLoaded = false;
+  eventId = '';
 
   activeTab: Tab = 'tickets';
   expandedRegId: string | null = null;
@@ -37,11 +38,56 @@ export class EventDetailsComponent implements OnInit {
   showConfirmCancelReg = false;
   regToCancel: EventRegistration | null = null;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private eventsService: EventsService
+  ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    this.event = MOCK_EVENTS.find(e => e.id === id) || null;
+    if (id) {
+      this.eventId = id;
+      this.loadEventDetails();
+    }
+  }
+
+  loadEventDetails() {
+    this.eventsService.getEventById(this.eventId).subscribe({
+      next: (event) => {
+        this.event = event;
+        if (this.activeTab === 'registrations') {
+          this.loadRegistrations();
+        }
+      },
+      error: (err) => console.error('Failed to load event details', err)
+    });
+  }
+
+  loadRegistrations() {
+    this.eventsService.getEventRegistrations(this.eventId, 1, 100).subscribe({
+      next: (res) => {
+        this.registrations = res.items.map((r: any) => ({
+          id: r.id,
+          eventId: r.eventId,
+          registrantName: `User ${r.registrantId.substring(0, 4)}`,
+          registrantInitials: 'U',
+          status: r.status,
+          attendeeCount: r.attendees?.length || 0,
+          totalPrice: r.finalTotal || (r.totalBasePrice - r.discountAmount),
+          appliedPolicies: r.appliedPolicies ? r.appliedPolicies.split(',') : [],
+          attendees: (r.attendees || []).map((a: any) => ({
+            id: a.id,
+            name: a.attendeeName,
+            ticketCategory: 'Public', // Fallback display category
+            age: a.age || 0,
+            gender: a.gender || ''
+          }))
+        }));
+        this.registrationsLoaded = true;
+      },
+      error: (err) => console.error('Failed to load registrations', err)
+    });
   }
 
   // ─── Navigation ─────────────────────────────────
@@ -51,8 +97,7 @@ export class EventDetailsComponent implements OnInit {
   switchTab(tab: Tab) {
     this.activeTab = tab;
     if (tab === 'registrations' && !this.registrationsLoaded) {
-      this.registrations = MOCK_REGISTRATIONS.filter(r => r.eventId === this.event?.id);
-      this.registrationsLoaded = true;
+      this.loadRegistrations();
     }
   }
 
@@ -61,25 +106,45 @@ export class EventDetailsComponent implements OnInit {
   closeEditModal() { this.showEditModal = false; }
   onEditSave(cmd: CreateEventCommand) {
     if (!this.event) return;
-    Object.assign(this.event, {
-      name: cmd.name,
-      description: cmd.description,
-      startDate: cmd.startDate,
-      endDate: cmd.endDate,
-      venue: cmd.venue,
-      capacity: cmd.capacity,
-      imageUrl: cmd.imageUrl,
-      badge: cmd.badge,
+    this.eventsService.updateEvent(this.eventId, { ...cmd, id: this.eventId }).subscribe({
+      next: () => {
+        this.loadEventDetails();
+        this.closeEditModal();
+      },
+      error: (err) => console.error('Failed to update event', err)
     });
-    this.closeEditModal();
   }
 
   // ─── Publish / Cancel Event ─────────────────────
   confirmPublish() { this.showConfirmPublish = true; }
-  doPublish() { if (this.event) { this.event.status = 'Published'; } this.showConfirmPublish = false; }
+  doPublish() {
+    if (!this.event) return;
+    this.eventsService.publishEvent(this.eventId).subscribe({
+      next: () => {
+        this.loadEventDetails();
+        this.showConfirmPublish = false;
+      },
+      error: (err) => {
+        console.error('Failed to publish event', err);
+        this.showConfirmPublish = false;
+      }
+    });
+  }
 
   confirmCancel() { this.showConfirmCancel = true; }
-  doCancel() { if (this.event) { this.event.status = 'Cancelled'; } this.showConfirmCancel = false; }
+  doCancel() {
+    if (!this.event) return;
+    this.eventsService.cancelEvent(this.eventId).subscribe({
+      next: () => {
+        this.loadEventDetails();
+        this.showConfirmCancel = false;
+      },
+      error: (err) => {
+        console.error('Failed to cancel event', err);
+        this.showConfirmCancel = false;
+      }
+    });
+  }
 
   // ─── Ticket CRUD ─────────────────────────────────
   openAddTicket() { this.editingTicket = null; this.showTicketModal = true; }
@@ -89,47 +154,38 @@ export class EventDetailsComponent implements OnInit {
   onTicketSave(cmd: CreateTicketCommand) {
     if (!this.event) return;
     if (this.editingTicket) {
-      // Edit existing
-      const idx = this.event.ticketTypes.findIndex(t => t.id === this.editingTicket!.id);
-      if (idx >= 0) {
-        this.event.ticketTypes[idx] = {
-          ...this.event.ticketTypes[idx],
-          category: cmd.category,
-          basePrice: cmd.basePrice,
-          totalQuantity: cmd.totalQuantity,
-          maxPerMember: cmd.maxPerMember,
-          requiresMembership: cmd.requiresMembership,
-          minAge: cmd.minAge,
-          maxAge: cmd.maxAge,
-          genderRestriction: cmd.genderRestriction,
-        };
-      }
+      this.eventsService.updateTicketType(this.eventId, this.editingTicket.id, {
+        ...cmd,
+        ticketTypeId: this.editingTicket.id
+      }).subscribe({
+        next: () => {
+          this.loadEventDetails();
+          this.closeTicketModal();
+        },
+        error: (err) => console.error('Failed to update ticket type', err)
+      });
     } else {
-      // Add new
-      const newTicket: TicketType = {
-        id: Date.now().toString(),
-        eventId: this.event.id,
-        category: cmd.category,
-        basePrice: cmd.basePrice,
-        totalQuantity: cmd.totalQuantity,
-        availableQuantity: cmd.totalQuantity,
-        maxPerMember: cmd.maxPerMember,
-        requiresMembership: cmd.requiresMembership,
-        minAge: cmd.minAge,
-        maxAge: cmd.maxAge,
-        genderRestriction: cmd.genderRestriction,
-      };
-      this.event.ticketTypes.push(newTicket);
+      this.eventsService.addTicketType(this.eventId, cmd).subscribe({
+        next: () => {
+          this.loadEventDetails();
+          this.closeTicketModal();
+        },
+        error: (err) => console.error('Failed to add ticket type', err)
+      });
     }
-    this.closeTicketModal();
   }
 
   confirmDeleteTicket(t: TicketType) { this.ticketToDelete = t; this.showConfirmDeleteTicket = true; }
   doDeleteTicket() {
     if (!this.event || !this.ticketToDelete) return;
-    this.event.ticketTypes = this.event.ticketTypes.filter(t => t.id !== this.ticketToDelete!.id);
-    this.ticketToDelete = null;
-    this.showConfirmDeleteTicket = false;
+    this.eventsService.removeTicketType(this.eventId, this.ticketToDelete.id).subscribe({
+      next: () => {
+        this.loadEventDetails();
+        this.ticketToDelete = null;
+        this.showConfirmDeleteTicket = false;
+      },
+      error: (err) => console.error('Failed to delete ticket type', err)
+    });
   }
 
   // ─── Registrations ───────────────────────────────
@@ -139,9 +195,18 @@ export class EventDetailsComponent implements OnInit {
 
   confirmCancelReg(reg: EventRegistration) { this.regToCancel = reg; this.showConfirmCancelReg = true; }
   doCancelReg() {
-    if (this.regToCancel) { this.regToCancel.status = 'Cancelled'; }
-    this.regToCancel = null;
-    this.showConfirmCancelReg = false;
+    if (!this.regToCancel) return;
+    this.eventsService.cancelRegistration(this.eventId, this.regToCancel.id).subscribe({
+      next: () => {
+        if (this.activeTab === 'registrations') {
+          this.loadRegistrations();
+        }
+        this.loadEventDetails();
+        this.regToCancel = null;
+        this.showConfirmCancelReg = false;
+      },
+      error: (err) => console.error('Failed to cancel registration', err)
+    });
   }
 
   // ─── Computed ─────────────────────────────────────
