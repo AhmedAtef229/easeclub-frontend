@@ -5,7 +5,7 @@
   <!-- Stats Strip -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
     <!-- Pending Applications -->
-    <div (click)="navigateToReviews()" class="dashboard-stat-card cursor-pointer flex items-center justify-between p-6 bg-white dark:bg-darkCard rounded-3xl border border-gray-100 dark:border-darkBorder shadow-sm hover:shadow-md transition-all">
+    <div (click)="navigateToReviews()" class="dashboard-stat-card ec-card cursor-pointer flex items-center justify-between p-6 hover:shadow-md transition-all">
       <div>
         <p class="text-sm font-semibold text-mediumGray mb-0">Pending Applications</p>
         <h3 class="text-3xl font-extrabold text-darkGray dark:text-white mt-2 leading-none mb-0">{{ pendingApplicationsCount }}</h3>
@@ -16,7 +16,7 @@
     </div>
 
     <!-- Upcoming Events -->
-    <div (click)="navigateToEvents()" class="dashboard-stat-card cursor-pointer flex items-center justify-between p-6 bg-white dark:bg-darkCard rounded-3xl border border-gray-100 dark:border-darkBorder shadow-sm hover:shadow-md transition-all">
+    <div (click)="navigateToEvents()" class="dashboard-stat-card ec-card cursor-pointer flex items-center justify-between p-6 hover:shadow-md transition-all">
       <div>
         <p class="text-sm font-semibold text-mediumGray mb-0">Upcoming Events</p>
         <h3 class="text-3xl font-extrabold text-darkGray dark:text-white mt-2 leading-none mb-0">{{ upcomingEventsCount }}</h3>
@@ -27,7 +27,7 @@
     </div>
 
     <!-- Club Branches -->
-    <div (click)="navigateToBranches()" class="dashboard-stat-card cursor-pointer flex items-center justify-between p-6 bg-white dark:bg-darkCard rounded-3xl border border-gray-100 dark:border-darkBorder shadow-sm hover:shadow-md transition-all">
+    <div (click)="navigateToBranches()" class="dashboard-stat-card ec-card cursor-pointer flex items-center justify-between p-6 hover:shadow-md transition-all">
       <div>
         <p class="text-sm font-semibold text-mediumGray mb-0">Club Branches</p>
         <h3 class="text-3xl font-extrabold text-darkGray dark:text-white mt-2 leading-none mb-0">{{ branchesCount }}</h3>
@@ -42,7 +42,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-8">
     
     <!-- Left: Applications Awaiting Review -->
-    <div class="lg:col-span-3 bg-white dark:bg-darkCard rounded-3xl border border-gray-100 dark:border-darkBorder p-6 shadow-sm flex flex-col">
+    <div class="lg:col-span-3 ec-card p-6 flex flex-col">
       <div class="flex items-center gap-2 mb-6">
         <i class="fa-regular fa-address-card text-purple-500"></i>
         <h3 class="text-lg font-bold text-darkGray dark:text-white mb-0">Applications Awaiting Review</h3>
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Right: Event Registrations -->
-    <div class="lg:col-span-2 bg-white dark:bg-darkCard rounded-3xl border border-gray-100 dark:border-darkBorder p-6 shadow-sm flex flex-col">
+    <div class="lg:col-span-2 ec-card p-6 flex flex-col">
       <div class="flex items-center gap-2 mb-6">
         <i class="fa-regular fa-calendar-check text-sky-500"></i>
         <h3 class="text-lg font-bold text-darkGray dark:text-white mb-0">Event Registrations</h3>

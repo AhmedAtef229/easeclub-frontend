@@ -53,6 +53,11 @@ export class ClubSettingService {
     });
   }
 
+  // ================= GET ADMIN DASHBOARD =================
+  getAdminDashboard(clubId: string): Observable<any> {
+    return this.http.get<any>(`${this.BASE_URL}/${clubId}/admin-dashboard`);
+  }
+
   // ================= UPDATE CLUB =================
   updateClub(
     id: string,

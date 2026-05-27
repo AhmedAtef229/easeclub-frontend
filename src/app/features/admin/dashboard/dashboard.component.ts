@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout.component';
-import { EventsService } from '../../../core/services/api/events.service';
-import { ApplicationReviewsService } from '../../../core/services/api/application-reviews.service';
+import { ClubSettingService } from '../../../core/services/api/club-setting.service';
 import { BranchService } from '../../../core/services/api/branches.service';
 import { AdminContextService } from '../../../core/services/api/admin-context.service';
 
@@ -43,8 +42,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private eventsService: EventsService,
-    private reviewsService: ApplicationReviewsService,
+    private clubSettingService: ClubSettingService,
     private branchService: BranchService,
     private adminContextService: AdminContextService
   ) {}
@@ -59,54 +57,56 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData() {
-    // 1. Load Pending Applications
-    this.reviewsService.getApplications(this.clubId, 'Submitted', '', '', '', 1, 10).subscribe({
+    this.clubSettingService.getAdminDashboard(this.clubId).subscribe({
       next: (res: any) => {
-        const items = res?.items ?? [];
-        this.pendingApplicationsCount = res?.totalCount ?? items.length;
-        if (items.length > 0) {
-          this.awaitingReviewList = items.slice(0, 4);
+        // 1. Metrics
+        this.pendingApplicationsCount = res?.metrics?.pendingApplicationsCount ?? 12;
+        this.upcomingEventsCount = res?.metrics?.upcomingEventsCount ?? 5;
+        this.branchesCount = res?.metrics?.branchesCount ?? 3;
+
+        // 2. Pending Applications Awaiting Review List
+        const pendingApps = res?.pendingApplications ?? [];
+        if (pendingApps.length > 0) {
+          this.awaitingReviewList = pendingApps.map((app: any) => ({
+            id: app.applicationId,
+            userName: app.applicantName,
+            membershipPlanName: app.planName,
+            submittedAt: app.submittedAt
+          }));
         } else {
           this.awaitingReviewList = this.defaultAwaitingReviews;
-          this.pendingApplicationsCount = 12; // default mock count
         }
-      },
-      error: () => {
-        this.awaitingReviewList = this.defaultAwaitingReviews;
-        this.pendingApplicationsCount = 12;
-      }
-    });
 
-    // 2. Load Upcoming Events
-    this.eventsService.getUpcomingEvents(this.clubId, { page: 1, limit: 10 }).subscribe({
-      next: (res: any) => {
-        const items = res?.items ?? [];
-        this.upcomingEventsCount = res?.totalCount ?? items.length;
-        if (items.length > 0) {
-          this.eventRegistrationsList = items.slice(0, 4);
+        // 3. Event Registrations List
+        const events = res?.eventRegistrations ?? [];
+        if (events.length > 0) {
+          this.eventRegistrationsList = events.map((e: any) => ({
+            id: e.eventId,
+            name: e.eventTitle,
+            registrationsCount: e.registeredCount,
+            capacity: e.maxCapacity,
+            fillPercentage: Math.round(e.fillPercentage)
+          }));
         } else {
           this.eventRegistrationsList = this.defaultEventRegistrations;
-          this.upcomingEventsCount = 5; // default mock count
         }
       },
-      error: () => {
-        this.eventRegistrationsList = this.defaultEventRegistrations;
+      error: (err) => {
+        console.error('Failed to load admin dashboard from backend', err);
+        // Fallback to mocks
+        this.pendingApplicationsCount = 12;
         this.upcomingEventsCount = 5;
-      }
-    });
-
-    // 3. Load Branches
-    this.branchService.getBranches(true).subscribe({
-      next: (branches: any[]) => {
-        this.branchesCount = branches.length || 3;
-      },
-      error: () => {
         this.branchesCount = 3;
+        this.awaitingReviewList = this.defaultAwaitingReviews;
+        this.eventRegistrationsList = this.defaultEventRegistrations;
       }
     });
   }
 
   getCapacityPercent(reg: any): number {
+    if (reg.fillPercentage !== undefined) {
+      return reg.fillPercentage;
+    }
     if (!reg.capacity) return 0;
     return Math.min(100, Math.round((reg.registrationsCount / reg.capacity) * 100));
   }
