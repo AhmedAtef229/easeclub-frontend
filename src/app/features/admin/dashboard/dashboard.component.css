@@ -1,0 +1,12 @@
+.dashboard-stat-card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.py-4\.5 {
+  padding-top: 1.125rem;
+  padding-bottom: 1.125rem;
+}
