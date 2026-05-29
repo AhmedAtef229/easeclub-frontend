@@ -18,6 +18,7 @@ export const MOCK_EVENTS: Event[] = [
     status: 'Published',
     imageUrl: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&auto=format',
     badge: 'Championship',
+    pricingPolicyIds: [],
     ticketTypes: [
       {
         id: 'tt1',
@@ -60,6 +61,7 @@ export const MOCK_EVENTS: Event[] = [
     status: 'Published',
     imageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&auto=format',
     badge: 'Ramadan Special',
+    pricingPolicyIds: [],
     ticketTypes: [
       {
         id: 'tt3',
@@ -102,6 +104,7 @@ export const MOCK_EVENTS: Event[] = [
     status: 'Draft',
     imageUrl: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&auto=format',
     badge: null,
+    pricingPolicyIds: [],
     ticketTypes: [],
   },
   {
@@ -117,6 +120,7 @@ export const MOCK_EVENTS: Event[] = [
     status: 'Draft',
     imageUrl: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&auto=format',
     badge: null,
+    pricingPolicyIds: [],
     ticketTypes: [
       {
         id: 'tt5',
@@ -146,6 +150,7 @@ export const MOCK_EVENTS: Event[] = [
     status: 'Cancelled',
     imageUrl: 'https://images.unsplash.com/photo-1533560904424-a0c61dc306fc?w=800&auto=format',
     badge: null,
+    pricingPolicyIds: [],
     ticketTypes: [],
   },
 ];

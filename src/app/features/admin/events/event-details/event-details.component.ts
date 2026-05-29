@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   Event, TicketType, EventRegistration,
@@ -8,13 +9,15 @@ import {
 import { EventModalComponent } from '../event-modal/event-modal.component';
 import { TicketModalComponent } from '../ticket-modal/ticket-modal.component';
 import { EventsService } from '../../../../core/services/api/events.service';
+import { PricingPoliciesService, PricingPolicy, PolicyAssignment } from '../../../../core/services/api/pricing-policies.service';
+import { BranchService } from '../../../../core/services/api/branches.service';
 
-type Tab = 'tickets' | 'registrations';
+type Tab = 'tickets' | 'registrations' | 'pricing';
 
 @Component({
   selector: 'app-event-details',
   standalone: true,
-  imports: [CommonModule, EventModalComponent, TicketModalComponent],
+  imports: [CommonModule, FormsModule, EventModalComponent, TicketModalComponent],
   templateUrl: './event-details.component.html',
   styleUrls: ['./event-details.component.css'],
 })
@@ -23,6 +26,7 @@ export class EventDetailsComponent implements OnInit {
   registrations: EventRegistration[] = [];
   registrationsLoaded = false;
   eventId = '';
+  clubId = '';
 
   activeTab: Tab = 'tickets';
   expandedRegId: string | null = null;
@@ -38,13 +42,26 @@ export class EventDetailsComponent implements OnInit {
   showConfirmCancelReg = false;
   regToCancel: EventRegistration | null = null;
 
+  // ─── Pricing Tab State ───────────────────────────────────
+  assignedPolicies: PolicyAssignment[] = [];
+  availablePolicies: PricingPolicy[] = [];
+  policiesLoaded = false;
+  showAssignDrawer = false;
+  assigningPolicyId = '';
+  assigningPriority: number = 1;
+  isAssigning = false;
+  assignError = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private eventsService: EventsService
+    private eventsService: EventsService,
+    private pricingService: PricingPoliciesService,
+    private branchService: BranchService
   ) {}
 
   ngOnInit() {
+    this.clubId = this.branchService.getClubId();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.eventId = id;
@@ -98,6 +115,9 @@ export class EventDetailsComponent implements OnInit {
     this.activeTab = tab;
     if (tab === 'registrations' && !this.registrationsLoaded) {
       this.loadRegistrations();
+    }
+    if (tab === 'pricing' && !this.policiesLoaded) {
+      this.loadPolicies();
     }
   }
 
@@ -207,6 +227,100 @@ export class EventDetailsComponent implements OnInit {
       },
       error: (err) => console.error('Failed to cancel registration', err)
     });
+  }
+
+  // ─── Pricing Policies ────────────────────────────────────
+  loadPolicies() {
+    this.pricingService.getAssignments('Event', this.eventId).subscribe({
+      next: (res) => {
+        this.assignedPolicies = res;
+      },
+      error: (err) => console.error('Failed to load assigned policies', err)
+    });
+    this.pricingService.getCompatiblePolicies(this.clubId, 'Event').subscribe({
+      next: (res) => {
+        this.availablePolicies = res;
+        this.policiesLoaded = true;
+      },
+      error: (err) => console.error('Failed to load compatible policies', err)
+    });
+  }
+
+  get unassignedCompatiblePolicies(): PricingPolicy[] {
+    const assignedIds = new Set(this.assignedPolicies.map(a => a.policyId));
+    return this.availablePolicies.filter(p => !assignedIds.has(p.id));
+  }
+
+  openAssignDrawer() {
+    this.assigningPolicyId = '';
+    this.assigningPriority = (this.assignedPolicies.length || 0) + 1;
+    this.assignError = '';
+    this.showAssignDrawer = true;
+  }
+
+  closeAssignDrawer() {
+    this.showAssignDrawer = false;
+    this.assignError = '';
+  }
+
+  doAssignPolicy() {
+    if (!this.assigningPolicyId) { this.assignError = 'Please select a policy.'; return; }
+    if (!this.assigningPriority || this.assigningPriority < 1) { this.assignError = 'Priority must be at least 1.'; return; }
+    this.isAssigning = true;
+    this.assignError = '';
+    this.pricingService.assignPolicies({
+      targetId: this.eventId,
+      targetType: 'Event',
+      priority: this.assigningPriority,
+      policies: [{ policyId: this.assigningPolicyId, priority: this.assigningPriority }]
+    }).subscribe({
+      next: () => {
+        this.isAssigning = false;
+        this.closeAssignDrawer();
+        this.policiesLoaded = false;
+        this.loadPolicies();
+      },
+      error: (err) => {
+        this.isAssigning = false;
+        this.assignError = err?.error?.detail || err?.error?.title || 'Failed to assign policy.';
+      }
+    });
+  }
+
+  doUnassignPolicy(policyId: string) {
+    this.pricingService.unassignPolicy({
+      policyId,
+      targetId: this.eventId,
+      targetType: 'Event'
+    }).subscribe({
+      next: () => {
+        this.assignedPolicies = this.assignedPolicies.filter(a => a.policyId !== policyId);
+      },
+      error: (err) => console.error('Failed to unassign policy', err)
+    });
+  }
+
+  getPolicyEffect(policy: PricingPolicy): string {
+    const direction = policy.isIncrease ? '+' : '-';
+    if (policy.percentageValue != null) return `${direction}${Math.round(policy.percentageValue * 100)}%`;
+    if (policy.fixedAmount != null) return `${direction}EGP ${policy.fixedAmount}`;
+    return direction;
+  }
+
+  getConditionSummary(policy: PricingPolicy): string {
+    if (!policy.conditions?.length) return 'Always applies';
+    return policy.conditions
+      .map(c => {
+        const op = c.operator === 'Equals' ? '=' : c.operator === 'NotEquals' ? '≠'
+          : c.operator === 'GreaterThan' ? '>' : '<';
+        const key = c.fieldKey.replace(/([A-Z])/g, ' $1').trim();
+        return `${key} ${op} ${c.expectedValue}`;
+      })
+      .join(' & ');
+  }
+
+  getPolicyByAssignment(policyId: string): PricingPolicy | null {
+    return this.availablePolicies.find(p => p.id === policyId) ?? null;
   }
 
   // ─── Computed ─────────────────────────────────────

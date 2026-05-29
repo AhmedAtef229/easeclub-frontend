@@ -59,6 +59,7 @@ export interface Event {
   imageUrl: string | null;
   badge: string | null;
   ticketTypes: TicketType[];
+  pricingPolicyIds: string[];
 }
 
 // ---- Create/Edit Command ----
