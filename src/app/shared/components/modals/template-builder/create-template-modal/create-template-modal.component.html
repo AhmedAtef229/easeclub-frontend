@@ -44,10 +44,10 @@
     </div>
 
     <!-- BODY -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
       <!-- SIDEBAR -->
       <div
-        class="w-72 border-r border-gray-200 dark:border-darkBorder p-4 overflow-y-auto bg-cardGray dark:bg-darkBg"
+        class="w-full lg:w-72 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-darkBorder p-4 overflow-y-auto bg-cardGray dark:bg-darkBg shrink-0"
       >
         <div class="text-xs text-mediumGray mb-2">NAVIGATOR</div>
 
@@ -61,7 +61,9 @@
               {{ i + 1 }}. {{ step.title }}
             </div>
 
-            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1 opacity-0 group-hover/step-nav:opacity-100 duration-150">✕</button>
+            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1 opacity-0 group-hover/step-nav:opacity-100 duration-150 flex items-center justify-center">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
 
@@ -126,8 +128,8 @@
 
 
       <!-- CANVAS -->
-      <div class="flex-1 bg-pageBg dark:bg-darkBg p-10 overflow-auto canvas-grid">
-  <div class="w-[520px] mx-auto space-y-6">
+      <div class="flex-1 bg-pageBg dark:bg-darkBg p-4 md:p-10 overflow-auto canvas-grid">
+  <div class="w-full max-w-[520px] mx-auto space-y-6">
     <div
       *ngFor="let step of steps || []; let si = index"
       class="group/step bg-cardGray dark:bg-darkCard rounded-xl border p-5 transition-all duration-150"
@@ -177,7 +179,7 @@
 
             <span
               *ngIf="section.repeatable"
-              class="text-[10px] bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300 px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
+              class="text-[10px] bg-primary/10 text-primary dark:bg-primary/20 dark:text-darkSecondary px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
             >
               Repeatable
             </span>

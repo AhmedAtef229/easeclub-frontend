@@ -26,7 +26,7 @@ import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dia
 })
 export class AdminLayoutComponent {
 
-  isSidebarOpen = false;
+  isSidebarOpen = window.innerWidth >= 1024;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
