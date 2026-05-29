@@ -70,6 +70,12 @@ export class ApplicationTemplatesComponent implements OnInit {
     },
 
     {
+      key: 'supportsFamilyPlans',
+      label: 'Family Support',
+      type: 'boolean',
+    },
+
+    {
       key: 'isActive',
       label: 'Status',
       type: 'status',
@@ -115,6 +121,8 @@ export class ApplicationTemplatesComponent implements OnInit {
             plans: item.connectedMembershipPlans || [],
 
             isActive: item.isActive,
+
+            supportsFamilyPlans: item.supportsFamilyPlans,
 
             lastModified: this.formatDate(item.lastModified),
           }));
