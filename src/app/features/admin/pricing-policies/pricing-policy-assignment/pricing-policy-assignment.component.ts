@@ -4,14 +4,37 @@ import { FormsModule } from '@angular/forms';
 import { PricingPoliciesService, PricingPolicy, PolicyAssignment } from '../../../../core/services/api/pricing-policies.service';
 import { ApplicationTemplateService } from '../../../../core/services/api/application-templates.service';
 import { BranchService } from '../../../../core/services/api/branches.service';
+import { FormDropdownComponent } from '../../../../shared/components/form-dropdown/form-dropdown.component';
 
 @Component({
   selector: 'app-pricing-policy-assignment',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormDropdownComponent],
   templateUrl: './pricing-policy-assignment.component.html',
 })
 export class PricingPolicyAssignmentComponent implements OnInit {
+
+  get templateDropdownOptions() {
+    return [
+      { value: '', label: '— Select a Template —' },
+      ...this.templates.map(t => ({ value: t.id, label: t.name }))
+    ];
+  }
+
+  get compatiblePoliciesDropdownOptions() {
+    return [
+      { value: '', label: '— Choose a rule —' },
+      ...this.unassignedCompatiblePolicies.map(p => {
+        const effect = p.isIncrease ? '▲ Increase' : '▼ Discount';
+        const detail = p.percentageValue != null ? `(${(p.percentageValue * 100).toFixed(0)}%)` :
+                       p.fixedAmount != null ? `(EGP ${p.fixedAmount})` : '';
+        return {
+          value: p.id,
+          label: `${p.name} | ${effect} ${detail}`
+        };
+      })
+    ];
+  }
   clubId!: string;
   templates: any[] = [];
   selectedTemplateId = '';

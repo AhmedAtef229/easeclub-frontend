@@ -1,14 +1,27 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FormDropdownComponent } from '../../form-dropdown/form-dropdown.component';
 
 @Component({
   selector: 'app-create-policy-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FormDropdownComponent],
   templateUrl: './create-policy-modal.component.html',
 })
 export class CreatePolicyModalComponent {
+
+  multiplierSourceOptions = [
+    { value: 'BaseFee', label: 'Base Fee' },
+    { value: 'Total', label: 'Total' }
+  ];
+
+  operatorOptions = [
+    { value: 'Equals', label: 'Equals' },
+    { value: 'NotEquals', label: 'Not Equals' },
+    { value: 'GreaterThan', label: 'Greater Than' },
+    { value: 'LessThan', label: 'Less Than' }
+  ];
 
   /* ================= MODE ================= */
   @Input() mode: 'create' | 'edit' = 'create';

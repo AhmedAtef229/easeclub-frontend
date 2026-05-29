@@ -12,16 +12,33 @@ import { EventsService } from '../../../../core/services/api/events.service';
 import { PricingPoliciesService, PricingPolicy, PolicyAssignment } from '../../../../core/services/api/pricing-policies.service';
 import { BranchService } from '../../../../core/services/api/branches.service';
 
+import { FormDropdownComponent } from '../../../../shared/components/form-dropdown/form-dropdown.component';
+
 type Tab = 'tickets' | 'registrations' | 'pricing';
 
 @Component({
   selector: 'app-event-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, EventModalComponent, TicketModalComponent],
+  imports: [CommonModule, FormsModule, EventModalComponent, TicketModalComponent, FormDropdownComponent],
   templateUrl: './event-details.component.html',
   styleUrls: ['./event-details.component.css'],
 })
 export class EventDetailsComponent implements OnInit {
+
+  get compatiblePoliciesDropdownOptions() {
+    return [
+      { value: '', label: '— Choose a policy —' },
+      ...this.unassignedCompatiblePolicies.map(p => {
+        const effect = p.isIncrease ? '▲ Increase' : '▼ Discount';
+        const detail = p.percentageValue != null ? `(${(p.percentageValue * 100).toFixed(0)}%)` :
+                       p.fixedAmount != null ? `(EGP ${p.fixedAmount})` : '';
+        return {
+          value: p.id,
+          label: `${p.name} | ${effect} ${detail}`
+        };
+      })
+    ];
+  }
   event: Event | null = null;
   registrations: EventRegistration[] = [];
   registrationsLoaded = false;
