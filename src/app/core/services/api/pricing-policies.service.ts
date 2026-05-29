@@ -27,6 +27,21 @@ export class PricingPoliciesService {
     );
   }
 
+  /**
+   * Returns only policies compatible with the given target type.
+   * For events: ?compatibleWith=Event
+   * For templates: ?compatibleWith=ApplicationTemplate&compatibleWithTargetId={templateId}
+   */
+  getCompatiblePolicies(
+    clubId: string,
+    targetType: 'Event' | 'ApplicationTemplate',
+    targetId?: string
+  ): Observable<PricingPolicy[]> {
+    let url = `${BASE_URL}/clubs/${clubId}/pricing-policies?compatibleWith=${targetType}`;
+    if (targetId) url += `&compatibleWithTargetId=${targetId}`;
+    return this.http.get<PricingPolicy[]>(url);
+  }
+
   /* ================= GET BY ID ================= */
 
   getPolicyById(id: string): Observable<PricingPolicy> {
@@ -73,8 +88,8 @@ export class PricingPoliciesService {
 
   /* ================= GET ASSIGNMENTS ================= */
 
-  getAssignments(targetType: string, targetId: string): Observable<any> {
-    return this.http.get(
+  getAssignments(targetType: string, targetId: string): Observable<PolicyAssignment[]> {
+    return this.http.get<PolicyAssignment[]>(
       `${BASE_URL}/pricing-policies/${targetType}/targets/${targetId}/assignments`
     );
   }
@@ -144,4 +159,15 @@ export interface UnassignPolicyDto {
   policyId: string;
   targetId: string;
   targetType: 'ApplicationTemplate' | 'Event';
+}
+
+/* ================= ASSIGNMENT (response) ================= */
+
+export interface PolicyAssignment {
+  id: string;
+  policyId: string;
+  policyName: string;
+  targetId: string;
+  targetType: 'ApplicationTemplate' | 'Event';
+  priority?: number;
 }

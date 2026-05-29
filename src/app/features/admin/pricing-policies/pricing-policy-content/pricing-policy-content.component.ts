@@ -30,9 +30,8 @@ export class PricingPolicyContentComponent implements OnInit {
   search = '';
 
   columns: TableColumn[] = [
-    { key: 'name', label: 'Policy Name' },
-    { key: 'effect', label: 'Effect' },
-    { key: 'value', label: 'Value' },
+    { key: 'name', label: 'Policy Name', type: 'policy-name' },
+    { key: 'compatibility', label: 'Compatibility', type: 'badge' },
     { key: 'conditions', label: 'Conditions' },
   ];
 
@@ -52,17 +51,15 @@ export class PricingPolicyContentComponent implements OnInit {
           id: item.id,
           name: item.name,
 
-          // Effect
-          effect: item.isIncrease ? 'Increase' : 'Discount',
-
-          // Value
-          value: this.getValue(item),
+          // Compatibility badge list
+          compatibility: this.getCompatibility(item),
 
           // Conditions count
-          conditions: `${item.conditions?.length || 0} Condition`,
+          conditions: `${item.conditions?.length || 0} Condition${item.conditions?.length === 1 ? '' : 's'}`,
 
           // Keep original data for editing
-          originalData: item
+          originalData: item,
+          value: this.getValue(item)
         }));
 
         this.applyFilter();
@@ -75,9 +72,41 @@ export class PricingPolicyContentComponent implements OnInit {
 
   /* ================= HELPERS ================= */
 
+  getCompatibility(item: any): string[] {
+    const eventKeys = new Set([
+      'attendeecategory',
+      'requiresmembership',
+      'ticketbaseprice',
+      'attendeeage',
+      'attendeegender',
+      'attendeecount'
+    ]);
+
+    const requiredKeys: string[] = [];
+    if (item.conditions) {
+      item.conditions.forEach((c: any) => {
+        if (c.fieldKey) requiredKeys.push(c.fieldKey.toLowerCase());
+      });
+    }
+    if (item.multiplierSourceKey) {
+      requiredKeys.push(item.multiplierSourceKey.toLowerCase());
+    }
+
+    if (requiredKeys.length === 0) {
+      return ['Event', 'Template'];
+    }
+
+    const allKeysAreEventKeys = requiredKeys.every(k => eventKeys.has(k));
+    if (allKeysAreEventKeys) {
+      return ['Event', 'Template'];
+    } else {
+      return ['Template Only'];
+    }
+  }
+
   getValue(item: any): string {
-    if (item.percentageValue) return `${item.percentageValue}%`;
-    if (item.fixedAmount) return `$${item.fixedAmount}`;
+    if (item.percentageValue != null) return `${item.percentageValue * 100}%`;
+    if (item.fixedAmount != null) return `${item.fixedAmount} EGP`;
     return '-';
   }
 
@@ -125,7 +154,7 @@ openEdit(row: any) {
     type: item.isIncrease ? 'increase' : 'discount',
     method: item.percentageValue ? 'percentage' : 'fixed',
     amount: item.fixedAmount,
-    percentage: item.percentageValue,
+    percentage: item.percentageValue ? item.percentageValue * 100 : null,
     multiplierSource: item.multiplierSourceKey || 'BaseFee',
     conditions: item.conditions ? item.conditions.map((c: any) => ({
       field: c.fieldKey,
@@ -145,7 +174,7 @@ onSavePolicy(data: any) {
     priority: 1, // Default priority
     isIncrease: data.type === 'increase',
     fixedAmount: data.method === 'fixed' ? data.amount : undefined,
-    percentageValue: data.method === 'percentage' ? data.percentage : undefined,
+    percentageValue: data.method === 'percentage' ? (data.percentage / 100) : undefined,
     multiplierKey: data.method === 'percentage' ? data.multiplierSource : undefined,
     conditions: data.conditions ? data.conditions.map((c: any) => ({
       fieldKey: c.field,
@@ -176,4 +205,31 @@ onSavePolicy(data: any) {
     });
   }
 }
+
+  showViewModal = false;
+  viewingPolicy: any = null;
+
+  openView(row: any) {
+    this.viewingPolicy = row.originalData;
+    this.showViewModal = true;
+  }
+
+  closeView() {
+    this.showViewModal = false;
+    this.viewingPolicy = null;
+  }
+
+  getConditionSummary(c: any): string {
+    return `${c.fieldKey} ${this.formatOperator(c.operator)} "${c.expectedValue}"`;
+  }
+
+  formatOperator(op: string): string {
+    switch (op) {
+      case 'Equals': return '=';
+      case 'NotEquals': return '!=';
+      case 'GreaterThan': return '>';
+      case 'LessThan': return '<';
+      default: return op;
+    }
+  }
 }
