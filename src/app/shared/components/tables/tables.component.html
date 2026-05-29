@@ -109,6 +109,24 @@
               </div>
             </ng-container>
 
+            <!-- Policy Name with Effect Badge -->
+            <ng-container *ngIf="col?.type === 'policy-name'">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-semibold text-darkGray dark:text-white">
+                  {{ row?.[col.key] ?? '-' }}
+                </span>
+                <span
+                  *ngIf="row?.originalData"
+                  class="text-xs font-bold px-2 py-0.5 rounded-full"
+                  [ngClass]="row.originalData.isIncrease
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'
+                    : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'"
+                >
+                  {{ row.originalData.isIncrease ? '+' : '-' }}{{ row.value }}
+                </span>
+              </div>
+            </ng-container>
+
             <!-- Text -->
             <ng-container *ngIf="!col?.type || col?.type === 'text'">
               <span [ngClass]="first ? 'font-semibold text-darkGray dark:text-white' : 'text-mediumGray dark:text-gray-400'">
