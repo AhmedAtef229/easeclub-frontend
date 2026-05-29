@@ -54,7 +54,7 @@
           <!-- Approve -->
           <button
             (click)="openApproveConfirm()"
-            class="px-4 h-9 rounded-xl bg-cyan-500 hover:bg-cyan-600
+            class="px-4 h-9 rounded-xl bg-primary hover:bg-primaryHover
                    text-white font-semibold text-xs transition">
             ✓ Approve
           </button>
@@ -463,7 +463,7 @@
                 type="button"
                 [disabled]="submitting"
                 (click)="submitReview('Approved')"
-                class="px-5 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
+                class="px-5 py-2.5 rounded-2xl bg-primary hover:bg-primaryHover text-white transition disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5"
               >
                 <span *ngIf="submitting" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 Approve
