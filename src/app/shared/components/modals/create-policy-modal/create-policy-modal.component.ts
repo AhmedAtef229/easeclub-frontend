@@ -23,6 +23,22 @@ export class CreatePolicyModalComponent {
     { value: 'LessThan', label: 'Less Than' }
   ];
 
+  targetTypeOptions = [
+    { value: 'Event', label: 'Event' },
+    { value: 'Template', label: 'Application Template' }
+  ];
+
+  eventFieldKeyOptions = [
+    { value: 'attendeeCategory', label: 'Attendee Category' },
+    { value: 'ticketBasePrice', label: 'Ticket Base Price' },
+    { value: 'attendeeAge', label: 'Attendee Age' },
+    { value: 'attendeeGender', label: 'Attendee Gender' },
+    { value: 'attendeeCount', label: 'Attendee Count' },
+    { value: 'guestCount', label: 'Guest Count' },
+    { value: 'familyMemberCount', label: 'Family Member Count' },
+    { value: 'isMember', label: 'Is Member' },
+  ];
+
   /* ================= MODE ================= */
   @Input() mode: 'create' | 'edit' = 'create';
 
@@ -36,6 +52,7 @@ export class CreatePolicyModalComponent {
   form: any = {
     name: '',
     type: 'discount', // discount | increase
+    targetType: 'Event', // Event | Template
     method: 'fixed',  // fixed | percentage
     amount: null,
     percentage: null,

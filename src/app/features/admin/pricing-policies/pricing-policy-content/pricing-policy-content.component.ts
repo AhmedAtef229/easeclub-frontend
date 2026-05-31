@@ -74,12 +74,9 @@ export class PricingPolicyContentComponent implements OnInit {
 
   getCompatibility(item: any): string[] {
     const eventKeys = new Set([
-      'attendeecategory',
-      'requiresmembership',
-      'ticketbaseprice',
-      'attendeeage',
-      'attendeegender',
-      'attendeecount'
+      'attendeecategory', 'ticketbaseprice', 'attendeeage',
+      'attendeegender', 'attendeecount', 'guestcount',
+      'familymembercount', 'ismember'
     ]);
 
     const requiredKeys: string[] = [];
@@ -148,10 +145,23 @@ openEdit(row: any) {
   
   // Map original API data to match the form structure in the modal
   const item = row.originalData;
+
+  // Detect target type from condition field keys
+  const eventKeys = new Set([
+    'attendeecategory', 'requiresmembership', 'ticketbaseprice',
+    'attendeeage', 'attendeegender', 'attendeecount',
+    'guestcount', 'familymembercount', 'ismember'
+  ]);
+  const conditionKeys: string[] = (item.conditions || []).map((c: any) => c.fieldKey?.toLowerCase());
+  const multiplierKey = item.multiplierSourceKey?.toLowerCase();
+  const allKeys = multiplierKey ? [...conditionKeys, multiplierKey] : conditionKeys;
+  const isEventTarget = allKeys.length === 0 || allKeys.every((k: string) => eventKeys.has(k));
+
   this.selectedPolicy = {
     id: item.id,
     name: item.name,
     type: item.isIncrease ? 'increase' : 'discount',
+    targetType: isEventTarget ? 'Event' : 'Template',
     method: item.percentageValue ? 'percentage' : 'fixed',
     amount: item.fixedAmount,
     percentage: item.percentageValue ? item.percentageValue * 100 : null,
