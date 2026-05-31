@@ -20,7 +20,9 @@
   [columns]="columns"
   [data]="filteredData"
   [showActions]="true"
- (edit)="openEdit($event)"
+  [showView]="true"
+  (edit)="openEdit($event)"
+  (view)="openView($event)"
 ></app-tables>
 <app-create-policy-modal
   *ngIf="showModal"
@@ -29,3 +31,89 @@
   (close)="showModal = false"
   (save)="onSavePolicy($event)"
 ></app-create-policy-modal>
+
+<!-- VIEW DETAILS MODAL -->
+<div *ngIf="showViewModal && viewingPolicy" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+  <div class="w-full max-w-md bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder rounded-2xl shadow-xl flex flex-col overflow-hidden animate-slide-up">
+    <!-- Header -->
+    <div class="flex justify-between items-start p-6 pb-3 border-b border-gray-100 dark:border-darkBorder/60">
+      <div>
+        <h3 class="text-lg font-bold text-darkGray dark:text-white leading-tight">
+          {{ viewingPolicy.name }}
+        </h3>
+        <p class="text-xs text-mediumGray mt-0.5">Pricing Rule Details</p>
+      </div>
+      <button (click)="closeView()" class="text-mediumGray hover:text-darkGray dark:hover:text-white transition-colors">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[70vh]">
+      <!-- Calculation -->
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs font-semibold text-mediumGray">Price Adjustment</span>
+        <div class="flex items-center gap-2">
+          <span
+            class="text-xs font-bold px-2.5 py-1 rounded-full shrink-0"
+            [ngClass]="viewingPolicy.isIncrease
+              ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'
+              : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'"
+          >
+            {{ viewingPolicy.isIncrease ? 'Increase' : 'Discount' }}
+          </span>
+          <span class="text-sm font-bold text-darkGray dark:text-white">
+            {{ getValue(viewingPolicy) }}
+          </span>
+          <span *ngIf="viewingPolicy.multiplierSourceKey" class="text-xs text-mediumGray">
+            (applied to {{ viewingPolicy.multiplierSourceKey }})
+          </span>
+        </div>
+      </div>
+
+      <!-- Compatibility -->
+      <div class="flex flex-col gap-1.5">
+        <span class="text-xs font-semibold text-mediumGray">Compatibility Scope</span>
+        <div class="flex gap-2">
+          <span
+            *ngFor="let target of getCompatibility(viewingPolicy)"
+            class="px-2 py-0.5 rounded bg-primary/10 text-primary dark:bg-darkPrimary/20 dark:text-darkPrimary text-xs font-semibold"
+          >
+            {{ target }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="flex flex-col gap-2">
+        <span class="text-xs font-semibold text-mediumGray">Conditions Details</span>
+        
+        <!-- Empty Conditions -->
+        <div *ngIf="!viewingPolicy.conditions || viewingPolicy.conditions.length === 0" class="p-4 rounded-xl border border-dashed border-gray-200 dark:border-darkBorder text-center text-xs text-mediumGray">
+          <i class="fa-solid fa-circle-info mb-1 block text-base opacity-40"></i>
+          Applies to all registrations unconditionally.
+        </div>
+
+        <!-- Conditions List -->
+        <div *ngIf="viewingPolicy.conditions && viewingPolicy.conditions.length > 0" class="flex flex-col gap-2">
+          <div
+            *ngFor="let cond of viewingPolicy.conditions"
+            class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border border-gray-100 dark:border-darkBorder/60 bg-gray-50/50 dark:bg-darkBg text-xs text-darkGray dark:text-white"
+          >
+            <i class="fa-solid fa-code text-primary shrink-0 opacity-80"></i>
+            <span class="font-mono bg-white dark:bg-darkCard px-1.5 py-0.5 rounded border border-gray-150 dark:border-darkBorder/50 font-semibold">{{ cond.fieldKey }}</span>
+            <span class="font-bold text-primary">{{ formatOperator(cond.operator) }}</span>
+            <span class="font-mono bg-white dark:bg-darkCard px-1.5 py-0.5 rounded border border-gray-150 dark:border-darkBorder/50 font-semibold">"{{ cond.expectedValue }}"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="p-6 pt-3 border-t border-gray-100 dark:border-darkBorder/60 bg-gray-50/50 dark:bg-darkCard flex justify-end">
+      <button (click)="closeView()" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-250 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg text-xs font-semibold transition-all">
+        Close Details
+      </button>
+    </div>
+  </div>
+</div>

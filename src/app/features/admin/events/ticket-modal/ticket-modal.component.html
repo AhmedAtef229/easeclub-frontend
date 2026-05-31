@@ -95,23 +95,7 @@
           />
         </div>
 
-        <!-- Requires Membership Toggle -->
-        <label class="flex items-center gap-3 cursor-pointer group">
-          <div class="relative flex items-center">
-            <input
-              type="checkbox"
-              formControlName="requiresMembership"
-              class="w-5 h-5 rounded-lg border-2 border-gray-200 dark:border-darkBorder
-                     appearance-none checked:bg-primary checked:border-primary transition-all cursor-pointer"
-            />
-            <i class="fa-solid fa-check absolute left-0.5 text-white text-[10px]
-                      opacity-0 pointer-events-none"
-               [ngClass]="{ 'opacity-100': form.get('requiresMembership')?.value }"></i>
-          </div>
-          <span class="text-sm font-medium text-darkGray dark:text-white group-hover:text-primary transition-colors">
-            Requires active membership
-          </span>
-        </label>
+
 
         <!-- Age Restriction -->
         <div>

@@ -22,6 +22,10 @@ export class CreateTemplateModalComponent implements OnInit {
 
   templateName = 'Standard Membership Application';
 
+  hasConnectedFamilyPlan = false;
+  connectedFamilyPlanName: string | null = null;
+  maxFamilyMembersOfConnectedPlan: number | null = null;
+
   fieldTypeDropdownOptions = [
     { value: 'text', label: 'Short Text' },
     { value: 'number', label: 'Number' },
@@ -264,6 +268,9 @@ export class CreateTemplateModalComponent implements OnInit {
   ngOnInit(): void {
     if (this.initialData) {
       this.templateName = this.initialData.name;
+      this.hasConnectedFamilyPlan = this.initialData.hasConnectedFamilyPlan || false;
+      this.connectedFamilyPlanName = this.initialData.connectedFamilyPlanName || null;
+      this.maxFamilyMembersOfConnectedPlan = this.initialData.maxFamilyMembersOfConnectedPlan || null;
 
       this.steps = (this.initialData.steps || []).map((step: any) => ({
         ...step,
@@ -545,6 +552,15 @@ export class CreateTemplateModalComponent implements OnInit {
   }
 
   addFamilySection() {
+    const hasFamilySection = this.steps.some(step =>
+      (step.sections || []).some((sec: any) => sec.intent === 'FamilyMembers' || sec.system === true)
+    );
+
+    if (hasFamilySection) {
+      alert('Only one family section is allowed per template.');
+      return;
+    }
+
     const currentStep = this.steps[this.selectedStepIndex];
 
     if (!currentStep) {
@@ -754,6 +770,12 @@ export class CreateTemplateModalComponent implements OnInit {
   }
 
   deleteSection(index: number) {
+    const section = this.steps[this.selectedStepIndex].sections[index];
+    if (section.system && this.hasConnectedFamilyPlan) {
+      alert(`Cannot delete family section. This template is connected to plan "${this.connectedFamilyPlanName}" which requires it.`);
+      return;
+    }
+
     this.steps[this.selectedStepIndex].sections.splice(index, 1);
 
     this.selectedType = null;

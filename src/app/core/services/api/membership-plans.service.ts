@@ -20,6 +20,7 @@ export interface MembershipPlan {
   createdAt: string;
   enrollmentMode?: string;
   paymentMode?: string;
+  installmentsAllowdInRenewal?: boolean;
   installmentsAllowedInRenewal?: boolean;
   installmentTemplateIds?: string[];
 }

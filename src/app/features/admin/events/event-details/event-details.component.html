@@ -140,9 +140,9 @@
         <!-- Capacity Progress -->
         <div class="pt-2 border-t border-gray-100 dark:border-darkBorder">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-darkGray dark:text-white">Capacity</span>
+            <span class="text-sm font-semibold text-darkGray dark:text-white">Tickets Sold</span>
             <span class="text-sm font-bold text-primary dark:text-darkPrimary">
-              {{ event.registrationsCount }} / {{ event.capacity }}
+              {{ event.capacity - event.remainingCapacity }} / {{ event.capacity }}
             </span>
           </div>
           <div class="h-2.5 bg-gray-200 dark:bg-darkBorder rounded-full overflow-hidden">
@@ -186,6 +186,18 @@
           <span class="ml-1.5 bg-primary/10 text-primary dark:bg-primary/20 dark:text-darkPrimary
                        text-xs font-bold px-2 py-0.5 rounded-full">
             {{ event.registrationsCount }}
+          </span>
+        </button>
+        <button
+          (click)="switchTab('pricing')"
+          class="tab-btn"
+          [ngClass]="{ 'active-tab': activeTab === 'pricing' }"
+        >
+          <i class="fa-solid fa-tag mr-2"></i>Pricing
+          <span *ngIf="assignedPolicies.length > 0"
+                class="ml-1.5 bg-primary/10 text-primary dark:bg-primary/20 dark:text-darkPrimary
+                       text-xs font-bold px-2 py-0.5 rounded-full">
+            {{ assignedPolicies.length }}
           </span>
         </button>
       </div>
@@ -386,7 +398,7 @@
             <!-- Attendees Expandable -->
             <div *ngIf="expandedRegId === reg.id"
                  class="px-6 pb-4 attendees-expand">
-              <div class="bg-gray-50 dark:bg-darkBorder/30 rounded-2xl overflow-hidden">
+              <div class="bg-gray-50 dark:bg-darkBorder/30 rounded-2xl overflow-x-auto w-full">
                 <table class="w-full text-xs">
                   <thead>
                     <tr class="border-b border-gray-200 dark:border-darkBorder">
@@ -415,6 +427,93 @@
           </div>
         </div>
       </div>
+
+      <!-- ─── Tab: Pricing Policies ─── -->
+      <div *ngIf="activeTab === 'pricing'" class="p-6 flex flex-col gap-4 flex-1">
+
+        <!-- Header row -->
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-darkGray dark:text-white">
+            Assigned Pricing Policies
+          </h3>
+          <button
+            (click)="openAssignDrawer()"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold
+                   hover:bg-primary/90 transition-all"
+          >
+            <i class="fa-solid fa-plus"></i> Assign Policy
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="!policiesLoaded" class="py-12 text-center text-mediumGray">
+          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+          <p class="text-sm">Loading policies...</p>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="policiesLoaded && assignedPolicies.length === 0"
+             class="py-12 flex flex-col items-center gap-3 text-mediumGray">
+          <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-darkBorder flex items-center justify-center">
+            <i class="fa-solid fa-tag text-xl opacity-40"></i>
+          </div>
+          <p class="text-sm font-medium">No pricing policies assigned yet.</p>
+          <p class="text-xs text-center max-w-xs">
+            Assign policies to automatically apply discounts or surcharges during registration.
+          </p>
+        </div>
+
+        <!-- Policy List -->
+        <div *ngIf="policiesLoaded && assignedPolicies.length > 0" class="flex flex-col gap-3">
+          <div
+            *ngFor="let assignment of assignedPolicies"
+            class="group flex items-start gap-3 p-4 rounded-2xl border border-gray-200 dark:border-darkBorder
+                   bg-white dark:bg-darkCard hover:border-primary/30 dark:hover:border-darkPrimary/30
+                   transition-all duration-150"
+          >
+            <!-- Priority badge -->
+            <div class="w-8 h-8 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0">
+              <span class="text-xs font-bold text-primary dark:text-darkPrimary">{{ assignment.priority ?? '—' }}</span>
+            </div>
+
+            <!-- Policy info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-semibold text-sm text-darkGray dark:text-white">
+                  {{ assignment.policyName }}
+                </span>
+                <!-- Effect notice beside name -->
+                <span
+                  *ngIf="getPolicyByAssignment(assignment.policyId) as pol"
+                  class="text-xs font-bold px-2 py-0.5 rounded-full"
+                  [ngClass]="pol.isIncrease
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400'
+                    : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'"
+                >
+                  {{ getPolicyEffect(pol) }}
+                </span>
+              </div>
+              <!-- Condition summary -->
+              <p
+                *ngIf="getPolicyByAssignment(assignment.policyId) as pol"
+                class="text-xs text-mediumGray mt-0.5"
+              >{{ getConditionSummary(pol) }}</p>
+            </div>
+
+            <!-- Remove button -->
+            <button
+              (click)="doUnassignPolicy(assignment.policyId)"
+              class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0
+                     text-mediumGray hover:bg-red-50 dark:hover:bg-red-900/20
+                     hover:text-red-500 dark:hover:text-red-400 transition-all
+                     opacity-0 group-hover:opacity-100"
+              title="Remove policy"
+            >
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -428,12 +527,106 @@
   </div>
 </ng-template>
 
+<!-- ═══════════════════ ASSIGN POLICY DRAWER ═══════════════════ -->
+<div
+  *ngIf="showAssignDrawer"
+  class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end"
+>
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" (click)="closeAssignDrawer()"></div>
+
+  <!-- Drawer panel -->
+  <div class="relative z-10 bg-white dark:bg-darkCard border border-gray-200 dark:border-darkBorder
+              rounded-t-3xl sm:rounded-3xl shadow-2xl w-full sm:max-w-sm sm:mr-4 p-6 flex flex-col gap-5
+              animate-slide-up">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-bold text-darkGray dark:text-white">Assign Pricing Policy</h3>
+        <p class="text-xs text-mediumGray mt-0.5">Only compatible policies are shown</p>
+      </div>
+      <button
+        (click)="closeAssignDrawer()"
+        class="w-8 h-8 rounded-xl flex items-center justify-center text-mediumGray
+               hover:bg-gray-100 dark:hover:bg-darkBorder transition-all"
+      >
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Policy Select -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold text-darkGray dark:text-white">Select Policy</label>
+      <app-form-dropdown
+        [(ngModel)]="assigningPolicyId"
+        [options]="compatiblePoliciesDropdownOptions"
+        placeholder="— Choose a policy —"
+      ></app-form-dropdown>
+
+      <!-- No compatible policies available -->
+      <p *ngIf="unassignedCompatiblePolicies.length === 0"
+         class="text-xs text-amber-500 dark:text-amber-400 mt-1">
+        <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+        No compatible policies available. Create event-compatible policies from the Pricing Policies page.
+      </p>
+    </div>
+
+    <!-- Priority Input -->
+    <div class="flex flex-col gap-1.5">
+      <label class="text-xs font-semibold text-darkGray dark:text-white">
+        Priority
+        <span class="font-normal text-mediumGray ml-1">(lower = applied first)</span>
+      </label>
+      <input
+        type="number"
+        [(ngModel)]="assigningPriority"
+        min="1"
+        class="w-full rounded-xl border border-gray-200 dark:border-darkBorder
+               bg-gray-50 dark:bg-darkBorder text-sm text-darkGray dark:text-white
+               px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+      />
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="assignError"
+         class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 dark:bg-red-900/20
+                border border-red-100 dark:border-red-900/40 text-red-500 dark:text-red-400 text-xs">
+      <i class="fa-solid fa-circle-exclamation shrink-0"></i>
+      <span>{{ assignError }}</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex gap-3 pt-1">
+      <button
+        (click)="closeAssignDrawer()"
+        class="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-darkBorder
+               text-sm font-semibold text-darkGray dark:text-white
+               hover:bg-gray-50 dark:hover:bg-darkBorder transition-all"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="doAssignPolicy()"
+        [disabled]="isAssigning || !assigningPolicyId"
+        class="flex-1 py-2.5 rounded-xl bg-primary text-white text-sm font-bold
+               hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all
+               flex items-center justify-center gap-2"
+      >
+        <i *ngIf="isAssigning" class="fa-solid fa-spinner fa-spin"></i>
+        <span>{{ isAssigning ? 'Assigning...' : 'Assign' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════ MODALS ═══════════════════ -->
 
 <!-- Edit Event Modal -->
 <app-event-modal
   *ngIf="showEditModal"
   [event]="event"
+  [error]="editError"
   (close)="closeEditModal()"
   (save)="onEditSave($event)"
 ></app-event-modal>

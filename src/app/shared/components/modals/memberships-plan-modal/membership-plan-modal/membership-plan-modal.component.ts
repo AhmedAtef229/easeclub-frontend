@@ -34,7 +34,12 @@ export class MembershipPlanModalComponent implements OnInit {
   }
 
   get applicationTemplateOptions() {
-    return this.applicationTemplates.map(t => ({ value: t.id, label: t.name }));
+    const maxFamily = +(this.form?.get('maxFamilyMembers')?.value) || 0;
+    let templates = this.applicationTemplates;
+    if (maxFamily > 0) {
+      templates = templates.filter((t: any) => t.supportsFamilyPlans === true);
+    }
+    return templates.map((t: any) => ({ value: t.id, label: t.name }));
   }
 
   constructor(
@@ -76,6 +81,11 @@ export class MembershipPlanModalComponent implements OnInit {
       this.handleEnrollmentModeChange(mode);
     });
 
+    // Live-validate template compatibility on any form value change
+    this.form.valueChanges.subscribe(() => {
+      this.validateTemplateCompatibility();
+    });
+
     // Initialize state
     const initialMode = this.form.get('enrollmentMode')?.value;
     if (initialMode) {
@@ -112,7 +122,41 @@ export class MembershipPlanModalComponent implements OnInit {
 
     this.applicationTemplateService.getTemplates(this.clubId).subscribe((res: any) => {
       this.applicationTemplates = res?.items || res || [];
+      // Re-validate after templates are loaded
+      this.validateTemplateCompatibility();
     });
+  }
+
+  validateTemplateCompatibility() {
+    const templateControl = this.form.get('applicationTemplateId');
+    if (!templateControl) return;
+
+    const maxFamily = +(this.form.get('maxFamilyMembers')?.value) || 0;
+    const selectedTemplateId = templateControl.value;
+
+    if (!selectedTemplateId || maxFamily === 0) {
+      // Remove error if no mismatch condition
+      if (templateControl.hasError('requiresFamilySupport')) {
+        const errors = { ...templateControl.errors };
+        delete errors['requiresFamilySupport'];
+        templateControl.setErrors(Object.keys(errors).length ? errors : null);
+      }
+      return;
+    }
+
+    const selectedTemplate = this.applicationTemplates.find((t: any) => t.id === selectedTemplateId);
+    if (selectedTemplate && selectedTemplate.supportsFamilyPlans === false) {
+      templateControl.setErrors({
+        ...(templateControl.errors || {}),
+        requiresFamilySupport: true,
+      });
+    } else {
+      if (templateControl.hasError('requiresFamilySupport')) {
+        const errors = { ...templateControl.errors };
+        delete errors['requiresFamilySupport'];
+        templateControl.setErrors(Object.keys(errors).length ? errors : null);
+      }
+    }
   }
 
   toggleTemplate(id: string) {

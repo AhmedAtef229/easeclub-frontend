@@ -70,6 +70,12 @@ export class ApplicationTemplatesComponent implements OnInit {
     },
 
     {
+      key: 'supportsFamilyPlans',
+      label: 'Family Support',
+      type: 'boolean',
+    },
+
+    {
       key: 'isActive',
       label: 'Status',
       type: 'status',
@@ -115,6 +121,8 @@ export class ApplicationTemplatesComponent implements OnInit {
             plans: item.connectedMembershipPlans || [],
 
             isActive: item.isActive,
+
+            supportsFamilyPlans: item.supportsFamilyPlans,
 
             lastModified: this.formatDate(item.lastModified),
           }));
@@ -168,6 +176,17 @@ export class ApplicationTemplatesComponent implements OnInit {
 
   closeConnectionsModal(): void {
     this.showConnectionsModal = false;
+  }
+
+  // =========================================================
+  // TOGGLE STATUS
+  // =========================================================
+
+  onToggleStatus(row: any): void {
+    this.service.toggleStatus(row.id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('❌ Toggle Status Error:', err),
+    });
   }
 
   // =========================================================

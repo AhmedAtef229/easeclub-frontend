@@ -51,7 +51,7 @@ export class TicketModalComponent implements OnInit {
       basePrice: +v.basePrice,
       totalQuantity: +v.totalQuantity,
       maxPerMember: v.maxPerMember ? +v.maxPerMember : null,
-      requiresMembership: v.requiresMembership,
+      requiresMembership: v.category === 'Member' || v.category === 'FamilyMember',
       minAge: v.minAge ? +v.minAge : null,
       maxAge: v.maxAge ? +v.maxAge : null,
       genderRestriction: v.genderRestriction === 'Any' ? null : v.genderRestriction,

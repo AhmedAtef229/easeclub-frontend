@@ -53,12 +53,14 @@ export interface Event {
   endDate: string;
   venue: string;
   capacity: number;
+  remainingCapacity: number;
   registrationsCount: number;
   accessType: EventAccessType;
   status: EventStatus;
   imageUrl: string | null;
   badge: string | null;
   ticketTypes: TicketType[];
+  pricingPolicyIds: string[];
 }
 
 // ---- Create/Edit Command ----

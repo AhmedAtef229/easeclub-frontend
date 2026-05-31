@@ -44,10 +44,10 @@
     </div>
 
     <!-- BODY -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
       <!-- SIDEBAR -->
       <div
-        class="w-72 border-r border-gray-200 dark:border-darkBorder p-4 overflow-y-auto bg-cardGray dark:bg-darkBg"
+        class="w-full lg:w-72 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-darkBorder p-4 overflow-y-auto bg-cardGray dark:bg-darkBg shrink-0"
       >
         <div class="text-xs text-mediumGray mb-2">NAVIGATOR</div>
 
@@ -61,7 +61,9 @@
               {{ i + 1 }}. {{ step.title }}
             </div>
 
-            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1 opacity-0 group-hover/step-nav:opacity-100 duration-150">✕</button>
+            <button (click)="deleteStep(i); $event.stopPropagation()" class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors text-xs font-semibold px-1 opacity-0 group-hover/step-nav:opacity-100 duration-150 flex items-center justify-center">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
         </div>
 
@@ -126,8 +128,8 @@
 
 
       <!-- CANVAS -->
-      <div class="flex-1 bg-pageBg dark:bg-darkBg p-10 overflow-auto canvas-grid">
-  <div class="w-[520px] mx-auto space-y-6">
+      <div class="flex-1 bg-pageBg dark:bg-darkBg p-4 md:p-10 overflow-auto canvas-grid">
+  <div class="w-full max-w-[520px] mx-auto space-y-6">
     <div
       *ngFor="let step of steps || []; let si = index"
       class="group/step bg-cardGray dark:bg-darkCard rounded-xl border p-5 transition-all duration-150"
@@ -177,7 +179,7 @@
 
             <span
               *ngIf="section.repeatable"
-              class="text-[10px] bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-300 px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
+              class="text-[10px] bg-primary/10 text-primary dark:bg-primary/20 dark:text-darkSecondary px-2 py-0.5 rounded-full font-semibold uppercase tracking-tight"
             >
               Repeatable
             </span>
@@ -192,9 +194,27 @@
             </span>
           </div>
 
-          <!-- DELETE -->
+          <!-- DELETE or LOCK -->
+          <!-- Non-system section: always deletable -->
           <button
-            *ngIf="!section.system || section.deletable"
+            *ngIf="!section.system"
+            (click)="deleteSection(i); $event.stopPropagation()"
+            class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors opacity-0 group-hover/section:opacity-100 duration-150 p-1 flex items-center justify-center"
+            title="Delete Section"
+          >
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+          <!-- Family section connected to plan: locked, cannot delete -->
+          <span
+            *ngIf="section.system && hasConnectedFamilyPlan"
+            class="text-purple-400 dark:text-purple-300 opacity-0 group-hover/section:opacity-100 p-1 flex items-center justify-center"
+            title="Cannot delete: template is connected to a family plan"
+          >
+            <i class="fa-solid fa-lock text-sm"></i>
+          </span>
+          <!-- Family section not connected to any plan: deletable -->
+          <button
+            *ngIf="section.system && !hasConnectedFamilyPlan"
             (click)="deleteSection(i); $event.stopPropagation()"
             class="text-mediumGray dark:text-gray-400 hover:text-danger transition-colors opacity-0 group-hover/section:opacity-100 duration-150 p-1 flex items-center justify-center"
             title="Delete Section"
@@ -302,18 +322,39 @@
 
     <!-- Repeatable Card -->
     <div
-      class="border border-borderGray dark:border-darkBorder rounded-xl p-4 bg-gray-50 dark:bg-darkCard space-y-4 mb-4"
+      class="border rounded-xl p-4 space-y-4 mb-4"
+      [ngClass]="selectedSection.system
+        ? 'border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-900/10'
+        : 'border-borderGray dark:border-darkBorder bg-gray-50 dark:bg-darkCard'"
     >
-      <!-- Repeatable Toggle -->
-      <div class="flex items-center justify-between">
+      <!-- FAMILY SECTION NOTICE (always shown for system sections) -->
+      <div *ngIf="selectedSection.system" class="flex items-start gap-2.5 p-3 rounded-lg bg-purple-100/80 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800">
+        <i class="fa-solid fa-lock text-purple-500 dark:text-purple-400 mt-0.5 flex-shrink-0 text-xs"></i>
+        <div>
+          <p class="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wide mb-0.5">System Section — Repeat Rules Locked</p>
+          <p class="text-xs text-purple-600 dark:text-purple-400">
+            <ng-container *ngIf="hasConnectedFamilyPlan; else notConnectedNotice">
+              Repeat count is fixed to <strong>{{ maxFamilyMembersOfConnectedPlan }}</strong> to match plan
+              <strong>"{{ connectedFamilyPlanName }}"</strong>. Remove the plan connection to unlock.
+            </ng-container>
+            <ng-template #notConnectedNotice>
+              Repeat rule is managed automatically and cannot be changed manually.
+            </ng-template>
+          </p>
+        </div>
+      </div>
+
+      <!-- Repeatable Toggle (disabled for system sections) -->
+      <div class="flex items-center justify-between" [class.opacity-50]="selectedSection.system">
         <span class="text-darkGray dark:text-white font-medium text-sm">
           Repeatable
         </span>
 
-        <label class="relative inline-flex items-center cursor-pointer">
+        <label class="relative inline-flex items-center" [class.cursor-pointer]="!selectedSection.system" [class.cursor-not-allowed]="selectedSection.system">
           <input
             type="checkbox"
             [(ngModel)]="selectedSection.repeatable"
+            [disabled]="selectedSection.system"
             class="sr-only peer"
           />
           <div
@@ -336,25 +377,27 @@
       </div>
 
       <!-- Repeat Mode Dropdown -->
-      <div *ngIf="selectedSection.repeatable" class="space-y-1.5">
+      <div *ngIf="selectedSection.repeatable" class="space-y-1.5" [class.opacity-50]="selectedSection.system">
         <label class="text-xs font-semibold text-mediumGray block">
           Repeat Mode
         </label>
         <app-form-dropdown
           [(ngModel)]="selectedSection.repeatMode"
           [options]="repeatModeDropdownOptions"
+          [disabled]="selectedSection.system"
           placeholder="Select mode"
         ></app-form-dropdown>
       </div>
 
       <!-- Repeat Count Input -->
-      <div *ngIf="selectedSection.repeatable" class="space-y-1.5">
+      <div *ngIf="selectedSection.repeatable" class="space-y-1.5" [class.opacity-50]="selectedSection.system">
         <label class="text-xs font-semibold text-mediumGray block">
           Repeat Count
         </label>
         <input
           type="number"
           [(ngModel)]="selectedSection.numberOfRepeats"
+          [disabled]="selectedSection.system"
           placeholder="e.g., 3"
           class="w-full border border-borderGray dark:border-darkBorder
                  p-2.5 rounded-xl
