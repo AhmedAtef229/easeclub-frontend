@@ -140,9 +140,9 @@
         <!-- Capacity Progress -->
         <div class="pt-2 border-t border-gray-100 dark:border-darkBorder">
           <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-semibold text-darkGray dark:text-white">Capacity</span>
+            <span class="text-sm font-semibold text-darkGray dark:text-white">Tickets Sold</span>
             <span class="text-sm font-bold text-primary dark:text-darkPrimary">
-              {{ event.registrationsCount }} / {{ event.capacity }}
+              {{ event.capacity - event.remainingCapacity }} / {{ event.capacity }}
             </span>
           </div>
           <div class="h-2.5 bg-gray-200 dark:bg-darkBorder rounded-full overflow-hidden">
@@ -626,6 +626,7 @@
 <app-event-modal
   *ngIf="showEditModal"
   [event]="event"
+  [error]="editError"
   (close)="closeEditModal()"
   (save)="onEditSave($event)"
 ></app-event-modal>

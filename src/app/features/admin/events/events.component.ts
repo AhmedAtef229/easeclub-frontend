@@ -24,6 +24,7 @@ export class EventsComponent implements OnInit {
   selectedAccess = 'All';
 
   showCreateModal = false;
+  createError: string | null = null;
 
   statusOptions = ['All', 'Draft', 'Published', 'Cancelled'];
   accessOptions = ['All', 'MembersOnly', 'Public'];
@@ -136,11 +137,12 @@ export class EventsComponent implements OnInit {
     });
   }
 
-  openCreateModal() { this.showCreateModal = true; }
-  closeCreateModal() { this.showCreateModal = false; }
+  openCreateModal() { this.createError = null; this.showCreateModal = true; }
+  closeCreateModal() { this.createError = null; this.showCreateModal = false; }
 
   onCreateEvent(cmd: CreateEventCommand) {
     if (!this.clubId) return;
+    this.createError = null;
     this.eventsService.createEvent({ ...cmd, clubId: this.clubId }).subscribe({
       next: (res) => {
         this.closeCreateModal();
@@ -148,7 +150,10 @@ export class EventsComponent implements OnInit {
         this.loadEvents();
         this.router.navigate(['/admin/events', res.id]);
       },
-      error: (err) => console.error('Failed to create event', err)
+      error: (err) => {
+        console.error('Failed to create event', err);
+        this.createError = err?.error?.detail || err?.error?.title || 'Failed to create event.';
+      }
     });
   }
 
@@ -167,7 +172,7 @@ export class EventsComponent implements OnInit {
 
   getCapacityPercent(event: Event): number {
     if (event.capacity === 0) return 0;
-    return Math.min(100, Math.round((event.registrationsCount / event.capacity) * 100));
+    return Math.min(100, Math.round(((event.capacity - event.remainingCapacity) / event.capacity) * 100));
   }
 
   formatDateRange(start: string, end: string): string {

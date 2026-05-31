@@ -49,6 +49,7 @@ export class EventDetailsComponent implements OnInit {
   expandedRegId: string | null = null;
 
   showEditModal = false;
+  editError: string | null = null;
   showTicketModal = false;
   editingTicket: TicketType | null = null;
 
@@ -139,16 +140,20 @@ export class EventDetailsComponent implements OnInit {
   }
 
   // ─── Edit Event ─────────────────────────────────
-  openEditModal() { this.showEditModal = true; }
-  closeEditModal() { this.showEditModal = false; }
+  openEditModal() { this.editError = null; this.showEditModal = true; }
+  closeEditModal() { this.editError = null; this.showEditModal = false; }
   onEditSave(cmd: CreateEventCommand) {
     if (!this.event) return;
+    this.editError = null;
     this.eventsService.updateEvent(this.eventId, { ...cmd, id: this.eventId }).subscribe({
       next: () => {
         this.loadEventDetails();
         this.closeEditModal();
       },
-      error: (err) => console.error('Failed to update event', err)
+      error: (err) => {
+        console.error('Failed to update event', err);
+        this.editError = err?.error?.detail || err?.error?.title || 'Failed to update event.';
+      }
     });
   }
 
@@ -346,7 +351,7 @@ export class EventDetailsComponent implements OnInit {
   get cancelledRegCount() { return this.registrations.filter(r => r.status === 'Cancelled').length; }
   get capacityPercent() {
     if (!this.event || this.event.capacity === 0) return 0;
-    return Math.min(100, Math.round((this.event.registrationsCount / this.event.capacity) * 100));
+    return Math.min(100, Math.round(((this.event.capacity - this.event.remainingCapacity) / this.event.capacity) * 100));
   }
 
   // ─── Helpers ──────────────────────────────────────

@@ -171,9 +171,9 @@
           <!-- Capacity bar -->
           <div>
             <div class="flex justify-between items-center mb-1">
-              <span class="text-xs text-mediumGray">Registered</span>
+              <span class="text-xs text-mediumGray">Tickets Sold</span>
               <span class="text-xs font-semibold text-darkGray dark:text-white">
-                {{ event.registrationsCount }} / {{ event.capacity }}
+                {{ event.capacity - event.remainingCapacity }} / {{ event.capacity }}
               </span>
             </div>
             <div class="h-1.5 bg-gray-200 dark:bg-darkBorder rounded-full overflow-hidden">
@@ -233,6 +233,7 @@
 <app-event-modal
   *ngIf="showCreateModal"
   [event]="null"
+  [error]="createError"
   (close)="closeCreateModal()"
   (save)="onCreateEvent($event)"
 ></app-event-modal>
