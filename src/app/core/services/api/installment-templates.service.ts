@@ -84,6 +84,14 @@ export class InstallmentTemplatesService {
     );
   }
 
+  /* ================= TOGGLE STATUS ================= */
+  toggleStatus(id: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/installment-templates/${id}/toggle-status`,
+      {}
+    );
+  }
+
   /* ================= UPDATE ================= */
   updateInstallments(
     id: string,

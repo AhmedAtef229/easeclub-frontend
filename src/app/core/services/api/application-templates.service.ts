@@ -98,6 +98,17 @@ export class ApplicationTemplateService {
   }
 
   // ============================================
+  // TOGGLE STATUS
+  // ============================================
+
+  toggleStatus(id: string): Observable<void> {
+    return this.http.patch<void>(
+      `${this.api}/admin/application-templates/${id}/toggle-status`,
+      {}
+    );
+  }
+
+  // ============================================
   // DELETE
   // ============================================
 

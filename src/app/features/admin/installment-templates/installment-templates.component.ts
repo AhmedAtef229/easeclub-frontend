@@ -142,6 +142,14 @@ onPlanChange(value: string) {
     });
   }
 
+  // 🔄 TOGGLE STATUS
+  onToggleStatus(row: any) {
+    this.installmentService.toggleStatus(row.id).subscribe({
+      next: () => this.loadTemplates(),
+      error: (err) => console.error('Failed to toggle status', err),
+    });
+  }
+
   // 💾 SAVE EDIT
   onSaveEditInstallments(updated: any[]) {
     this.installmentService

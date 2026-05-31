@@ -110,6 +110,8 @@ export class MembershipPlansComponent implements OnInit {
             ...item,
             // Convert to array because Table component expects array for 'badge' type
             membershipTypeName: item.membershipTypeName ? [item.membershipTypeName] : [],
+            // Backend returns misspelled 'installmentsAllowdInRenewal' — normalize to correct spelling
+            installmentsAllowedInRenewal: (item as any).installmentsAllowdInRenewal ?? false,
           }));
 
           this.filteredData = [...this.data];

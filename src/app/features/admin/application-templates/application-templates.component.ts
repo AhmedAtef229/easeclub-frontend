@@ -179,6 +179,17 @@ export class ApplicationTemplatesComponent implements OnInit {
   }
 
   // =========================================================
+  // TOGGLE STATUS
+  // =========================================================
+
+  onToggleStatus(row: any): void {
+    this.service.toggleStatus(row.id).subscribe({
+      next: () => this.loadData(),
+      error: (err) => console.error('❌ Toggle Status Error:', err),
+    });
+  }
+
+  // =========================================================
   // DELETE
   // =========================================================
 
