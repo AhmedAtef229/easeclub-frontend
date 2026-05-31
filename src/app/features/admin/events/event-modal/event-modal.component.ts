@@ -14,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class EventModalComponent implements OnInit {
   @Input() event: Event | null = null;
+  @Input() error: string | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<CreateEventCommand>();
 
