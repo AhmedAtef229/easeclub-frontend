@@ -32,6 +32,11 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "_redirects",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
@@ -65,11 +70,11 @@
         },
         "serve": {
           "options": {
-                  "ssl": true,
-                  "sslKey": "ssl/server.key",
-                  "sslCert": "ssl/server.crt",
-                  "port": 4300
-                      },
+            "ssl": true,
+            "sslKey": "ssl/server.key",
+            "sslCert": "ssl/server.crt",
+            "port": 4300
+          },
 
           "builder": "@angular/build:dev-server",
           "configurations": {
