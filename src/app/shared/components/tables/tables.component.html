@@ -166,7 +166,7 @@
               <i class="fa-regular fa-pen-to-square"></i>
             </button>
             <button
-              *ngIf="showManage"
+              *ngIf="showManage && row?.paymentMode !== 'Cash'"
               (click)="manage.emit(row)"
               title="Manage Connections"
               class="w-7 h-7 sm:w-8 sm:h-8 rounded-md flex items-center justify-center border border-borderGray dark:border-darkBorder text-mediumGray hover:text-primary hover:bg-lavender/20 transition"

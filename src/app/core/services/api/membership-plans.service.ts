@@ -12,17 +12,16 @@ export interface MembershipPlan {
   membershipTypeName: any;
   price: number;
   renewPrice?: number;
-  maxPaymentPeriod: number;
+  maxPaymentPeriodInDays: number;
   subscriptionValidityInYears: number;
   maxFamilyMembers: number;
-  durationInDays?: number;
   isActive: boolean;
   createdAt: string;
   enrollmentMode?: string;
   paymentMode?: string;
-  installmentsAllowdInRenewal?: boolean;
   installmentsAllowedInRenewal?: boolean;
   installmentTemplateIds?: string[];
+  templates?: { id: string; name: string }[];
 }
 
 export interface MembershipPlansResponse {
@@ -49,16 +48,10 @@ export interface CreatePlanDto {
 }
 
 export interface UpdatePlanDto {
-  membershipTypeId?: string;
   name: string;
   description: string;
   totalPrice: number;
   renewPrice: number;
-  subscriptionValidityInYears: number;
-  durationInDays: number;
-  maxFamilyMembers?: number;
-  enrollmentMode?: string;
-  paymentMode?: string;
 }
 
 /* ================= SERVICE ================= */

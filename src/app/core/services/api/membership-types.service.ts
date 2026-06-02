@@ -48,7 +48,7 @@ export class MembershipTypesService {
   /* ================= TOGGLE ================= */
   toggleStatus(id: string): Observable<boolean> {
     return this.http.patch<boolean>(
-      `${this.baseUrl}/clubs/${this.clubId}/membership-types/${id}/toggle-status`,
+      `${this.baseUrl}/membership-types/${id}/toggle-status`,
       {}
     );
   }
