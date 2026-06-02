@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -7,18 +8,20 @@ import { Injectable } from '@angular/core';
 export class PaymentsService {
 
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   /* ================= INSTALLMENTS ================= */
 
  getClubInstallments(
-  clubId: string,
+  clubId?: string,
   status?: string,
   search?: string,
   page: number = 1,
   limit: number = 10
 ) {
+  const activeClubId = clubId || this.adminContextStore.getClubId();
 
   let params = new HttpParams()
     .set('Page', page)
@@ -31,7 +34,7 @@ export class PaymentsService {
     params = params.set('search', search);
 
   return this.http.get(
-    `${this.baseUrl}/clubs/${clubId}/memberships/installments`,
+    `${this.baseUrl}/clubs/${activeClubId}/memberships/installments`,
     { params }
   );
 }
@@ -39,12 +42,13 @@ export class PaymentsService {
   /* ================= INVOICES ================= */
 
   getClubInvoices(
-    clubId: string,
+    clubId?: string,
     status?: string,
     search?: string,
     page: number = 1,
     limit: number = 10
   ) {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
 
     let params = new HttpParams()
       .set('Page', page)
@@ -57,7 +61,7 @@ export class PaymentsService {
       params = params.set('search', search);
 
     return this.http.get(
-      `${this.baseUrl}/clubs/${clubId}/invoices`,
+      `${this.baseUrl}/clubs/${activeClubId}/invoices`,
       { params }
     );
   }
@@ -114,9 +118,10 @@ export class PaymentsService {
 
   /* ================= STATISTICS ================= */
 
-  getClubPaymentStats(clubId: string) {
+  getClubPaymentStats(clubId?: string) {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     return this.http.get(
-      `${this.baseUrl}/clubs/${clubId}/invoices/stats`
+      `${this.baseUrl}/clubs/${activeClubId}/invoices/stats`
     );
   }
 }

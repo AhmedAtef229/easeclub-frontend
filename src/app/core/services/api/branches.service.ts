@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Branch } from '../../models/branch.model';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,18 +10,18 @@ import { Branch } from '../../models/branch.model';
 export class BranchService {
 
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
-  private clubId = '9f3a8b6e-2a7d-4b5c-9d9c-1e8c4c2f7a31';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   getClubId(): string {
-    return this.clubId;
+    return this.adminContextStore.getClubId();
   }
 
   /* ================= GET ================= */
   getBranches(isActive?: boolean): Observable<Branch[]> {
-
-    let url = `${this.baseUrl}/clubs/${this.clubId}/branches`;
+    const clubId = this.adminContextStore.getClubId();
+    let url = `${this.baseUrl}/clubs/${clubId}/branches`;
 
     if (isActive !== undefined) {
       url += `?isActive=${isActive}`;
@@ -31,11 +32,12 @@ export class BranchService {
 
   /* ================= CREATE ================= */
   createBranch(data: { name: string; address: string }): Observable<string> {
+    const clubId = this.adminContextStore.getClubId();
     return this.http.post<string>(
       `${this.baseUrl}/branches`,
       {
         ...data,
-        clubId: this.clubId
+        clubId: clubId
       }
     );
   }

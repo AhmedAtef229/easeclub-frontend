@@ -1,5 +1,3 @@
-// application-template.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import {
   HttpClient,
@@ -8,6 +6,7 @@ import {
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +14,7 @@ import { map } from 'rxjs/operators';
 export class ApplicationTemplateService {
 
   private http = inject(HttpClient);
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   // ✅ IMPORTANT
   private api = 'https://easeclub.runasp.net/api/v1';
@@ -24,7 +24,7 @@ export class ApplicationTemplateService {
   // ============================================
 
   getTemplates(
-    clubId: string,
+    clubId?: string,
     query?: {
       page?: number;
       limit?: number;
@@ -33,6 +33,7 @@ export class ApplicationTemplateService {
       sortDesc?: boolean;
     }
   ): Observable<any> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
 
     let params = new HttpParams();
 
@@ -57,7 +58,7 @@ export class ApplicationTemplateService {
     }
 
     return this.http.get(
-      `${this.api}/clubs/${clubId}/application-templates`,
+      `${this.api}/clubs/${activeClubId}/application-templates`,
       {
         params,
         responseType: 'text',
@@ -85,15 +86,20 @@ export class ApplicationTemplateService {
   // ============================================
 
   upsertTemplate(payload: {
-    clubId: string;
+    clubId?: string;
     templateId?: string;
     name: string;
     steps: any[];
   }): Observable<void> {
+    const activeClubId = payload.clubId || this.adminContextStore.getClubId();
+    const finalPayload = {
+      ...payload,
+      clubId: activeClubId
+    };
 
     return this.http.post<void>(
       `${this.api}/admin/application-templates/upsert`,
-      payload
+      finalPayload
     );
   }
 

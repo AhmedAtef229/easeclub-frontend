@@ -1,19 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MembershipTypesService {
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
-  private clubId = '9f3a8b6e-2a7d-4b5c-9d9c-1e8c4c2f7a31';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   /* ================= GET ================= */
   getMembershipTypes(filters?: any): Observable<any[]> {
     let params = new HttpParams();
+    const clubId = this.adminContextStore.getClubId();
 
     if (filters?.branchId) {
       params = params.set('branchId', filters.branchId);
@@ -24,7 +26,7 @@ export class MembershipTypesService {
     }
 
     return this.http.get<any[]>(
-      `${this.baseUrl}/clubs/${this.clubId}/membership-types`,
+      `${this.baseUrl}/clubs/${clubId}/membership-types`,
       { params }
     );
   }
@@ -39,16 +41,18 @@ export class MembershipTypesService {
 
   /* ================= UPDATE ================= */
   updateMembershipType(id: string, data: any): Observable<void> {
+    const clubId = this.adminContextStore.getClubId();
     return this.http.patch<void>(
-      `${this.baseUrl}/clubs/${this.clubId}/membership-types/${id}`,
+      `${this.baseUrl}/clubs/${clubId}/membership-types/${id}`,
       data
     );
   }
 
   /* ================= TOGGLE ================= */
   toggleStatus(id: string): Observable<boolean> {
+    const clubId = this.adminContextStore.getClubId();
     return this.http.patch<boolean>(
-      `${this.baseUrl}/clubs/${this.clubId}/membership-types/${id}/toggle-status`,
+      `${this.baseUrl}/clubs/${clubId}/membership-types/${id}/toggle-status`,
       {}
     );
   }

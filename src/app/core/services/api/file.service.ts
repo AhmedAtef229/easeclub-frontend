@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppConfig } from '../../appconfig';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 /**
  * Single source of truth for backend Purpose values
@@ -33,19 +34,21 @@ export interface FileDto {
 export class FileService {
 
   private BASE_URL = `${AppConfig.ProdApi}/files`;
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   uploadClubFile(
     file: File,
-    clubId: string,
+    clubId?: string,
     purpose: ClubFilePurpose = CLUB_FILE_PURPOSE.LOGO
   ): Observable<any> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
 
     const formData = new FormData();
 
     formData.append('File', file);
-    formData.append('ClubId', clubId);
+    formData.append('ClubId', activeClubId);
     formData.append('Purpose', purpose);
     formData.append('IsPrivate', 'false');
 

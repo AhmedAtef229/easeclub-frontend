@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 const BASE_URL = 'https://easeclub.runasp.net/api/v1';
 
@@ -8,6 +9,7 @@ const BASE_URL = 'https://easeclub.runasp.net/api/v1';
   providedIn: 'root'
 })
 export class PricingPoliciesService {
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
@@ -21,9 +23,10 @@ export class PricingPoliciesService {
 
   /* ================= GET ALL ================= */
 
-  getAllPolicies(clubId: string): Observable<PricingPolicy[]> {
+  getAllPolicies(clubId?: string): Observable<PricingPolicy[]> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     return this.http.get<PricingPolicy[]>(
-      `${BASE_URL}/clubs/${clubId}/pricing-policies`
+      `${BASE_URL}/clubs/${activeClubId}/pricing-policies`
     );
   }
 
@@ -33,11 +36,12 @@ export class PricingPoliciesService {
    * For templates: ?compatibleWith=ApplicationTemplate&compatibleWithTargetId={templateId}
    */
   getCompatiblePolicies(
-    clubId: string,
+    clubId: string | undefined,
     targetType: 'Event' | 'ApplicationTemplate',
     targetId?: string
   ): Observable<PricingPolicy[]> {
-    let url = `${BASE_URL}/clubs/${clubId}/pricing-policies?compatibleWith=${targetType}`;
+    const activeClubId = clubId || this.adminContextStore.getClubId();
+    let url = `${BASE_URL}/clubs/${activeClubId}/pricing-policies?compatibleWith=${targetType}`;
     if (targetId) url += `&compatibleWithTargetId=${targetId}`;
     return this.http.get<PricingPolicy[]>(url);
   }
@@ -53,9 +57,14 @@ export class PricingPoliciesService {
   /* ================= CREATE ================= */
 
   createPolicy(payload: CreatePricingPolicyDto): Observable<any> {
+    const activeClubId = payload.clubId || this.adminContextStore.getClubId();
+    const finalPayload = {
+      ...payload,
+      clubId: activeClubId
+    };
     return this.http.post(
-      `${BASE_URL}/clubs/${payload.clubId}/pricing-policies`,
-      payload
+      `${BASE_URL}/clubs/${activeClubId}/pricing-policies`,
+      finalPayload
     );
   }
 

@@ -1,7 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,11 +10,12 @@ import { map } from 'rxjs/operators';
 export class ApplicationReviewsService {
 
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   getApplications(
-    clubId: string,
+    clubId?: string,
     status?: string,
     dateFrom?: string,
     dateTo?: string,
@@ -21,6 +23,7 @@ export class ApplicationReviewsService {
     page: number = 1,
     limit: number = 10
   ) {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
 
     let params = new HttpParams()
       .set('pagination.Page', page)
@@ -31,7 +34,7 @@ export class ApplicationReviewsService {
       .set('filters.TrackingNumber', search || '');
 
     return this.http.get(
-      `${this.baseUrl}/clubs/${clubId}/membership-applications`,
+      `${this.baseUrl}/clubs/${activeClubId}/membership-applications`,
       { params }
     );
   }

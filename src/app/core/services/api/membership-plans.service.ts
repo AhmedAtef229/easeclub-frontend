@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 /* ================= INTERFACES ================= */
 
@@ -69,13 +70,14 @@ export interface UpdatePlanDto {
 export class MembershipPlansService {
 
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   /* ================= GET ALL ================= */
 
   getAll(
-    clubId: string,
+    clubId?: string,
     filters?: {
       membershipTypeId?: string;
       isActive?: boolean;
@@ -85,7 +87,7 @@ export class MembershipPlansService {
       sortDesc?: boolean;
     }
   ): Observable<MembershipPlansResponse> {
-
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     let params = new HttpParams();
 
     if (filters?.membershipTypeId) {
@@ -113,7 +115,7 @@ export class MembershipPlansService {
     }
 
     return this.http.get<MembershipPlansResponse>(
-      `${this.baseUrl}/clubs/${clubId}/membership-plans`,
+      `${this.baseUrl}/clubs/${activeClubId}/membership-plans`,
       { params }
     );
   }
@@ -128,9 +130,10 @@ export class MembershipPlansService {
 
   /* ================= CREATE ================= */
 
-  create(clubId: string, body: CreatePlanDto): Observable<string> {
+  create(clubId?: string, body?: CreatePlanDto): Observable<string> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     return this.http.post(
-      `${this.baseUrl}/clubs/${clubId}/membership-plans`,
+      `${this.baseUrl}/clubs/${activeClubId}/membership-plans`,
       body,
       { responseType: 'text' }
     );
@@ -178,14 +181,19 @@ export class MembershipPlansService {
   /* ================= DIRECT PAY ================= */
 
   directPay(planId: string, body: {
-    clubId: string;
+    clubId?: string;
     membershipTypeId: string;
     installmentTemplateId: string;
   }): Observable<any> {
+    const activeClubId = body.clubId || this.adminContextStore.getClubId();
+    const payload = {
+      ...body,
+      clubId: activeClubId
+    };
 
     return this.http.post(
       `${this.baseUrl}/membership-plans/${planId}/direct-pay`,
-      body
+      payload
     );
   }
 

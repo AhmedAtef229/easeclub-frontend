@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppConfig } from '../../appconfig';
+import { AdminContextStoreService } from './admin-context-store.service';
 import { 
   Event, 
   EventStatus, 
@@ -41,13 +42,14 @@ export interface EventStatsDto {
 })
 export class EventsService {
   private baseUrl = `${AppConfig.ProdApi}/events`;
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   /* ================= EVENTS ================= */
 
   getClubEvents(
-    clubId: string,
+    clubId?: string,
     filters?: {
       search?: string;
       status?: EventStatus;
@@ -55,6 +57,7 @@ export class EventsService {
       limit?: number;
     }
   ): Observable<UnifiedPaginatedResponse<Event>> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     let params = new HttpParams();
     
     if (filters?.search) {
@@ -71,19 +74,20 @@ export class EventsService {
     }
 
     return this.http.get<UnifiedPaginatedResponse<Event>>(
-      `${this.baseUrl}/club/${clubId}`,
+      `${this.baseUrl}/club/${activeClubId}`,
       { params }
     );
   }
 
   getUpcomingEvents(
-    clubId: string,
+    clubId?: string,
     filters?: {
       search?: string;
       page?: number;
       limit?: number;
     }
   ): Observable<UnifiedPaginatedResponse<Event>> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
     let params = new HttpParams();
     
     if (filters?.search) {
@@ -97,7 +101,7 @@ export class EventsService {
     }
 
     return this.http.get<UnifiedPaginatedResponse<Event>>(
-      `${this.baseUrl}/club/${clubId}/upcoming`,
+      `${this.baseUrl}/club/${activeClubId}/upcoming`,
       { params }
     );
   }
@@ -106,16 +110,22 @@ export class EventsService {
     return this.http.get<Event>(`${this.baseUrl}/${id}`);
   }
 
-  getStatusCounts(clubId: string): Observable<ClubEventStatusCountsDto> {
-    return this.http.get<ClubEventStatusCountsDto>(`${this.baseUrl}/club/${clubId}/status-counts`);
+  getStatusCounts(clubId?: string): Observable<ClubEventStatusCountsDto> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
+    return this.http.get<ClubEventStatusCountsDto>(`${this.baseUrl}/club/${activeClubId}/status-counts`);
   }
 
   getEventStats(id: string): Observable<EventStatsDto> {
     return this.http.get<EventStatsDto>(`${this.baseUrl}/${id}/stats`);
   }
 
-  createEvent(command: CreateEventCommand & { clubId: string }): Observable<{ id: string; name: string }> {
-    return this.http.post<{ id: string; name: string }>(this.baseUrl, command);
+  createEvent(command: CreateEventCommand & { clubId?: string }): Observable<{ id: string; name: string }> {
+    const activeClubId = command.clubId || this.adminContextStore.getClubId();
+    const finalCommand = {
+      ...command,
+      clubId: activeClubId
+    };
+    return this.http.post<{ id: string; name: string }>(this.baseUrl, finalCommand);
   }
 
   updateEvent(id: string, command: CreateEventCommand & { id: string }): Observable<{ id: string; name: string }> {

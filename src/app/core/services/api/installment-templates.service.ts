@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AdminContextStoreService } from './admin-context-store.service';
 
 /* ================= INTERFACES ================= */
 
@@ -22,7 +23,7 @@ export interface InstallmentTemplate {
 }
 
 export interface CreateTemplateDto {
-  clubId: string;
+  clubId?: string;
   name: string;
   numOfInstallments: number;
   durationInDays: number;
@@ -43,14 +44,16 @@ export interface TemplateDetails {
 export class InstallmentTemplatesService {
 
   private baseUrl = 'https://easeclub.runasp.net/api/v1';
+  private readonly adminContextStore = inject(AdminContextStoreService);
 
   constructor(private http: HttpClient) {}
 
   /* ================= GET ALL ================= */
   getAll(
-    clubId: string,
+    clubId?: string,
     filters?: { planId?: string; active?: boolean }
   ): Observable<InstallmentTemplate[]> {
+    const activeClubId = clubId || this.adminContextStore.getClubId();
 
     let params = new HttpParams();
 
@@ -63,7 +66,7 @@ export class InstallmentTemplatesService {
     }
 
     return this.http.get<InstallmentTemplate[]>(
-      `${this.baseUrl}/clubs/${clubId}/installment-templates`,
+      `${this.baseUrl}/clubs/${activeClubId}/installment-templates`,
       { params }
     );
   }
@@ -77,9 +80,15 @@ export class InstallmentTemplatesService {
 
   /* ================= CREATE ================= */
   create(body: CreateTemplateDto): Observable<string> {
+    const activeClubId = body.clubId || this.adminContextStore.getClubId();
+    const finalBody = {
+      ...body,
+      clubId: activeClubId
+    };
+
     return this.http.post(
       `${this.baseUrl}/installment-templates`,
-      body,
+      finalBody,
       { responseType: 'text' }
     );
   }
