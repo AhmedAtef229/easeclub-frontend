@@ -120,32 +120,7 @@
           </div>
         </div>
 
-        <!-- Access Type -->
-        <div>
-          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-2">Access Type</label>
-          <div class="flex gap-3">
-            <button
-              type="button"
-              (click)="setAccessType('MembersOnly')"
-              class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
-              [ngClass]="form.get('accessType')?.value === 'MembersOnly'
-                ? 'border-primary bg-primary/5 text-primary dark:text-darkPrimary dark:border-darkPrimary'
-                : 'border-gray-200 dark:border-darkBorder text-mediumGray hover:border-primary/50'"
-            >
-              <i class="fa-solid fa-lock mr-2"></i>Members Only
-            </button>
-            <button
-              type="button"
-              (click)="setAccessType('Public')"
-              class="flex-1 py-2.5 rounded-xl border-2 text-sm font-semibold transition-all"
-              [ngClass]="form.get('accessType')?.value === 'Public'
-                ? 'border-sky-500 bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-500'
-                : 'border-gray-200 dark:border-darkBorder text-mediumGray hover:border-sky-400/50'"
-            >
-              <i class="fa-solid fa-globe mr-2"></i>Public
-            </button>
-          </div>
-        </div>
+
 
         <!-- Image Upload + Badge -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">

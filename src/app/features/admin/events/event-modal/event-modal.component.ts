@@ -51,9 +51,7 @@ export class EventModalComponent implements OnInit {
     return iso ? iso.substring(0, 16) : '';
   }
 
-  setAccessType(value: EventAccessType) {
-    this.form.patchValue({ accessType: value });
-  }
+
 
   extractUuid(url: string): string | undefined {
     if (!url) return undefined;

@@ -29,14 +29,4 @@ export class AuthLayoutComponent {
     this.themeService.toggleTheme();
   }
 
-  toggleLang() {
-    const currentLang = this.translate.currentLang || 'ar';
-    const nextLang = currentLang === 'ar' ? 'en' : 'ar';
-
-    this.translate.use(nextLang);
-    localStorage.setItem('lang', nextLang);
-
-    document.documentElement.lang = nextLang;
-    document.documentElement.dir = nextLang === 'ar' ? 'rtl' : 'ltr';
-  }
 }
