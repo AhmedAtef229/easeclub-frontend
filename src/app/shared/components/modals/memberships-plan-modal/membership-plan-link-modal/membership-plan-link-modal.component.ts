@@ -27,10 +27,9 @@ export class MembershipPlanLinkModalComponent implements OnInit {
 
   ngOnInit(): void {
     const clubId = this.branchService.getClubId();
-    // 1. Get current plan details to know which templates are already linked
-    // (Assuming the plan object passed has installmentTemplateIds or similar)
-    // For now, let's just use the IDs if they exist
-    this.selectedIds = (this.plan as any).installmentTemplateIds || [];
+    this.selectedIds = this.plan.installmentTemplateIds || 
+                       this.plan.templates?.map((t: any) => t.id) || 
+                       [];
 
     this.installmentService.getAll(clubId, { active: true }).subscribe({
       next: (allTemplates) => {
@@ -78,5 +77,9 @@ export class MembershipPlanLinkModalComponent implements OnInit {
   getInstallmentAmount(percentage: number): string {
     const amount = (this.plan.price * percentage) / 100;
     return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+
+  isSelected(id: string): boolean {
+    return this.selectedIds.includes(id);
   }
 }

@@ -5,11 +5,15 @@
 @layer base {
   html {
     font-size: 14px; /* حجم الخط الأساسي للمحتوى */
+    height: 100%;
+    overflow: hidden;
   }
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    height: 100%;
+    overflow: hidden;
     @apply text-darkGray bg-pageBg;
   }
 

@@ -67,6 +67,7 @@ export class MembershipPlansComponent implements OnInit {
     { key: 'renewPrice', label: 'Renew Price', type: 'currency' },
     { key: 'maxFamilyMembers', label: 'Max Family Members' },
     { key: 'paymentMode', label: 'Payment Mode', type: 'pill' },
+    { key: 'maxPaymentPeriodInDays', label: 'Max Payment Duration', type: 'text' },
     { key: 'installmentsAllowedInRenewal', label: 'Installment in Renew', type: 'boolean' },
     { key: 'subscriptionValidityInYears', label: 'Validity (Years)', suffix: 'year' },
     { key: 'enrollmentMode', label: 'Enrollment Mode', type: 'pill' },
@@ -111,7 +112,9 @@ export class MembershipPlansComponent implements OnInit {
             // Convert to array because Table component expects array for 'badge' type
             membershipTypeName: item.membershipTypeName ? [item.membershipTypeName] : [],
             // Backend returns misspelled 'installmentsAllowdInRenewal' — normalize to correct spelling
-            installmentsAllowedInRenewal: (item as any).installmentsAllowdInRenewal ?? false,
+            installmentsAllowedInRenewal:
+              item.installmentsAllowedInRenewal ?? (item as any).installmentsAllowdInRenewal ?? false,
+            maxPaymentPeriodInDays: item.maxPaymentPeriodInDays ?? 0,
           }));
 
           this.filteredData = [...this.data];
@@ -180,17 +183,17 @@ export class MembershipPlansComponent implements OnInit {
       renewPrice: +form.renewPrice || 0,
       subscriptionValidityInYears: years,
       maxFamilyMembers: +form.maxFamilyMembers || 0,
-      durationInDays: +form.durationInDays,
+      durationInDays: +form.maxPaymentPeriodInDays,
       enrollmentMode: form.enrollmentMode,
       applicationTemplateId: form.enrollmentMode === 'ApplicationForm' ? form.applicationTemplateId : undefined,
       paymentMode: form.paymentMode,
-      installmentTemplateIds: form.templateIds || [],
+      installmentTemplateIds: form.paymentMode === 'Cash' ? [] : (form.installmentTemplateIds || []),
       installmentsAllowedInRenewal: form.installmentsAllowedInRenewal || false,
     };
 
     this.plansService.create(this.clubId, body).subscribe({
       next: (planId: string) => {
-        if (body.installmentTemplateIds?.length) {
+        if (body.paymentMode !== 'Cash' && body.installmentTemplateIds?.length) {
           this.plansService
             .updateInstallmentTemplates(planId, body.installmentTemplateIds)
             .subscribe({
@@ -216,21 +219,15 @@ export class MembershipPlansComponent implements OnInit {
       },
     });
   }
+
   onSaveEdit(form: any): void {
     if (!this.selectedPlan) return;
 
-    const years = this.selectedPlan.subscriptionValidityInYears || 1;
     const body: UpdatePlanDto = {
-      membershipTypeId: this.selectedPlan.membershipTypeId,
       name: form.name,
       description: form.description || this.selectedPlan.description || '',
       totalPrice: +form.price || this.selectedPlan.price,
       renewPrice: +form.renewPrice || this.selectedPlan.renewPrice || this.selectedPlan.price,
-      subscriptionValidityInYears: years,
-      durationInDays: this.selectedPlan.durationInDays || (years * 365),
-      maxFamilyMembers: this.selectedPlan.maxFamilyMembers,
-      enrollmentMode: this.selectedPlan.enrollmentMode,
-      paymentMode: this.selectedPlan.paymentMode,
     };
 
     this.plansService.update(this.selectedPlan.id, body).subscribe({

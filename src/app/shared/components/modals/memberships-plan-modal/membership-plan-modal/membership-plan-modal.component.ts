@@ -26,6 +26,7 @@ export class MembershipPlanModalComponent implements OnInit {
   membershipTypes: any[] = [];
   installmentTemplates: any[] = [];
   applicationTemplates: any[] = [];
+  selectedPlanDurationDays = 0;
 
   clubId!: string;
 
@@ -52,6 +53,8 @@ export class MembershipPlanModalComponent implements OnInit {
 
   ngOnInit() {
     this.clubId = this.branchService.getClubId();
+    this.selectedPlanDurationDays =
+      +(this.plan?.maxPaymentPeriodInDays ?? this.plan?.durationInDays ?? 0) || 0;
 
     this.form = this.fb.group({
       name: [this.plan?.name || '', Validators.required],
@@ -64,13 +67,13 @@ export class MembershipPlanModalComponent implements OnInit {
         Validators.required,
       ],
       maxFamilyMembers: [this.plan?.maxFamilyMembers || 0],
-      durationInDays: [this.plan?.durationInDays || 0, Validators.required],
+      maxPaymentPeriodInDays: [this.plan?.maxPaymentPeriodInDays || 0, Validators.required],
       enrollmentMode: [this.plan?.enrollmentMode || 'DirectPay', Validators.required],
       applicationTemplateId: [this.plan?.applicationTemplateId || ''],
       paymentMode: [this.plan?.paymentMode || 'Cash', Validators.required],
       installmentsAllowedInRenewal: [this.plan?.installmentsAllowedInRenewal || false],
       isActive: [this.plan?.isActive ?? true],
-      templateIds: [this.plan?.installmentTemplateIds || []],
+      installmentTemplateIds: [this.plan?.installmentTemplateIds || []],
     });
 
     this.loadMembershipTypes();
@@ -81,9 +84,18 @@ export class MembershipPlanModalComponent implements OnInit {
       this.handleEnrollmentModeChange(mode);
     });
 
+    // Listen to payment mode changes to clear installment templates if Cash
+    this.form.get('paymentMode')?.valueChanges.subscribe(mode => {
+      if (mode === 'Cash') {
+        this.form.get('installmentTemplateIds')?.setValue([]);
+      }
+    });
+
     // Live-validate template compatibility on any form value change
     this.form.valueChanges.subscribe(() => {
       this.validateTemplateCompatibility();
+      this.validateInstallmentTemplateSelection();
+      this.enforceFamilyPlanEnrollmentMode();
     });
 
     // Initialize state
@@ -102,6 +114,7 @@ export class MembershipPlanModalComponent implements OnInit {
   loadTemplates() {
     this.installmentService.getAll(this.clubId).subscribe((res: any) => {
       this.installmentTemplates = res || [];
+      this.validateInstallmentTemplateSelection();
     });
   }
 
@@ -159,18 +172,67 @@ export class MembershipPlanModalComponent implements OnInit {
     }
   }
 
+  validateInstallmentTemplateSelection() {
+    const control = this.form.get('installmentTemplateIds');
+    if (!control) return;
+
+    const paymentMode = this.form.get('paymentMode')?.value;
+    const selectedIds = control.value || [];
+    const selectedTemplates = this.installmentTemplates.filter((t: any) =>
+      selectedIds.includes(t.id),
+    );
+
+    const durationLimit =
+      this.selectedPlanDurationDays || +(this.form.get('maxPaymentPeriodInDays')?.value) || 0;
+    const exceedsDuration = selectedTemplates.some((template: any) => {
+      const templateDuration =
+        +(template?.durationOfPaymentInDays ?? template?.durationInDays ?? 0) || 0;
+      return durationLimit > 0 && templateDuration > durationLimit;
+    });
+
+    const errors = { ...(control.errors || {}) };
+
+    if (paymentMode === 'Installments' && selectedIds.length === 0) {
+      errors['required'] = true;
+    } else {
+      delete errors['required'];
+    }
+
+    if (exceedsDuration) {
+      errors['templateDurationExceedsPlanDuration'] = true;
+    } else {
+      delete errors['templateDurationExceedsPlanDuration'];
+    }
+
+    control.setErrors(Object.keys(errors).length ? errors : null);
+  }
+
+  enforceFamilyPlanEnrollmentMode() {
+    const maxFamily = +(this.form.get('maxFamilyMembers')?.value) || 0;
+    const enrollmentMode = this.form.get('enrollmentMode');
+
+    if (!enrollmentMode) return;
+
+    if (maxFamily > 0 && enrollmentMode.value !== 'ApplicationForm') {
+      enrollmentMode.setValue('ApplicationForm', { emitEvent: false });
+      enrollmentMode.markAsDirty();
+      enrollmentMode.updateValueAndValidity({ emitEvent: false });
+      this.handleEnrollmentModeChange('ApplicationForm');
+    }
+  }
+
   toggleTemplate(id: string) {
-    const current = this.form.value.templateIds || [];
+    const current = this.form.value.installmentTemplateIds || [];
 
     this.form.patchValue({
-      templateIds: current.includes(id)
+      installmentTemplateIds: current.includes(id)
         ? current.filter((x: string) => x !== id)
         : [...current, id],
     });
   }
 
   isChecked(id: string) {
-    return (this.form.value.templateIds || []).includes(id);
+    return (this.form.value.installmentTemplateIds || []).includes(id);
   }
 
   submit() {

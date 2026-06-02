@@ -253,10 +253,10 @@ export class PaymentsComponent implements OnInit {
     this.service
       .getClubPaymentStats(this.clubId)
       .subscribe((res: any) => {
-        this.stats[0].value = `$${(res.totalReceivables || 0).toFixed(2)}`;
-        this.stats[1].value = `$${(res.overdueDues || 0).toFixed(2)}`;
+        this.stats[0].value = `${(res.totalReceivables || 0).toFixed(2)} EGP`;
+        this.stats[1].value = `${(res.overdueDues || 0).toFixed(2)} EGP`;
         this.stats[1].subtitle = `${res.overdueCount || 0} High Priority`;
-        this.stats[2].value = `$${(res.monthlyRevenue || 0).toFixed(2)}`;
+        this.stats[2].value = `${(res.monthlyRevenue || 0).toFixed(2)} EGP`;
       });
   }
 
