@@ -85,8 +85,8 @@
             <!-- Currency -->
             <ng-container *ngIf="col?.type === 'currency'">
               <div class="flex items-center gap-1 text-darkGray dark:text-white font-medium">
-                <span class="text-gray-400 dark:text-gray-500 font-normal">$</span>
                 <span>{{ (row?.[col.key] !== null && row?.[col.key] !== undefined) ? (row?.[col.key] | number:'1.2-2') : '0.00' }}</span>
+                <span class="text-gray-400 dark:text-gray-500 font-normal">EGP</span>
               </div>
             </ng-container>
 
