@@ -264,14 +264,6 @@
                     class="bg-gray-100 dark:bg-darkBorder text-mediumGray px-2 py-0.5 rounded-full font-medium">
                 Max {{ ticket.maxPerMember }} per member
               </span>
-              <span *ngIf="ticket.minAge || ticket.maxAge"
-                    class="bg-gray-100 dark:bg-darkBorder text-mediumGray px-2 py-0.5 rounded-full font-medium">
-                Age: {{ ticket.minAge || 0 }}–{{ ticket.maxAge || '∞' }}
-              </span>
-              <span *ngIf="ticket.genderRestriction"
-                    class="bg-gray-100 dark:bg-darkBorder text-mediumGray px-2 py-0.5 rounded-full font-medium">
-                {{ ticket.genderRestriction }} only
-              </span>
             </div>
           </div>
 

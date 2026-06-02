@@ -80,7 +80,7 @@
         </div>
 
         <!-- Max Per Member -->
-        <div>
+        <div *ngIf="form.get('category')?.value === 'Guest' || form.get('category')?.value === 'FamilyMember'">
           <label class="text-sm font-semibold text-darkGray dark:text-white block mb-1.5">Max Per Member</label>
           <input
             type="number"
@@ -93,61 +93,6 @@
                    focus:ring-2 focus:ring-primary/20 focus:border-primary
                    outline-none transition-all placeholder:text-gray-300"
           />
-        </div>
-
-
-
-        <!-- Age Restriction -->
-        <div>
-          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-2">Age Restriction</label>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs text-mediumGray block mb-1">Min Age</label>
-              <input
-                type="number"
-                formControlName="minAge"
-                min="0"
-                max="120"
-                placeholder="No min"
-                class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-darkCard
-                       border border-gray-100 dark:border-darkBorder
-                       text-darkGray dark:text-white text-sm
-                       focus:ring-2 focus:ring-primary/20 focus:border-primary
-                       outline-none transition-all placeholder:text-gray-300"
-              />
-            </div>
-            <div>
-              <label class="text-xs text-mediumGray block mb-1">Max Age</label>
-              <input
-                type="number"
-                formControlName="maxAge"
-                min="0"
-                max="120"
-                placeholder="No max"
-                class="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-darkCard
-                       border border-gray-100 dark:border-darkBorder
-                       text-darkGray dark:text-white text-sm
-                       focus:ring-2 focus:ring-primary/20 focus:border-primary
-                       outline-none transition-all placeholder:text-gray-300"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Gender Restriction -->
-        <div>
-          <label class="text-sm font-semibold text-darkGray dark:text-white block mb-2">Gender Restriction</label>
-          <div class="flex gap-2">
-            <button
-              *ngFor="let g of genderOptions"
-              type="button"
-              (click)="form.patchValue({ genderRestriction: g })"
-              class="flex-1 py-2 rounded-xl border-2 text-sm font-semibold transition-all"
-              [ngClass]="form.get('genderRestriction')?.value === g
-                ? 'border-primary bg-primary/5 text-primary dark:text-darkPrimary dark:border-darkPrimary'
-                : 'border-gray-200 dark:border-darkBorder text-mediumGray'"
-            >{{ g }}</button>
-          </div>
         </div>
 
       </form>

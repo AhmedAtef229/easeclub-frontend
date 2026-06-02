@@ -37,6 +37,9 @@ export class TicketModalComponent implements OnInit {
 
   setCategory(cat: TicketCategory) {
     this.form.patchValue({ category: cat });
+    if (cat === 'Member' || cat === 'Public') {
+      this.form.patchValue({ maxPerMember: null });
+    }
   }
 
   submit() {
@@ -45,16 +48,17 @@ export class TicketModalComponent implements OnInit {
       return;
     }
     const v = this.form.value;
+    const isGuestOrFamily = v.category === 'Guest' || v.category === 'FamilyMember';
     this.save.emit({
       eventId: this.eventId,
       category: v.category,
       basePrice: +v.basePrice,
       totalQuantity: +v.totalQuantity,
-      maxPerMember: v.maxPerMember ? +v.maxPerMember : null,
+      maxPerMember: isGuestOrFamily && v.maxPerMember ? +v.maxPerMember : null,
       requiresMembership: v.category === 'Member' || v.category === 'FamilyMember',
-      minAge: v.minAge ? +v.minAge : null,
-      maxAge: v.maxAge ? +v.maxAge : null,
-      genderRestriction: v.genderRestriction === 'Any' ? null : v.genderRestriction,
+      minAge: null,
+      maxAge: null,
+      genderRestriction: null,
     });
   }
 }
